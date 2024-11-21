@@ -1,0 +1,16 @@
+{
+  "name": "Buró de Crédito Ecuador",
+  "version": "0.0.1",
+  "description": "Obtén tu información crediticia de manera sencilla y al instante.",
+  "author": "juancuestav <juanbryanc@gmail.com>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/cli": "^6.2.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/preferences": "^6.0.2",
+    "@capacitor/status-bar": "^6.0.1",
+    "@capacitor/splash-screen": "^6.0.3"
+  }
+}

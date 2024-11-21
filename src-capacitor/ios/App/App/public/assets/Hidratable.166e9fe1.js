@@ -1,0 +1,1 @@
+class r{hydrate(t){for(const s in this){const e=this[s];e instanceof r?e.hydrate(t[s]):t.hasOwnProperty(s)&&(this[s]=t[s])}return this}createCopy(){const t=this.constructor();return t.hydrate(this),t}}export{r as H};

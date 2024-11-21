@@ -1,1 +1,15 @@
 // app global css in SCSS form
+@import './custom-styles-light.scss';
+@import './custom-styles-dark.scss';
+@import './general.scss';
+@import './router-transitions.scss';
+
+@font-face {
+  font-family: customfont;
+  src: url(./fonts/Quicksand-SemiBold.ttf);
+}
+
+// declare a class which applies it
+.my-font {
+  font-family: 'customfont';
+}

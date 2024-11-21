@@ -1,0 +1,1 @@
+var s=Object.defineProperty;var i=(a,t,d)=>t in a?s(a,t,{enumerable:!0,configurable:!0,writable:!0,value:d}):a[t]=d;var e=(a,t,d)=>(i(a,typeof t!="symbol"?t+"":t,d),d);import{H as l}from"./Hidratable.166e9fe1.js";class n extends l{constructor(){super();e(this,"id");e(this,"created_at");e(this,"updated_at");this.id=null,this.created_at=null,this.updated_at=null}}export{n as E};

@@ -1,0 +1,1 @@
+import{b as a}from"./index.6072a1b1.js";import{c}from"./vue-i18n.runtime.0ca83697.js";var o={failed:"Action failed",success:"Action was successful"},n={"en-US":o},i=a(({app:e})=>{const s=c({locale:"en-US",legacy:!1,messages:n});e.use(s)});export{i as default};
