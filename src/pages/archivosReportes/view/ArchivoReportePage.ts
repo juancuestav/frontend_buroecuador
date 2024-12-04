@@ -8,6 +8,8 @@ import SimpleLayout from 'src/shared/contenedor/modules/simple/view/SimpleLayout
 import EstadosComponent from 'components/tables/view/EstadosComponent.vue'
 import EssentialTable from 'components/tables/view/EssentialTable.vue'
 import GestorArchivos from 'components/gestorArchivos/GestorArchivos.vue'
+import PdfViewer from 'src/components/pdfViewer/PdfViewer.vue'
+// import PdfViewer2 from 'components/pdfViewer/PdfViewer2.vue'
 
 import { useAuthenticationStore } from 'stores/authentication'
 import { ArchivoReporte } from '../domain/ArchivoReporte'
@@ -28,6 +30,8 @@ export default defineComponent({
     EstadosComponent,
     EssentialTable,
     GestorArchivos,
+    PdfViewer,
+    // PdfViewer2,
   },
   setup() {
     /*********
@@ -55,6 +59,7 @@ export default defineComponent({
     /*************
      * Variables
      ************/
+    const refPdfViewer = ref()
     const puedeSubirArchivos = computed(
       () =>
         authenticationStore.esAdministrador || authenticationStore.esEmpleado
@@ -197,6 +202,18 @@ export default defineComponent({
       },
     }
 
+    const btnVisualizar: CustomActionTable<ArchivoReporte> = {
+      titulo: 'Visualizar',
+      icono: 'bi-eye',
+      color: 'primary',
+      accion: ({ entidad }) => {
+        refPdfViewer.value.abrir(
+          entidad.archivos[0].ruta
+          // 'https://www.uv.mx/pozarica/caa-conta/files/2016/02/REGULAR-AND-IRREGULAR-VERBS.pdf'
+        )
+      },
+    }
+
     const btnActualizarListado: CustomActionTable<ArchivoReporte> = {
       titulo: 'Actualizar listado de archivos',
       icono: 'bi-arrow-clockwise',
@@ -238,6 +255,7 @@ export default defineComponent({
 
     return {
       id,
+      refPdfViewer,
       refArchivo,
       mixin,
       listado,
@@ -252,10 +270,12 @@ export default defineComponent({
       btnRenombrar,
       btnEliminar,
       btnActualizarListado,
+      btnVisualizar,
       esCliente,
-      columnas: puedeSubirArchivos.value
+      /* columnas: puedeSubirArchivos.value
         ? [...configuracionColumnasArchivoReporte, accionesTabla]
-        : configuracionColumnasArchivoReporte,
+        : configuracionColumnasArchivoReporte, */
+      columnas: [...configuracionColumnasArchivoReporte, accionesTabla],
       puedeSubirArchivos,
       tipoSeleccionUsuario,
       consultarUsuarios,

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Buró de Crédito Ecuador</string>
-    <string name="title_activity_main">App</string>
+    <string name="title_activity_main">Buró de Crédito Ecuador</string>
     <string name="package_name">org.capacitor.quasar.buroecuador</string>
     <string name="custom_url_scheme">org.capacitor.quasar.buroecuador</string>
 </resources>

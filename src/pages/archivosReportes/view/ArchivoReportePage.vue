@@ -179,10 +179,20 @@
               :accion2Header="btnActualizarMisArchivos"
               :accion1="btnRenombrar"
               :accion2="btnEliminar"
+              :accion3="btnVisualizar"
             ></essential-table>
           </div>
         </transition>
       </div>
+
+      <!-- <PdfViewer
+        ref="refPdfViewer"
+        pdfUrl="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
+      ></PdfViewer> -->
+
+      <!-- <PdfViewer2 pdfUrl="https://www.burodecredito.ec/storage/archivos_reportes/2/Reporte548_1221654848.pdf"></PdfViewer2> -->
+
+      <PdfViewer ref="refPdfViewer"></PdfViewer>
     </template>
   </simple-layout>
 </template>

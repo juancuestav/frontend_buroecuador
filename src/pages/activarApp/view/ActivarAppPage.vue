@@ -75,9 +75,6 @@
         </q-card-section>
       </q-card>
     </div>
-    <!-- <div id="boton-whatsapp" class="flotante"></div> -->
-
-    <PdfViewer></PdfViewer>
   </q-page>
 </template>
 

@@ -735,46 +735,46 @@
                 </span>
 
                 <span v-if="col.name === 'archivos'">
-                    <q-btn
-                      v-if="col.value.length > 1"
-                      dense
-                      no-caps
-                      unelevated
-                      no-wrap
-                      class="q-px-sm text-primary border-primary"
-                      @click="
-                        verVisorArchivos({
-                          entidad: props.row,
-                          posicion: props.rowIndex,
-                        })
-                      "
-                    >
-                      <q-icon
-                        name="bi-archive"
-                        size="xs"
-                        class="q-mr-sm"
-                      ></q-icon>
-                      {{ col.value }}
-                      <!-- {{ props.value.length + ' archivos' }} -->
-                    </q-btn>
+                  <q-btn
+                    v-if="col.value.length > 1"
+                    dense
+                    no-caps
+                    unelevated
+                    no-wrap
+                    class="q-px-sm text-primary border-primary"
+                    @click="
+                      verVisorArchivos({
+                        entidad: props.row,
+                        posicion: props.rowIndex,
+                      })
+                    "
+                  >
+                    <q-icon
+                      name="bi-archive"
+                      size="xs"
+                      class="q-mr-sm"
+                    ></q-icon>
+                    {{ col.value }}
+                    <!-- {{ props.value.length + ' archivos' }} -->
+                  </q-btn>
 
-                    <q-btn
-                      v-if="col.value.length == 1"
-                      dense
-                      no-caps
-                      unelevated
-                      no-wrap
-                      class="q-px-sm text-primary border-primary"
-                      :href="col.value[0].ruta"
-                      target="_blank"
-                    >
-                      <q-icon
-                        name="bi-download"
-                        size="xs"
-                        class="q-mr-sm"
-                      ></q-icon>
-                      {{ 'Descargar' }}
-                    </q-btn>
+                  <q-btn
+                    v-if="col.value.length == 1"
+                    dense
+                    no-caps
+                    unelevated
+                    no-wrap
+                    class="q-px-sm text-primary border-primary"
+                    :href="col.value[0].ruta"
+                    target="_blank"
+                  >
+                    <q-icon
+                      name="bi-download"
+                      size="xs"
+                      class="q-mr-sm"
+                    ></q-icon>
+                    {{ 'Descargar' }}
+                  </q-btn>
                 </span>
 
                 <div :class="{ 'q-mb-xs': $q.screen.xs }">
@@ -919,6 +919,7 @@
                       'archivos',
                     ].includes(col.name)
                   "
+                  class="ellipsis-3-lines"
                   >{{ col.value }}</span
                 >
               </q-item-label>

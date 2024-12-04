@@ -57,7 +57,7 @@ export function descargarArchivoUrl(url: string): void {
 
 export async function downloadFile(data, titulo, formato) {
   const fileURL = URL.createObjectURL(
-    new Blob([data], { type: `appication/${formato}` })
+    new Blob([data], { type: `application/${formato}` })
   )
   const link = document.createElement('a')
   link.href = fileURL

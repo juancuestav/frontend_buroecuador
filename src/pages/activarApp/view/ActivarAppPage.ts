@@ -3,10 +3,8 @@ import { AxiosHttpRepository } from 'shared/http/infraestructure/AxiosHttpReposi
 import { useConfiguracionGeneralStore } from 'stores/configuracion_general'
 import { defineComponent, ref } from 'vue'
 import { endpoints } from 'config/api'
-import PdfViewer from 'src/components/pdfViewer/PdfViewer.vue'
 
 export default defineComponent({
-  components: { PdfViewer },
   setup() {
     /********
      * Store

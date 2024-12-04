@@ -2,9 +2,16 @@
 	"appId": "org.capacitor.quasar.buroecuador",
 	"appName": "App",
 	"webDir": "www",
+	"bundledWebRuntime": false,
+	"android": {
+		"allowMixedContent": true,
+		"webContentsDebuggingEnabled": true
+	},
 	"packageClassList": [
 		"AppPlugin",
 		"PreferencesPlugin",
-		"StatusBarPlugin"
+		"StatusBarPlugin",
+		"SplashScreenPlugin",
+		"CAPBrowserPlugin"
 	]
 }

@@ -1,5 +1,12 @@
 {
   "appId": "org.capacitor.quasar.buroecuador",
-  "appName": "App",
-  "webDir": "www"
+  "appName": "Buró de Crédito Ecuador",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": true,
+    "versionCode": 2,
+    "versionName": "1.0.1"
+  }
 }
