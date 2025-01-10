@@ -157,7 +157,7 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      class="bg-drawer border-right q-px-sm my-font"
+      class="bg-solid rounded-drawer q-px-sm my-font"
     >
       <!-- Drawer Header -->
       <div class="absolute-top text-center q-pa-md">
@@ -203,11 +203,11 @@
 
       <router-view v-slot="{ Component }">
         <!-- <essential-loading></essential-loading> -->
-        <transition name="scale" mode="out-in">
+        <!-- <transition name="scale" mode="out-in"> -->
           <keep-alive :exclude="['tablero_principal']">
             <component :is="Component" />
           </keep-alive>
-        </transition>
+        <!-- </transition> -->
       </router-view>
       <div class="text-rigdht absolute-bottodm">
         <footer-component></footer-component>

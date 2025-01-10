@@ -6,7 +6,7 @@
 
     <div v-if="titulo" class="text-h6 q-mb-md">{{ titulo }}</div>
 
-    <div class="bg-desenfoque border-white rounded q-pa-md">
+    <div class="bg-redsq-pa-md">
       <slot name="formulario" />
     </div>
 

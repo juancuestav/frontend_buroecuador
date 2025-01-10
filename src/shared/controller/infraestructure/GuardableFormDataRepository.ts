@@ -4,7 +4,6 @@ import { Endpoint } from 'shared/http/domain/Endpoint'
 import { ApiError } from '../../error/domain/ApiError'
 import { ResponseItem } from '../domain/ResponseItem'
 import { AxiosError, AxiosResponse } from 'axios'
-import { ParamsType } from 'config/types'
 
 export class GuardableFormDataRepository<T> {
   private readonly httpRepository = AxiosHttpRepository.getInstance()
@@ -16,17 +15,17 @@ export class GuardableFormDataRepository<T> {
 
   async guardar(
     formData: FormData,
-    params?: ParamsType
+    id?: number
   ): Promise<ResponseItem<T, HttpResponsePost<T>>> {
     try {
-      const ruta = this.httpRepository.getEndpoint(this.endpoint, params)
-      // const formData = this.convertirJsonAFormData(formData)
+      // const ruta = this.httpRepository.getEndpoint(this.endpoint, params)
+      const ruta =
+        this.httpRepository.getEndpoint(this.endpoint) + '/files/' + id //, params)
       const response: AxiosResponse = await this.httpRepository.post(
         ruta,
         formData,
         {
           headers: {
-            // ...(await AxiosHttpRepository.getHeaderToken()).headers,
             'Content-Type': 'multipart/form-data',
           },
         }
@@ -41,18 +40,4 @@ export class GuardableFormDataRepository<T> {
       throw new ApiError(axiosError)
     }
   }
-
-  /* convertirJsonAFormData(entidad: any, files?): FormData {
-    const formData = new FormData();
-
-    for (const key in entidad) {
-      if (entidad.hasOwnProperty(key)) {
-        formData.append(key, entidad[key]);
-      }
-    }
-
-    if(files) formData.append('file', files[0])
-
-    return formData
-  } */
 }

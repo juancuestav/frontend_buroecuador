@@ -10,6 +10,7 @@ export class EntidadAuditable extends Hidratable implements Auditable {
   // fecha_modifica: string | null
   created_at: string | null
   updated_at: string | null
+  isComponentFilesModified: boolean | null = false // Al momento de consultar un registro que tiene archivos y este se modifica (archivos) esta variable cambia a true
 
   constructor() {
     super()

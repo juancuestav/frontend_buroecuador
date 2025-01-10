@@ -1,5 +1,5 @@
 <template>
-  <q-page class="bg-grey-2f">
+  <q-page class="bg-grey-4">
     <div class="row items-center empresa">
       <q-avatar square>
         <img :src="!$q.dark.isActive ? logoClaro : logoOscuro" />
@@ -26,13 +26,10 @@
 
       <!-- Right side -->
       <div
-        class="col-12 bg-grey-2 col-md-4 column items-center justify-center bg-white window-height q-px-sm"
+        class="col-12 bg-grey-4 col-md-4 column items-center justify-center bg-white window-height q-px-sm"
       >
         <div class="rounded full-width q-mb-lg">
-          <form
-            @submit.prevent="login"
-            class="rounded bg-grey-2 q-pa-md q-py-lg"
-          >
+          <form @submit.prevent="login" class="rounded q-pa-md q-py-lg">
             <div class="q-mb-sm">
               <!-- <h2>Bienvenidos a {{ appName  }}</h2> -->
               <div class="text-center text-bold q-mb-md">

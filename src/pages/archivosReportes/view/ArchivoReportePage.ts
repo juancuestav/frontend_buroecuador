@@ -48,13 +48,21 @@ export default defineComponent({
     )
 
     const {
-      entidad: verificaCuenta,
+      entidad: archivoReporte,
       listado,
       listadosAuxiliares,
     } = mixin.useReferencias()
 
-    const { listar, cargarVista, obtenerListados, editarParcial, eliminar } =
-      mixin.useComportamiento()
+    const {
+      listar,
+      cargarVista,
+      obtenerListados,
+      editarParcial,
+      eliminar,
+      guardar,
+    } = mixin.useComportamiento()
+
+    const { onGuardado } = mixin.useHooks()
 
     /*************
      * Variables
@@ -86,13 +94,20 @@ export default defineComponent({
     const { usuarios, filtrarUsuarios } =
       useFiltrosGenerales(listadosAuxiliares)
 
-    async function subirArchivos() {
-      await refArchivo.value.subir({
-        titulo: 'Titulo',
-        user: filtroUsuario.user_id,
-        reporte: 1,
-      })
+    const subirArchivos = async (id: number) =>
+      await refArchivo.value.subir({ id })
+
+    async function guardarArchivos() {
+      archivoReporte.user = filtroUsuario.user_id
+      archivoReporte.reporte = 1
+      guardar(archivoReporte)
+      // await refArchivo.value.subir()
     }
+
+    onGuardado((id?: number) => {
+      if (id) setTimeout(() => subirArchivos(id), 1)
+      listarArchivos()
+    })
 
     /* const seleccionarTabEmpleados = (tipoSeleccion) => {
       filtroUsuario.user_id = null
@@ -255,11 +270,12 @@ export default defineComponent({
 
     return {
       id,
+      archivoReporte,
       refPdfViewer,
       refArchivo,
       mixin,
       listado,
-      verificaCuenta,
+      guardarArchivos,
       configuracionColumnasArchivoReporte,
       filtroUsuario,
       listadosAuxiliares,

@@ -118,10 +118,10 @@ export abstract class TransaccionSimpleController<T extends EntidadAuditable>
     return await this.descargableRepository.descargarListado(params)
   }
 
-  async guardarFormData(formData: FormData, params?: any) {
+  async guardarFormData(formData: FormData, id?: number) { //params?: any) {
     return await this.guardableFormDataRepository.guardar(
       formData,
-      params,
+      id,
     )
   }
 

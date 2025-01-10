@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <q-page class="bg-grey-4">
     <div v-if="!$q.screen.xs" class="row items-center empresa">
       <q-avatar square>
         <img :src="!$q.dark.isActive ? logoClaro : logoOscuro" />
@@ -27,7 +27,7 @@
 
       <!-- Right side -->
       <div
-        class="col-12 bg-grey-2 col-md-5 row items-center justify-center bg-white window-height"
+        class="col-12 bg-grey-4 col-md-5 row items-center justify-center bg-white window-height"
       >
         <form
           @submit.prevent="enviarCorreoRecuperacion"

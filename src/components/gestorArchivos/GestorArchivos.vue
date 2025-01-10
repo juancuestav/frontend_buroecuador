@@ -35,9 +35,9 @@
     </div>
   </transition>
 
-  <slot  v-if="quiero_subir_archivos" name="boton-subir"></slot>
+  <slot v-if="quiero_subir_archivos" name="boton-subir"></slot>
 
-  <!-- <div v-if="listadoArchivos.length" class="col-12 q-mb-sm">
+  <div v-if="listadoArchivos.length" class="col-12 q-mb-sm">
     <essential-table
       :titulo="`Existen ${listadoArchivos.length} archivos compartidos hasta el momento`"
       :configuracionColumnas="columnas"
@@ -52,7 +52,7 @@
       :accion1="btnDescargar"
       :accion2="btnEliminar"
     ></essential-table>
-  </div> -->
+  </div>
 </template>
 
 <script src="./GestorArchivos.ts"></script>

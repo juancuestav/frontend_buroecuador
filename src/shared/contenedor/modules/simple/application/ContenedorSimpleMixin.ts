@@ -302,6 +302,7 @@ export class ContenedorSimpleMixin<
         .then(({ response }) => {
           this.notificaciones.notificarCorrecto(response.data.mensaje)
           this.eliminarElementoListaArchivosActual(data)
+          this.entidad.isComponentFilesModified = true
           // this.reestablecer()
           if (callback) callback()
         })
@@ -532,22 +533,23 @@ export class ContenedorSimpleMixin<
   } */
 
   /*******************
-   * Seccion FormData
+   * Seccion FormData - Solo utilizar para guardar archivos - No enviar la entidad por aqui
    *******************/
   // Guardar
-  private async guardarFormData(formData: FormData) {
+  private async guardarFormData(formData: FormData, id?: number) {
     this.hooks.onBeforeGuardar()
 
     this.cargarVista(async () => {
       try {
         const { response } = await this.controller.guardarFormData(
           formData,
-          this.argsDefault
+          id
+          // this.argsDefault
         )
 
         this.notificaciones.notificarCorrecto(response.data.mensaje)
-        this.agregarElementoListadoActual(response.data.modelo)
-        this.entidad.hydrate(response.data.modelo)
+        // this.agregarElementoListadoActual(response.data.modelo)
+        // this.entidad.hydrate(response.data.modelo)
         this.hooks.onGuardado()
         this.reestablecer()
       } catch (error: unknown) {

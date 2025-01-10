@@ -19,6 +19,12 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: store.can('acceder.tablero'),
   },
   {
+    title: 'Accesos directos',
+    icon: 'bi-box-arrow-up-right',
+    link: 'accesos-directos',
+    can: store.can('acceder.accesos_directos'),
+  },
+  {
     title: 'Formulario de contacto',
     icon: 'bi-bell',
     link: 'formulario-contacto',

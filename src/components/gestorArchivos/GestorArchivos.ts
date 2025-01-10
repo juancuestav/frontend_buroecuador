@@ -58,17 +58,16 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: ['inicializado'],
+  emits: ['inicializado', 'nombre-archivo'],
   setup(props, { emit }) {
     /********
      * Mixin
      *********/
-    const { listadoArchivos } = props.mixin.useReferencias()
+    const { listadoArchivos, entidad } = props.mixin.useReferencias()
     const { eliminarArchivo, listarArchivos, guardarFormData } =
       props.mixin.useComportamiento()
 
-    const { notificarError, notificarAdvertencia, confirmar } =
-      useNotificaciones()
+    const { notificarError, notificarAdvertencia } = useNotificaciones()
 
     function listarArchivosAlmacenados(id: number, params: ParamsType) {
       listarArchivos(id, params)
@@ -77,6 +76,9 @@ export default defineComponent({
     const cantElementos = ref(0)
     const tamanioListado = ref(0)
     let paramsForm
+    let idEntidad
+
+    console.log(entidad)
 
     /***************
      * Botones tabla
@@ -87,10 +89,9 @@ export default defineComponent({
       color: 'negative',
       visible: () => props.permitirEliminar,
       accion: async ({ entidad }) => {
-        confirmar(
-          'Esta operación es irreversible. El archivo se eliminará de forma instantánea.',
-          () => eliminarArchivo(entidad)
-        )
+        await eliminarArchivo(entidad)
+        // entidad.isComponentFilesModified = true
+        console.log(entidad)
       },
     }
 
@@ -124,7 +125,7 @@ export default defineComponent({
       }
 
       try {
-        await guardarFormData(fd)
+        await guardarFormData(fd, idEntidad)
 
         files.value = []
         // if (props.listarAlGuardar) listadoArchivos.value.push(response.data.modelo)
@@ -139,6 +140,7 @@ export default defineComponent({
 
     function subir(params: ParamsType) {
       paramsForm = params
+      idEntidad = params.id
       if (refGestor.value) {
         refGestor.value.upload()
         refGestor.value.reset()
@@ -163,10 +165,16 @@ export default defineComponent({
         cantElementos.value += 1
       }
       tamanioListado.value += obtenerSumatoriaTamanio(files)
+      entidad.isComponentFilesModified = true
+
+      // Si hay un único archivo cargado
+      const fileName = files[0]?.name // Obtiene el nombre del archivo
+      emit('nombre-archivo', fileName)
     }
     function onFileRemoved(file) {
       cantElementos.value -= 1
       tamanioListado.value -= obtenerSumatoriaTamanio(file)
+      entidad.isComponentFilesModified = true
     }
     function obtenerSumatoriaTamanio(files) {
       const sumatoria = files.reduce((total, file) => total + file.size, 0)

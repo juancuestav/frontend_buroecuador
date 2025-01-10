@@ -188,6 +188,13 @@ const routes: RouteRecordRaw[] = [
           import('pages/archivosReportes/view/ArchivoReportePage.vue'),
         meta: { requiresAuth: true },
       },
+      {
+        path: '/accesos-directos',
+        name: 'accesos_directos',
+        component: () =>
+          import('pages/accesoDirecto/view/AccesoDirectoPage.vue'),
+        meta: { requiresAuth: true },
+      },
       /******************
        * Administracion
        ******************/

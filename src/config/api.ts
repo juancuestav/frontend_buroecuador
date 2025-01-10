@@ -45,6 +45,7 @@ export const endpoints = {
   verificar_cuenta: new Endpoint('verificar-cuenta'),
   archivos_reportes: new Endpoint('archivos-reportes'),
   archivos: new Endpoint('archivos'),
+  accesos_directos: new Endpoint('accesos-directos'),
   // Administracion
   permisos: new Endpoint('permisos'),
   permisos_administrar: new Endpoint('permisos_administrar'),

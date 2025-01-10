@@ -1,7 +1,7 @@
 <template>
   <simple-layout :mixin="mixin" :mostrarButtonSubmits="false" :titulo="titulo">
     <template #formulario>
-      <div class="row">
+      <div class="row bg-desenfoque q-pa-md rounded-card">
         <div v-if="puedeSubirArchivos" class="col-12 q-mb-md">
           <q-btn-toggle
             v-model="filtroUsuario.tipo_seleccion"
@@ -139,6 +139,7 @@
               :mixin="mixin"
               :permitir-eliminar="true"
               :multiple="false"
+              @nombre-archivo="(titulo) => archivoReporte.titulo = titulo"
             >
               <template #boton-subir>
                 <q-btn
@@ -146,7 +147,7 @@
                   no-caps
                   unelevated
                   class="full-width q-mb-lg"
-                  @click="subirArchivos()"
+                  @click="guardarArchivos()"
                 >
                   <q-icon name="bi-upload" class="q-mr-sm" size="xs"></q-icon>
                   Subir archivos seleccionados</q-btn
