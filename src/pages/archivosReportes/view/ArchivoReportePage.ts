@@ -1,6 +1,11 @@
 import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
 import { configuracionColumnasArchivoReporte } from '../domain/configuracionColumnasArchivoReporte'
-import { computed, defineComponent, reactive, ref } from 'vue'
+import { CustomActionPrompt } from 'components/tables/domain/CustomActionPrompt'
+import { CustomActionTable } from 'components/tables/domain/CustomActionTable'
+import { useFiltrosGenerales } from 'shared/filtrosGenerales'
+import { useNotificaciones } from 'shared/notificaciones'
+import { computed, defineComponent, ref } from 'vue'
+import { accionesTabla } from 'config/utils'
 
 // Componentes
 import SelectorImagen from 'components/SelectorImagen.vue'
@@ -9,17 +14,12 @@ import EstadosComponent from 'components/tables/view/EstadosComponent.vue'
 import EssentialTable from 'components/tables/view/EssentialTable.vue'
 import GestorArchivos from 'components/gestorArchivos/GestorArchivos.vue'
 import PdfViewer from 'src/components/pdfViewer/PdfViewer.vue'
+import SelectorUsuario from 'components/inputs/selectorUsuario/view/SelectorUsuario.vue'
 // import PdfViewer2 from 'components/pdfViewer/PdfViewer2.vue'
 
 import { useAuthenticationStore } from 'stores/authentication'
 import { ArchivoReporte } from '../domain/ArchivoReporte'
 import { ArchivoReporteController } from '../infraestructure/ArchivoReporteController'
-import { UsuarioController } from 'pages/usuarios/infraestructure/UsuarioController'
-import { useFiltrosGenerales } from 'shared/filtrosGenerales'
-import { CustomActionTable } from 'components/tables/domain/CustomActionTable'
-import { accionesTabla } from 'config/utils'
-import { useNotificaciones } from 'shared/notificaciones'
-import { CustomActionPrompt } from 'components/tables/domain/CustomActionPrompt'
 import { Usuario } from 'pages/usuarios/domain/Usuario'
 
 export default defineComponent({
@@ -31,6 +31,7 @@ export default defineComponent({
     EssentialTable,
     GestorArchivos,
     PdfViewer,
+    SelectorUsuario,
     // PdfViewer2,
   },
   setup() {
@@ -53,16 +54,10 @@ export default defineComponent({
       listadosAuxiliares,
     } = mixin.useReferencias()
 
-    const {
-      listar,
-      cargarVista,
-      obtenerListados,
-      editarParcial,
-      eliminar,
-      guardar,
-    } = mixin.useComportamiento()
+    const { listar, editarParcial, eliminar, guardar } =
+      mixin.useComportamiento()
 
-    const { onGuardado } = mixin.useHooks()
+    const { onGuardado, onReestablecer } = mixin.useHooks()
 
     /*************
      * Variables
@@ -73,20 +68,12 @@ export default defineComponent({
         authenticationStore.esAdministrador || authenticationStore.esEmpleado
     )
 
-    const tipoSeleccionUsuario = {
-      POR_IDENTIFICATION: 'Buscar usuario por su identificación',
-      POR_NOMBRES: 'Buscar usuario por sus nombres o apellidos',
-    }
-    const filtroUsuario = reactive<any>({
-      user_id: null,
-      identificacion: null,
-      tipo_seleccion: tipoSeleccionUsuario.POR_IDENTIFICATION,
-    })
-
     const refArchivo = ref()
     const id = ref()
     const { prompt, confirmar, notificarInformacion } = useNotificaciones()
     const esCliente = authenticationStore.esCliente
+    let idUsuario: number | null = null
+    let usuariosSeleccionados: Usuario[] = []
 
     /************
      * Funciones
@@ -98,86 +85,29 @@ export default defineComponent({
       await refArchivo.value.subir({ id })
 
     async function guardarArchivos() {
-      archivoReporte.user = filtroUsuario.user_id
+      archivoReporte.user = archivoReporte.user
       archivoReporte.reporte = 1
       guardar(archivoReporte)
-      // await refArchivo.value.subir()
-    }
-
-    onGuardado((id?: number) => {
-      if (id) setTimeout(() => subirArchivos(id), 1)
-      listarArchivos()
-    })
-
-    /* const seleccionarTabEmpleados = (tipoSeleccion) => {
-      filtroUsuario.user_id = null
-      if (tipoSeleccion === tipoSeleccionUsuario.POR_NOMBRES && listadosAuxiliares.empleados?.length === 0)
-        cargarVista(async () => {
-          await obtenerListados({
-            empleados: {
-              controller: new UsuarioController(),
-              params: {
-                campos: 'id,name,apellidos',
-                estado: 1,
-              },
-            },
-          })
-        })
-    } */
-
-    const consultarUsuarios = async () => {
-      await cargarVista(async () => {
-        await obtenerListados({
-          usuarios: {
-            controller: new UsuarioController(),
-            params: {
-              campos: 'id,name,apellidos,identificacion',
-              estado: 1,
-            },
-          },
-        })
-      })
     }
 
     const listarArchivos = async () => {
       await listar({
-        user_id:
-          filtroUsuario.tipo_seleccion === tipoSeleccionUsuario.POR_NOMBRES
-            ? filtroUsuario.user_id
-            : null,
-        identificacion:
-          filtroUsuario.tipo_seleccion ===
-          tipoSeleccionUsuario.POR_IDENTIFICATION
-            ? filtroUsuario.identificacion
-            : null,
+        user_id: archivoReporte.user,
       })
-
-      if (
-        filtroUsuario.tipo_seleccion === tipoSeleccionUsuario.POR_IDENTIFICATION
-      ) {
-        filtroUsuario.user_id = listado.value.length
-          ? listado.value[0].user
-          : buscarIdUsuarioPorIdentificacion(filtroUsuario.identificacion)
-      }
 
       if (listado.value.length === 0)
         notificarInformacion('Este usuario no tiene archivos subidos aún')
     }
 
     const listarMisArchivos = async () => {
-      filtroUsuario.user_id = authenticationStore.user.id
+      archivoReporte.user = authenticationStore.user.id
       await listar({
-        user_id: filtroUsuario.user_id,
+        user_id: archivoReporte.user,
       })
 
       if (listado.value.length === 0)
         notificarInformacion('Este usuario no tiene archivos subidos aún')
     }
-
-    const buscarIdUsuarioPorIdentificacion = (identificacion: string) =>
-      listadosAuxiliares.usuarios.find(
-        (u: Usuario) => u.identificacion === identificacion
-      )?.id
 
     /*****************
      * Botones tabla
@@ -212,7 +142,11 @@ export default defineComponent({
       accion: async ({ entidad }) => {
         confirmar(
           'Esta operación es irreversible. El archivo se eliminará de manera inmediata.',
-          () => eliminar(entidad)
+          () => {
+            idUsuario = archivoReporte.user
+            usuariosSeleccionados = archivoReporte.usuarios
+            eliminar(entidad)
+          }
         )
       },
     }
@@ -245,28 +179,30 @@ export default defineComponent({
       accion: () => listarMisArchivos(),
     }
 
-    /*************
-     * Validaciones
-     **************/
-    /* const reglas = {
-      documento_identidad_anverso: { required },
-      documento_identidad_reverso: { required },
-      documento_identidad_selfie: { required },
-      user_id: { required },
-    }
+    /********
+     * Hooks
+     ********/
+    onGuardado((id, responseData) => {
+      if (id) setTimeout(async () => await subirArchivos(id), 1)
+      idUsuario = responseData.modelo.user
+      usuariosSeleccionados = archivoReporte.usuarios
+      listarArchivos()
+    })
 
-    const v$ = useVuelidate(reglas, verificaCuenta)
-    setValidador(v$.value) */
+    onReestablecer(() => {
+      archivoReporte.user = idUsuario
+      archivoReporte.usuarios = usuariosSeleccionados
+    })
 
     /*******
      * Init
      *******/
     if (!puedeSubirArchivos.value) {
-      filtroUsuario.user_id = authenticationStore.user.id
+      archivoReporte.user = authenticationStore.user.id
       listar({
-        user_id: filtroUsuario.user_id ?? '',
+        user_id: archivoReporte.user ?? '',
       })
-    } else consultarUsuarios()
+    }
 
     return {
       id,
@@ -277,7 +213,6 @@ export default defineComponent({
       listado,
       guardarArchivos,
       configuracionColumnasArchivoReporte,
-      filtroUsuario,
       listadosAuxiliares,
       subirArchivos,
       usuarios,
@@ -288,19 +223,14 @@ export default defineComponent({
       btnActualizarListado,
       btnVisualizar,
       esCliente,
-      /* columnas: puedeSubirArchivos.value
-        ? [...configuracionColumnasArchivoReporte, accionesTabla]
-        : configuracionColumnasArchivoReporte, */
       columnas: [...configuracionColumnasArchivoReporte, accionesTabla],
       puedeSubirArchivos,
-      tipoSeleccionUsuario,
-      consultarUsuarios,
-      // seleccionarTabEmpleados,
       listarMisArchivos,
       btnActualizarMisArchivos,
       titulo: authenticationStore.esCliente
         ? 'Mi buró'
         : 'Compartir archivos a clientes',
+      puedeCrear: authenticationStore.can('crear.archivos_reportes'),
     }
   },
 })

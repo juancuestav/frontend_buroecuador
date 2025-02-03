@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <!-- Navbar -->
-    <q-header class="bg-body-background text-dark">
+    <q-header class="bg-desenfoque-0 text-dark rounded-card">
       <transition name="slide-fade" mode="out-in">
         <div v-if="mostrarBuscar" class="q-pa-xs">
           <q-input
@@ -110,13 +110,13 @@
         </span>
 
         <span>
-          <q-toggle
+          <!-- <q-toggle
             v-model="modoOscuro"
             checked-icon="bi-moon-fill"
             label=""
             unchecked-icon="bi-sun-fill"
             @click="toggleDarkMode()"
-          />
+          /> -->
 
           <!-- Notificaciones -->
           <boton-notificaciones></boton-notificaciones>
@@ -157,21 +157,21 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      class="bg-solid rounded-drawer q-px-sm my-font"
+      class="q-px-s5m my-font custom-shadow5 rounded-drawer"
+      :class="{ 'bg-solid': $q.screen.xs }"
     >
       <!-- Drawer Header -->
       <div class="absolute-top text-center q-pa-md">
-        <q-avatar size="98px" square>
+        <q-avatar size="60px" class="rounded-card custom-shadow25">
           <img
             :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''"
-            height="60"
             class="q-mx-auto block"
           />
         </q-avatar>
       </div>
 
       <!-- Drawer Body -->
-      <q-scroll-area style="height: calc(100% - 150px); margin-top: 120px">
+      <q-scroll-area style="height: calc(100% - 102px); margin-top: 100px">
         <div class="text-center">
           {{ 'Buró de crédito Ecuador' }}
         </div>
@@ -190,6 +190,7 @@
               :icon="item.icon"
               :children="item.children"
               :can="item.can"
+              class="q-mx-sm"
             ></EssentialLink>
           </div>
         </q-list>
@@ -197,20 +198,20 @@
     </q-drawer>
 
     <!-- Router -->
-    <q-page-container class="bg-body-background q-pb-xl my-font">
+    <q-page-container class="bg-body-background my-font rounded-card">
       <!-- <q-page-container class="bg-body-background q-pb-xl"> -->
       <simple-chat></simple-chat>
 
       <router-view v-slot="{ Component }">
         <!-- <essential-loading></essential-loading> -->
         <!-- <transition name="scale" mode="out-in"> -->
-          <keep-alive :exclude="['tablero_principal']">
-            <component :is="Component" />
-          </keep-alive>
+        <keep-alive :exclude="['tablero_principal', 'puntuacion_cliente']" class="bg-body-background-inverso rounded-card">
+          <component :is="Component" />
+        </keep-alive>
         <!-- </transition> -->
       </router-view>
-      <div class="text-rigdht absolute-bottodm">
-        <footer-component></footer-component>
+      <div class="absolute-bottom">
+        <!-- <footer-component></footer-component> -->
       </div>
     </q-page-container>
   </q-layout>

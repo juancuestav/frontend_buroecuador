@@ -38,6 +38,27 @@ export const configuracionColumnasUsuarios: ColumnConfig<Usuario>[] = [
     sortable: true,
   },
   {
+    name: 'provincia',
+    field: 'provincia',
+    label: 'Provincia',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    name: 'canton',
+    field: 'canton',
+    label: 'Cantón',
+    align: 'left',
+    sortable: true,
+  },
+  {
+    name: 'tipo_cliente',
+    field: 'tipo_cliente',
+    label: 'Tipo de cliente',
+    align: 'left',
+    sortable: true,
+  },
+  {
     name: 'rol',
     field: 'rol',
     label: 'Rol',

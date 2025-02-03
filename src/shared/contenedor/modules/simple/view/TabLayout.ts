@@ -1,18 +1,19 @@
 // Dependencias
+import { CustomActionTable } from 'components/tables/domain/CustomActionTable'
 import { EntidadAuditable } from 'shared/entidad/domain/entidadAuditable'
 import { ColumnConfig } from 'components/tables/domain/ColumnConfig'
 import { computed, defineComponent, ref, watchEffect } from 'vue'
-// import { useAuthenticationStore } from 'stores/authentication'
+import { useCargandoStore } from 'stores/cargando'
 import { useRouter } from 'vue-router'
 import { acciones } from 'config/utils'
 
 // Componentes
-import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
-import { CustomActionTable } from 'components/tables/domain/CustomActionTable'
+import EssentialTablePagination from 'components/tables/view/EssentialTablePagination.vue'
 import ButtonSubmits from 'components/buttonSubmits/buttonSubmits.vue'
 import EssentialTable from 'components/tables/view/EssentialTable.vue'
-import { useCargandoStore } from 'stores/cargando'
-// import { getCurrentInstance } from 'vue'
+
+// Logica y controladores
+import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
 
 export default defineComponent({
   props: {
@@ -148,8 +149,12 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    paginate: {
+      type: Boolean,
+      default: false,
+    },
   },
-  components: { EssentialTable, ButtonSubmits },
+  components: { EssentialTable, ButtonSubmits, EssentialTablePagination },
   setup(props) {
     const {
       listar,
@@ -165,8 +170,6 @@ export default defineComponent({
       props.mixin.useReferencias()
 
     const Router = useRouter()
-    let listadoCargado = false
-
     let columnas: any = props.configuracionColumnas ?? []
 
     if (props.mostrarAcciones) {
@@ -182,9 +185,17 @@ export default defineComponent({
       ]
     }
 
-    if (!listadoCargado && props.mostrarListado && props.listar) {
+    /* if (!listadoCargado && props.mostrarListado && props.listar) {
       listar()
       listadoCargado = true
+    } */
+
+    if (props.mostrarListado) {
+      if (props.paginate) {
+        listar({ paginate: 1 })
+      } else {
+        listar()
+      }
     }
 
     const seleccionado = ref()

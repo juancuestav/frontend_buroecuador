@@ -6,10 +6,12 @@
 
 @font-face {
   font-family: customfont;
-  src: url(./fonts/Quicksand-SemiBold.ttf);
+  // src: url(./fonts/Nunito-Regular.ttf);
+  src: url(./fonts/Lato-Regular.ttf);
+  // src: url(./fonts/Quicksand-SemiBold.ttf);
 }
 
 // declare a class which applies it
-.my-font-old {
+.my-font {
   font-family: 'customfont';
 }

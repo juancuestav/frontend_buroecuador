@@ -24,7 +24,7 @@
     <p class="text-bold q-mb-md">Publicidad popup</p>
     <div class="row q-col-gutter-sm">
       <div class="col-12 col-md-4 q-mb-sm">
-        <q-card class="card-image full-height" flat bordered @click="mostrar()">
+        <q-card class="card-image rounded-card full-height" flat bordered @click="mostrar()">
           <q-card-section class="text-center">
             <img
               src="~assets/add_alt.svg"

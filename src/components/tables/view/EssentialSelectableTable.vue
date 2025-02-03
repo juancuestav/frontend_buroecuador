@@ -16,6 +16,7 @@
           :mostrar-botones="false"
           :tipoSeleccion="tipoSeleccion"
           @selected="emitSelected"
+          :ajustarCeldas="true"
         ></essential-table>
       </q-card-section>
 
@@ -62,7 +63,7 @@ import EssentialTable from './EssentialTable.vue'
 export default defineComponent({
   props: {
     configuracionColumnas: {
-      type: Object as () => ColumnConfig<EntidadAuditable>[],
+      type: Object as () => ColumnConfig<any>[],
       required: true,
     },
     datos: {
@@ -89,17 +90,22 @@ export default defineComponent({
      * @param itemSeleccionado Si la búsqueda devuelve un elemento, se autoselecciona
      */
     const seleccionar = (itemSeleccionado?: any) => {
-      if (itemSeleccionado) return emit('selected', itemSeleccionado.id)
+      if (itemSeleccionado) return emit('selected', itemSeleccionado)
       refTabla.value.seleccionar()
     }
 
     const emitSelected = (itemsSeleccionados: EntidadAuditable[]) => {
+      if (itemsSeleccionados.length) emit('selected', itemsSeleccionados)
+      ocultar()
+    }
+
+    /* const emitSelected = (itemsSeleccionados: EntidadAuditable[]) => {
       if (itemsSeleccionados.length) {
         if (props.tipoSeleccion === 'single')
           emit('selected', itemsSeleccionados[0].id)
       }
       ocultar()
-    }
+    } */
 
     return {
       refTabla,

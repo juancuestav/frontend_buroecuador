@@ -15,7 +15,7 @@ export function useSelector(selector: any) {
 
     status.activar()
     const { response } = await controller.listar(filtros)
-    const result = response.data.results
+    const result = response.data.data ?? response.data.results // response.data.results
     status.desactivar()
 
     if (result.length === 0) {
@@ -27,7 +27,7 @@ export function useSelector(selector: any) {
 
     // si se obtiene un solo elemento, se auto selecciona
     if (result.length === 1) {
-      selector.refListadoSeleccionable.value.seleccionar(result[0])
+      selector.refListadoSeleccionable.value.seleccionar(result)//[0])
       return
     }
 

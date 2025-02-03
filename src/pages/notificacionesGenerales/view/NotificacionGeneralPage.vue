@@ -6,7 +6,7 @@
       <q-card
         v-for="notificacion in listado"
         :key="notificacion.id"
-        class="q-mb-xs bg-desenfoque"
+        class="q-mb-xs bg-desenfoque rounded-card"
         flat
         square
       >

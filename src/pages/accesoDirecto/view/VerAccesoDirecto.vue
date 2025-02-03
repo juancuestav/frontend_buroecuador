@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-3 q-mx-auto q-mb-xl">
+    <div class="col-6 col-md-3 q-mx-auto q-mb-xl">
       <div class="bg-solid rounded-card q-pa-md text-center q-mb-md">
         <img
           :src="entidad.imagen ?? ''"

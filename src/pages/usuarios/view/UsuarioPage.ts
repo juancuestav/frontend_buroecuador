@@ -13,6 +13,10 @@ import { UsuarioController } from '../infraestructure/UsuarioController'
 import { Usuario } from '../domain/Usuario'
 import { TipoIdentificacionController } from 'pages/sistema/tiposIdentificaciones/infraestructure/TipoIdentificacionController'
 import { RolController } from 'pages/sistema/roles_old/infraestructure/RolController'
+import { ProvinciaController } from 'shared/ubicacion/provincia/infraestructure/ProvinciaController'
+import { CantonController } from 'shared/ubicacion/canton/infraestructure/CantonController'
+import { useFiltrosGenerales } from 'shared/filtrosGenerales'
+import { tiposClientes } from 'config/utils'
 
 export default defineComponent({
   components: { TabLayout },
@@ -28,18 +32,20 @@ export default defineComponent({
 
     const { setValidador, obtenerListados, cargarVista } =
       mixin.useComportamiento()
+    const { onConsultado } = mixin.useHooks()
 
     // Reglas de validacion
     const reglas = {
       name: { required },
       apellidos: { required },
       edad: { required },
-      direccion: { required },
+      // direccion: { required },
       celular: { required },
       email: { required },
       identificacion: { required },
       tipo_identificacion: { required },
       rol: { required },
+      tipo_cliente: { required },
     }
 
     const v$ = useVuelidate(reglas, usuario)
@@ -49,7 +55,34 @@ export default defineComponent({
       await obtenerListados({
         tiposIdentificaciones: new TipoIdentificacionController(),
         roles: new RolController(),
+        provincias: new ProvinciaController(),
+        // cantones: new CantonController(),
       })
+    })
+
+    /*************
+     * Funciones
+     *************/
+    const { provincias, filtrarProvincias, cantones, filtrarCantones } =
+      useFiltrosGenerales(listadosAuxiliares)
+
+    const obtenerCantones = (idProvincia: number) => {
+      cargarVista(async () => {
+        await obtenerListados({
+          cantones: {
+            controller: new CantonController(),
+            params: { provincia: idProvincia },
+          },
+        })
+        cantones.value = listadosAuxiliares.cantones
+      })
+    }
+
+    /********
+     * Hooks
+     ********/
+    onConsultado(() => {
+      if (usuario.provincia) obtenerCantones(usuario.provincia)
     })
 
     return {
@@ -61,6 +94,12 @@ export default defineComponent({
       configuracionColumnas: configuracionColumnasUsuarios,
       listadosAuxiliares,
       isPwd: ref(true),
+      provincias,
+      filtrarProvincias,
+      cantones,
+      filtrarCantones,
+      obtenerCantones,
+      tiposClientes,
     }
   },
 })

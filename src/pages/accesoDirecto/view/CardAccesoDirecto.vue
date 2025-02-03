@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-solid rounded-card q-pa-md text-center cursor-pointer q-card-hover q-card-press"
+    class="bg-solid custom-shadow rounded-card q-pa-md text-center cursor-pointer q-card-hover q-card-press"
   >
     <img
       :src="accesoDirecto.imagen ?? ''"
@@ -50,7 +50,6 @@ defineProps({
 })
 
 const authenticationStore = useAuthenticationStore()
-
 
 /* const eliminarCard = () =>
   confirmar('¿Está seguro de eliminar este acceso directo?', () =>

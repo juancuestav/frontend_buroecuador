@@ -2,10 +2,10 @@
   <q-page>
     <q-btn
       v-if="tabsPage != '1'"
-      outline
-      color="grey-8"
+      flat
+      :color="$q.dark.isActive ? 'grey-5' : 'primary'"
       icon="bi-chevron-left"
-      class="q-mt-md q-ml-md"
+      class="q-mt-md q-ml-mdd"
       no-caps
       rounded
       @click="regresar()"

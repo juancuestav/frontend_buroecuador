@@ -461,7 +461,7 @@
               :mostrarFooter="false"
               separador="cell"
               :alto-fijo="false"
-              :agregarElemento="agregarActividad"
+              :accion1Header="agregarActividad"
               @eliminar="eliminarActividadEconomica"
             ></essential-table>
           </div>
@@ -504,7 +504,7 @@
               :mostrarFooter="false"
               separador="cell"
               :alto-fijo="false"
-              :agregarElemento="agregarEstablecimiento"
+              :accion1Header="agregarEstablecimiento"
               @eliminar="eliminarEstablecimiento"
             ></essential-table>
           </div>
@@ -725,7 +725,7 @@
               :mostrarFooter="false"
               separador="cell"
               :alto-fijo="false"
-              :agregarElemento="agregarOperacionCreditoBancaria"
+              :accion1Header="agregarOperacionCreditoBancaria"
               @eliminar="eliminarOperacionCreditoBancaria"
             ></essential-table>
           </div>
@@ -767,7 +767,7 @@
               :mostrarFooter="false"
               separador="cell"
               :alto-fijo="false"
-              :agregarElemento="agregarOperacionCreditoComercial"
+              :accion1Header="agregarOperacionCreditoComercial"
               @eliminar="eliminarOperacionCreditoComercial"
             ></essential-table>
           </div>
@@ -913,7 +913,7 @@
               :mostrarFooter="false"
               :alto-fijo="false"
               separador="cell"
-              :agregarElemento="agregarResumenVencimiento"
+              :accion1Header="agregarResumenVencimiento"
               @eliminar="eliminarResumenVencimiento"
             ></essential-table>
           </div>
@@ -955,7 +955,7 @@
               :mostrarFooter="false"
               separador="cell"
               :alto-fijo="false"
-              :agregarElemento="agregarSaldoPorVencer"
+              :accion1Header="agregarSaldoPorVencer"
               @eliminar="eliminarSaldoPorVencer"
             ></essential-table>
           </div>
@@ -1032,7 +1032,7 @@
               :mostrarFooter="false"
               separador="cell"
               :alto-fijo="false"
-              :agregarElemento="agregarOperacionCancelada"
+              :accion1Header="agregarOperacionCancelada"
               @eliminar="eliminarOperacionCancelada"
             ></essential-table>
           </div>

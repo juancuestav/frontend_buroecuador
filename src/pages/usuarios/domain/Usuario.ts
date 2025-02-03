@@ -20,6 +20,12 @@ export class Usuario extends EntidadAuditable {
   codigo_reclutador: string | null
   roles: []
   permisos: []
+  user_profile_id: number | null = null
+
+  // User profile
+  tipo_cliente: string | null = null
+  provincia: number | null = null
+  canton: number | null = null
 
   constructor() {
     super()

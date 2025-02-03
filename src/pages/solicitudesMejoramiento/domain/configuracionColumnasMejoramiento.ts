@@ -2,13 +2,13 @@ import { ColumnConfig } from 'components/tables/domain/ColumnConfig'
 import { Mejoramiento } from './Mejoramiento'
 
 export const configuracionColumnasMejoramiento: ColumnConfig<Mejoramiento>[] = [
-  {
+  /* {
     name: 'estado',
     field: 'estado',
     label: 'Estado',
     align: 'left',
     sortable: true,
-  },
+  }, */
   {
     name: 'cliente',
     field: 'cliente',

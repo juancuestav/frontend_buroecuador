@@ -1,13 +1,13 @@
 // Dependencias
 import { EntidadAuditable } from 'shared/entidad/domain/entidadAuditable'
 import { useAuthenticationStore } from 'stores/authentication'
+import { useCargandoStore } from 'stores/cargando'
 import { computed, defineComponent } from 'vue'
 import { useRoute } from 'vue-router'
 
 // Componentes
 import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
 import ButtonSubmits from 'components/buttonSubmits/buttonSubmits.vue'
-import { useCargandoStore } from 'stores/cargando'
 
 export default defineComponent({
   props: {

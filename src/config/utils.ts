@@ -1,3 +1,6 @@
+export const maskFecha = 'YYYY-MM-DD'
+export const maskFechaHora = 'YYYY-MM-DD HH:mm:ss'
+
 // Tipos
 export type TipoSeleccion = 'none' | 'single' | 'multiple'
 
@@ -57,3 +60,4 @@ export const puntuaciones = [
 
 export const tiposReportes = ['GOLD', 'STANDAR', 'NORMAL']
 export const tiposContribuyente = ['PERSONA NATURAL', 'PERSONA JURÍDICA']
+export const tiposClientes = ['CLIENTE', 'EMPRENDEDOR', 'EMPRESA']

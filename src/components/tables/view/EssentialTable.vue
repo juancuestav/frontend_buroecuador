@@ -172,18 +172,17 @@
 
       <div
         v-if="titulo"
-        class="row text-primary text-subtitle2 q-mb-lg items-center justify-between col-12"
+        class="row text-subtitle2 q-mb-lg items-center justify-between col-12"
         :class="{
           'titulo-tabla2': !$q.screen.xs,
           'justify-center': $q.screen.xs,
-          'bg-grey-9': $q.dark.isActive,
         }"
       >
+        <!-- 'bg-grey-9': $q.dark.isActive, -->
         <span>
           <q-icon
             v-if="!$q.screen.xs"
             name="bi-grip-vertical"
-            color="primary"
             class="q-mr-sm"
           ></q-icon>
           <span>{{ titulo }}</span>
@@ -703,6 +702,21 @@
                   ></q-icon>
                 </span>
 
+                <span v-if="col.name === 'verificado'">
+                  <q-icon
+                    v-if="col.value"
+                    name="bi-check-circle-fill"
+                    color="positive"
+                    size="xs"
+                  ></q-icon>
+                  <q-icon
+                    v-else
+                    name="bi-check-circle"
+                    color="grey-6"
+                    size="xs"
+                  ></q-icon>
+                </span>
+
                 <span v-if="col.name === 'es_responsable'">
                   <q-icon
                     v-if="col.value"
@@ -965,17 +979,20 @@
       </q-td>
     </template>
 
-    <template #body-cell-despachado="props">
-      <q-td
-        :props="props"
-        :class="{
-          'bg-lime-2': !$q.dark.isActive,
-          'bg-green-10': $q.dark.isActive,
-        }"
-      >
-        <q-badge color="positive">
-          {{ props.value }}
-        </q-badge>
+    <template #body-cell-verificado="props">
+      <q-td :props="props">
+        <q-icon
+          v-if="props.value"
+          name="bi-check-circle-fill"
+          color="positive"
+          size="xs"
+        ></q-icon>
+        <q-icon
+          v-else
+          name="bi-check-circle-fill"
+          color="negative"
+          size="xs"
+        ></q-icon>
       </q-td>
     </template>
 
@@ -1052,18 +1069,6 @@
       </q-td>
     </template>
 
-    <!-- Resumen tendido -->
-    <template #body-cell-instalo_manga="props">
-      <q-td :props="props">
-        <q-icon
-          v-if="props.value"
-          name="bi-check-circle-fill"
-          color="positive"
-          size="xs"
-        ></q-icon>
-      </q-td>
-    </template>
-
     <template #body-cell-es_dosis_unica="props">
       <q-td :props="props">
         <q-icon
@@ -1091,6 +1096,7 @@
         ></q-icon>
       </q-td>
     </template>
+
     <template #body-cell-tiene_factura="props">
       <q-td :props="props">
         <q-chip v-if="props.value" class="bg-yellow-1">
@@ -1677,11 +1683,11 @@
 
 .my-sticky-column-table-light {
   thead tr:first-child th:last-child {
-    background-color: $grey-2;
+    background-color: #e2e4ec;
   }
 
   td:last-child {
-    background-color: #fff;
+    background-color: rgba($grey-1, 0.8);
   }
 }
 

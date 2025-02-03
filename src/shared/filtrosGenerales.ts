@@ -2,6 +2,7 @@
 import { Usuario } from 'pages/usuarios/domain/Usuario'
 import { ordernarListaString } from './utils'
 import { ref } from 'vue'
+import { Canton } from './ubicacion/canton/domain/Provincia'
 
 export const useFiltrosGenerales = (listadosAuxiliares) => {
   /*************
@@ -9,7 +10,7 @@ export const useFiltrosGenerales = (listadosAuxiliares) => {
    *************/
   const paises = ref(listadosAuxiliares.paises)
   const provincias = ref(listadosAuxiliares.provincias)
-  // const cantones = ref(listadosAuxiliares.cantones)
+  const cantones = ref(listadosAuxiliares.cantones)
   const usuarios = ref(listadosAuxiliares.usuarios)
 
   function filtrarPaises(val, update) {
@@ -34,12 +35,12 @@ export const useFiltrosGenerales = (listadosAuxiliares) => {
       const needle = val.toLowerCase()
       if (listadosAuxiliares.provincias)
         provincias.value = listadosAuxiliares.provincias.filter(
-          (v) => v.provincia.toLowerCase().indexOf(needle) > -1
+          (v) => v.nombre.toLowerCase().indexOf(needle) > -1
         )
     })
   }
 
-  /* function filtrarCantones(val, update) {
+  function filtrarCantones(val, update) {
     if (val === '') {
       update(() => (cantones.value = listadosAuxiliares.cantones))
       return
@@ -48,14 +49,16 @@ export const useFiltrosGenerales = (listadosAuxiliares) => {
       const needle = val.toLowerCase()
       if (listadosAuxiliares.cantones)
         cantones.value = listadosAuxiliares.cantones.filter(
-          (v) => v.canton.toLowerCase().indexOf(needle) > -1
+          (v) => v.nombre.toLowerCase().indexOf(needle) > -1
         )
     })
-  } */
+  }
 
-  /* function ordenarCantones() {
-    cantones.value.sort((a: Canton, b: Canton) => ordernarListaString(a.canton!, b.canton!))
-  } */
+  function ordenarCantones() {
+    cantones.value.sort((a: Canton, b: Canton) =>
+      ordernarListaString(a.nombre!, b.nombre!)
+    )
+  }
 
   function filtrarUsuarios(val, update) {
     if (val === '') {
@@ -106,7 +109,9 @@ export const useFiltrosGenerales = (listadosAuxiliares) => {
     filtrarPaises,
     provincias,
     filtrarProvincias,
-    // cantones, filtrarCantones, ordenarCantones,
+    cantones,
+    filtrarCantones,
+    ordenarCantones,
     usuarios,
     filtrarUsuarios,
     ordenarUsuarios,

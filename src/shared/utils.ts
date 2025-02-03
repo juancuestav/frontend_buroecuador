@@ -318,3 +318,13 @@ export function ordernarListaString(a: string, b: string) {
   return 0
 }
 
+export function formatearFechaHora(fecha: string, hora: string) {
+  const arrayFecha = fecha.split('-').map(Number) // YYYY-MM-DD
+  const nuevaFecha = date.buildDate({
+    year: arrayFecha[2],
+    month: arrayFecha[1],
+    day: arrayFecha[0],
+  })
+
+  return date.formatDate(nuevaFecha, 'YYYY-MM-DD') + ' ' + hora
+}

@@ -1,6 +1,14 @@
 // Custom scrollbar
 body {
-  background-color: $grey-5;
+  // background-color: $grey-5;
+  /* Versión con rgba para mayor control de opacidad si se necesita */
+  /* background: linear-gradient(
+    180deg,
+    rgba(75, 46, 131, 1) 0%,
+    rgba(30, 58, 138, 1) 100%
+  ); */
+  background: linear-gradient(to bottom right, #a9abbe, #e2e4ec);
+
   &::-webkit-scrollbar {
     width: 10px;
     background-color: transparent;
@@ -48,12 +56,55 @@ body {
   opacity: 0.6;
 }
 
+.q-tabs {
+  margin-bottom: 4px;
+}
+
+// Mis estilos
+.custom-shadow {
+  box-shadow: 0px 10px 60px -10px rgba(44, 54, 60, 0.2);
+}
+
+.custom-shadow2 {
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 20px 30px;
+}
+
+.custom-shadow3 {
+  // box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+
+.shadow-button {
+  box-shadow: 0px 10px 60px -10px rgba(44, 54, 60, 0.4);
+}
+
+.error-validation {
+  box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px,
+    rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+  padding: 8px;
+  background-color: #fff;
+  width: 100%;
+  margin: 0;
+  border-radius: 4px;
+  z-index: 99999;
+}
+
+.shadow-chip {
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 5px 15px;
+}
+
+.text-thin {
+  font-weight: 200;
+}
+
 .rounded-field {
   border-radius: 4px !important;
 }
 
 .rounded-card {
   border-radius: 16px !important;
+  // box-shadow: rgba(0, 0, 0, 0.12) 0px 5px 15px;
 }
 
 .square-card {
@@ -61,7 +112,7 @@ body {
 }
 
 .rounded-tabpanel {
-  border-radius: 0 16px 16px 16px;
+  border-radius: 16px;
 }
 
 .rounded-toolbar {
@@ -127,6 +178,10 @@ td {
 
 .label-card-table {
   text-transform: uppercase;
+}
+
+.q-field--outlined .q-field__control:before {
+  border: none; // Quitar el borde de los inputs
 }
 
 input[type='time']::-webkit-calendar-picker-indicator {
@@ -222,4 +277,22 @@ input[type='time']::-webkit-calendar-picker-indicator {
 .border-positive-banner {
   border-top: 2px solid $positive;
   border-bottom: 2px solid $positive;
+}
+
+.gradiente-azul-morado {
+  /* Versión con rgba para mayor control de opacidad si se necesita */
+  background: linear-gradient(
+    180deg,
+    rgba(75, 46, 131, 1) 0%,
+    rgba(30, 58, 138, 1) 100%
+  );
+}
+
+.gradiente-blanco {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.8),
+    rgba(240, 240, 240, 0.5)
+  );
+  backdrop-filter: blur(10px);
 }

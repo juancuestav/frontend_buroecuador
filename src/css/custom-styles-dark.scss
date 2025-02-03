@@ -20,7 +20,7 @@ $border-color: #464646;
     background-color: #000000a3;
   }
 
-  .bg-solid{
+  .bg-solid {
     background-color: #1b1b1b;
   }
 
@@ -34,6 +34,11 @@ $border-color: #464646;
 
   .bg-body-table-dark-color {
     background-color: $dark-color;
+  }
+
+  .bg-desenfoque-0 {
+    background-color: rgba($dark-color, 0.1);
+    backdrop-filter: blur(10px);
   }
 
   .bg-desenfoque {
@@ -52,15 +57,6 @@ $border-color: #464646;
 
   .bg-border {
     background-color: $text-color-transparency;
-  }
-
-  .tab-inactive {
-    background-color: #ffffff66;
-    border-radius: 16px 4px 0 0;
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 5px 15px;
-    border-width: 1px 1px 0 1px;
-    border-style: solid;
-    border-color: $grey-8;
   }
 
   .bg-drawer {
@@ -83,17 +79,14 @@ $border-color: #464646;
   .tab-active {
     background-color: $dark-color;
     color: $text-color;
-    border-radius: 16px 16px 0 0;
-    border: 1px solid rgba($text-color-transparency, .4);
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 5px 15px;
+    border-radius: 16px;
+    border: 1px solid rgba($text-color-transparency, 0.4);
   }
-  
+
   .tab-inactive {
-    background-color: rgba($dark-color, 0.6);
-    color: $text-color-transparency;
-    border-radius: 16px 16px 0 0;
-    border: 1px solid rgba($text-color-transparency, .1);
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 5px 15px;
+    background-color: transparent !important;
+    color: rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
   }
 
   // Toggle
@@ -116,8 +109,23 @@ $border-color: #464646;
 
   // Tabla
   .q-table__top,
+  .q-table__bottom {
+    box-shadow: rgba(30, 58, 138, 0.25) 1px 2px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  th:first-child {
+    border-left: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  th:last-child {
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .q-table__top,
   thead tr:first-child th {
     background-color: $dark-color;
+    color: #fff;
   }
 
   .borde-header-tabla {
@@ -156,6 +164,7 @@ $border-color: #464646;
   .q-field .q-field__inner {
     // text-transform: uppercase;
     background-color: $bg-body;
+    border-radius: 8px;
   }
 
   .q-field--disabled .q-field__inner {
@@ -184,8 +193,11 @@ $border-color: #464646;
 
   // Menu item drawer
   .link-active {
-    background: $primary; //rgba($bg-body, 1);
-    // border-right: 3px solid $primary;
+    background: linear-gradient(
+      180deg,
+      rgba(75, 46, 131, 1) 0%,
+      rgba(30, 58, 138, 1) 100%
+    );
     border-radius: 8px;
 
     i {
@@ -198,7 +210,14 @@ $border-color: #464646;
   }
 
   .color-icono {
-    color: $primary; //#8288a2;
+    color: white;
+    background: linear-gradient(
+      180deg,
+      rgba(75, 46, 131, 1) 0%,
+      rgba(30, 58, 138, 1) 100%
+    );
+    padding: 6px;
+    border-radius: 4px;
   }
 
   // Botones tabla
@@ -239,5 +258,50 @@ $border-color: #464646;
       rgba($bg-body, 0.7) 70%,
       rgba($bg-body, 0.9) 100%
     ) !important;
+  }
+
+  // Card capas
+  .card-capas {
+    background: $dark-color;
+    border-radius: 12px;
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+  
+  .card-capas::before,
+  .card-capas::after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 12px;
+    z-index: -1;
+  }
+  
+  /* Middle card layer */
+  .card-capas::before {
+    width: 94%;
+    height: 100%;
+    bottom: -10px;
+    left: 3%;
+    // background: rgba(255, 255, 255, 0.8);
+    background-color: rgba(230, 231, 240, 0.5);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Bottom card layer */
+  .card-capas::after {
+    width: 88%;
+    height: 100%;
+    bottom: -20px;
+    left: 6%;
+    z-index: -10;
+    // background: rgba(255, 255, 255, 0.6);
+    background-color: rgba(230, 231, 240, 0.5);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Top card styling and shadow */
+  .card-capas {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 }

@@ -1,10 +1,10 @@
 <template>
-  <q-page class="bg-grey-4">
+  <q-page class="gradiente-azul-morado">
     <div class="row items-center empresa">
-      <q-avatar square>
-        <img :src="!$q.dark.isActive ? logoClaro : logoOscuro" />
+      <q-avatar class="rounded-card">
+        <img :src="!$q.dark.isActive ? logoClaro : logoOscuro"/>
       </q-avatar>
-      <span class="q-ml-md text-h5">{{ appName }}</span>
+      <span class="q-ml-md text-h5 text-thin text-white">{{ appName }}</span>
     </div>
     <div class="row items-center">
       <!-- Left side -->
@@ -26,9 +26,9 @@
 
       <!-- Right side -->
       <div
-        class="col-12 bg-grey-4 col-md-4 column items-center justify-center bg-white window-height q-px-sm"
+        class="col-12 bg-greyd-4 col-md-4 column items-center justify-center window-height q-px-sm"
       >
-        <div class="rounded full-width q-mb-lg">
+        <div class="gradiente-blanco rounded-card full-width q-mb-lg">
           <form @submit.prevent="login" class="rounded q-pa-md q-py-lg">
             <div class="q-mb-sm">
               <!-- <h2>Bienvenidos a {{ appName  }}</h2> -->
@@ -87,7 +87,7 @@
                 :disabled="!enableLoginButton"
                 no-caps
                 unelevated
-                square
+                rounded
                 @click="login()"
               >
               </q-btn>
@@ -97,6 +97,7 @@
                 label="Crear cuenta"
                 class="full-width"
                 replace
+                rounded
                 no-caps
                 flat
               >
@@ -106,10 +107,10 @@
         </div>
 
         <div class="text-center">
-          <div class="text-primary text-h5 q-mb-md">
+          <div class="text-white text-h5 q-mb-md">
             ¿Quieres conocer tu situación crediticia personal?
           </div>
-          <div class="q-mb-md">
+          <div class="q-mb-md text-grey-5">
             El reporte de crédito te permite saber el estado de tus deudas y
             ordenar tus finanzas personales
           </div>
@@ -148,8 +149,9 @@ h2 {
 
 .empresa {
   position: fixed;
-  top: 16px;
-  left: 16px;
+  top: 0px;
+  left: 0px;
+  padding: 16px;
 }
 
 /* .q-field .q-field__inner {

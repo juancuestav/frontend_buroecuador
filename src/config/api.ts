@@ -39,8 +39,8 @@ export const endpoints = {
   popup: new Endpoint('popup'),
   // ubicacion
   paises: new Endpoint('paises'),
-  provincias: new Endpoint('provincias'),
-  ciudades: new Endpoint('ciudades'),
+  provincias: new Endpoint('public/provincias'),
+  ciudades: new Endpoint('public/ciudades'),
   // Usuarios
   verificar_cuenta: new Endpoint('verificar-cuenta'),
   archivos_reportes: new Endpoint('archivos-reportes'),
@@ -53,4 +53,5 @@ export const endpoints = {
   asignar_permisos_individual: new Endpoint('asignar-permisos-usuario'),
   crear_permiso: new Endpoint('crear-permiso'),
   permisos_roles_usuario: new Endpoint('permisos_roles_usuario'),
+  user_profiles: new Endpoint('user-profiles'),
 }

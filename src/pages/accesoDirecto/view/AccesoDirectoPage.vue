@@ -22,7 +22,7 @@
             ></q-icon
             >{{
               (mostrarCrearAccesoDirecto ? 'Ocultar' : 'Mostrar') +
-              ' formulario para crear nuevo acceso directo'
+              ' formulario Crear nuevo acceso directo'
             }}
           </q-btn>
         </div>

@@ -1,14 +1,6 @@
 // Dependencias
 import { EstadoPrevisualizarTablaPDF } from '../application/EstadoPrevisualizarTablaPDF'
-import {
-  computed,
-  defineComponent,
-  ref,
-  watchEffect,
-  nextTick,
-  Ref,
-  watch,
-} from 'vue'
+import { computed, defineComponent, ref, watchEffect, nextTick, Ref } from 'vue'
 import { EntidadAuditable } from 'shared/entidad/domain/entidadAuditable'
 import { Instanciable } from 'shared/entidad/domain/instanciable'
 import { CustomActionTable } from '../domain/CustomActionTable'
@@ -52,7 +44,7 @@ export default defineComponent({
       default: 'horizontal',
     },
     configuracionColumnas: {
-      type: Object as () => ColumnConfig<EntidadAuditable>[],
+      type: Object as () => ColumnConfig<any>[],
       required: true,
     },
     datos: {
@@ -207,6 +199,14 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    agregarElemento: {
+      type: Object as () => CustomActionTable,
+      required: false,
+    },
+    disable: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: [
     'consultar',
@@ -306,10 +306,10 @@ export default defineComponent({
       // emit('update:selected', selected.value);
     }
 
-    watch(selected, () => {
+    /* watch(selected, () => {
       console.log(selected.value)
       emit('selected', selected.value)
-    })
+    }) */
 
     /*const emitSelectedChange = () => {
       emit('update:selected', selected.value);
@@ -430,7 +430,7 @@ export default defineComponent({
     function exportTable() {
       // naive encoding to csv format
       const content = [
-        props.configuracionColumnas.map((col: any) => wrapCsvValue(col.label))
+        props.configuracionColumnas.map((col: any) => wrapCsvValue(col.label)),
       ]
         .concat(
           props.datos.map((row: any) =>

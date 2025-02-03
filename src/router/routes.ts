@@ -182,6 +182,13 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: '/puntuacion-cliente',
+        name: 'puntuacion_cliente',
+        component: () =>
+          import('pages/puntuacionCliente/PuntuacionClientePage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: '/archivos-reportes',
         name: 'archivos_reportes',
         component: () =>

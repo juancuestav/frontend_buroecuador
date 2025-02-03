@@ -3,6 +3,7 @@
     :mixin="mixin"
     :configuracionColumnas="configuracionColumnas"
     titulo-pagina="Usuarios"
+    paginate
   >
     <template #formulario>
       <q-form @submit.prevent>
@@ -15,7 +16,6 @@
               placeholder="Obligatorio"
               :disable="disabled"
               :error="!!v$.name.$errors.length"
-              @update:model-value="(v) => (usuario.name = v.toUpperCase())"
               outlined
               dense
             >
@@ -35,7 +35,6 @@
               placeholder="Obligatorio"
               :disable="disabled"
               :error="!!v$.apellidos.$errors.length"
-              @update:model-value="(v) => (usuario.apellidos = v.toUpperCase())"
               outlined
               dense
             >
@@ -55,7 +54,6 @@
               placeholder="Obligatorio"
               :disable="disabled"
               :error="!!v$.edad.$errors.length"
-              @update:model-value="(v) => (usuario.edad = v.toUpperCase())"
               outlined
               dense
             >
@@ -68,7 +66,7 @@
           </div>
 
           <!-- Direccion -->
-          <div class="col-12 col-md-3 q-mb-md">
+          <!-- <div class="col-12 col-md-3 q-mb-md">
             <label class="q-mb-sm block">Dirección</label>
             <q-input
               v-model="usuario.direccion"
@@ -85,6 +83,68 @@
                 </div>
               </template>
             </q-input>
+          </div> -->
+
+          <!--Provincia -->
+          <div class="col-12 col-md-3 q-mb-md">
+            <label class="q-mb-sm block">Provincia</label>
+            <q-select
+              v-model="usuario.provincia"
+              :options="provincias"
+              transition-show="jump-up"
+              transition-hide="jump-down"
+              options-dense
+              dense
+              outlined
+              use-input
+              @update:model-value="
+                () => {
+                  obtenerCantones(usuario.provincia)
+                  usuario.canton = null
+                }
+              "
+              input-debounce="0"
+              @filter="filtrarProvincias"
+              :option-value="(v) => v.id"
+              :option-label="(v) => v.nombre"
+              emit-value
+              map-options
+              ><template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No hay resultados
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+          </div>
+
+          <!--Canton -->
+          <div class="col-12 col-md-3 q-mb-md">
+            <label class="q-mb-sm block">Cantón</label>
+            <q-select
+              v-model="usuario.canton"
+              :options="cantones"
+              transition-show="jump-up"
+              transition-hide="jump-down"
+              options-dense
+              dense
+              outlined
+              use-input
+              input-debounce="0"
+              @filter="filtrarCantones"
+              :option-value="(v) => v.id"
+              :option-label="(v) => v.nombre"
+              emit-value
+              map-options
+              ><template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No hay resultados
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
           </div>
 
           <!-- Celular -->
@@ -124,6 +184,30 @@
                 </div>
               </template>
             </q-input>
+          </div>
+
+          <!-- Tipo de cliente -->
+          <div class="col-12 col-md-3">
+            <label class="q-mb-sm block">Tipo cliente</label>
+            <q-select
+              v-model="usuario.tipo_cliente"
+              :options="tiposClientes"
+              :error="!!v$.tipo_cliente.$errors.length"
+              transition-show="flip-up"
+              transition-hide="flip-down"
+              options-dense
+              dense
+              outlined
+            >
+              <template v-slot:error>
+                <div
+                  v-for="error of v$.tipo_identificacion.$errors"
+                  :key="error.$uid"
+                >
+                  <div class="error-msg">{{ error.$message }}</div>
+                </div>
+              </template>
+            </q-select>
           </div>
 
           <!-- Tipo de identificacion -->

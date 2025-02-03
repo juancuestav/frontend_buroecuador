@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <div class="rounded-card bg-solid q-pa-xs rounded mb-3">
-    <div class="row q-col-gutter-sm q-py-md">
+  <div class="rounded-card bg-solid q-pa-xs rounded mb-3 q-pa-md">
+    <div class="row q-col-gutter-sm">
       <!-- Puntaje actual -->
       <div class="col-12 col-md-3 q-mb-md">
         <label class="q-mb-sm block">Puntaje actual</label>

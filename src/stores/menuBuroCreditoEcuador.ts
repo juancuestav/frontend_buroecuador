@@ -77,6 +77,12 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: store.can('acceder.activar_app') && !appActivada,
   },
   {
+    title: 'Mi puntuación',
+    icon: 'bi-person-check',
+    link: 'puntuacion-cliente',
+    can: store.can('acceder.puntuacion_cliente'),// && !appActivada,
+  },
+  {
     title: esCliente.value ? 'Mi Buró' : 'Compartir archivos a clientes',
     icon: 'bi-archive',
     link: 'archivos-reportes',

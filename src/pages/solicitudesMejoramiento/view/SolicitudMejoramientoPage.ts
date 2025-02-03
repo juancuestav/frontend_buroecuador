@@ -16,7 +16,7 @@ import { TabOption } from 'components/tables/domain/TabOption'
 export default defineComponent({
   components: { TabLayoutFilterTabs },
   setup() {
-    const tabActual = ref('pendiente')
+    const tabActual = ref('PENDIENTE')
 
     const mixin = new ContenedorSimpleMixin(
       Mejoramiento,
@@ -46,7 +46,7 @@ export default defineComponent({
     /*******
      * Init
      *******/
-    filtrarSolicitudes('pendiente')
+    filtrarSolicitudes('PENDIENTE')
 
     return {
       mixin,

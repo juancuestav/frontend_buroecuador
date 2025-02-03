@@ -1,6 +1,6 @@
 // Dependencias
 import { configuracionColumnasFacturacion } from '../domain/configuracionColumnasFacturacion'
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { date } from 'quasar'
 
 // Componentes
@@ -12,16 +12,33 @@ import { findIndexById } from 'shared/utils'
 import { endpoints } from 'config/api'
 import { TabOption } from 'components/tables/domain/TabOption'
 import { StatusEssentialLoading } from 'components/loading/application/StatusEssentialLoading'
+import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
+import { FacturacionPlan } from '../domain/FacturacionPlan'
+import { FacturacionPlanController } from '../infraestructure/FacturacionPlanController'
 
 export default defineComponent({
   components: {
     EssentialTableTabs,
   },
   setup() {
+    /********
+     * Mixin
+     ********/
+    const mixin = new ContenedorSimpleMixin(
+      FacturacionPlan,
+      new FacturacionPlanController()
+    )
+
+    const {
+      entidad: facturacionPlan,
+      listado,
+      filtros,
+    } = mixin.useReferencias()
+    const { listar } = mixin.useComportamiento()
+
     /*************
      * Variables
      *************/
-    const listado: any = ref([])
     const { notificarCorrecto } = useNotificaciones()
 
     const axios = AxiosHttpRepository.getInstance()
@@ -88,31 +105,32 @@ export default defineComponent({
       },
     }
 
-    async function obtenerListado(params?) {
-      cargando.activar()
-      const ruta = axios.getEndpoint(endpoints.facturacion_planes, {
-        pagado: params,
-      })
-      const response: any = await axios.get(ruta)
-      listado.value = [...response.data.results]
-      cargando.desactivar()
-    }
-
-    obtenerListado('true')
-
     const tabOptions: TabOption[] = [
-      // { label: 'Todo', value: '' },
-      { label: 'Pagados', value: 'true' },
-      { label: 'No pagados', value: 'false' },
+      { label: 'Pagados', value: 1 },
+      { label: 'No pagados', value: 0 },
     ]
 
+    async function filtrarFacturacion(tabSeleccionado: string) {
+      await listar({ pagado: tabSeleccionado, paginate: true }, false)
+
+      filtros.fields = { pagado: tabSeleccionado }
+      // tabActualTarea = tabSeleccionado
+    }
+
+    /*******
+     * Init
+     *******/
+    listar({ pagado: 1, paginate: true })
+
     return {
+      mixin,
+      facturacionPlan,
       listado,
       configuracionColumnasFacturacion,
       pagado,
       noPagado,
       tabOptions,
-      obtenerListado,
+      filtrarFacturacion,
     }
   },
 })
