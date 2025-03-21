@@ -46,6 +46,10 @@ export const endpoints = {
   archivos_reportes: new Endpoint('archivos-reportes'),
   archivos: new Endpoint('archivos'),
   accesos_directos: new Endpoint('accesos-directos'),
+  // Bases de datos
+  registro_civil: new Endpoint('registro-civil'),
+  iess: new Endpoint('iess'),
+  ant: new Endpoint('ant'),
   // Administracion
   permisos: new Endpoint('permisos'),
   permisos_administrar: new Endpoint('permisos_administrar'),

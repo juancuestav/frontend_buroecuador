@@ -25,6 +25,28 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: store.can('acceder.accesos_directos'),
   },
   {
+    title: 'Bases de datos',
+    icon: 'bi-database',
+    can: store.can('acceder.modulo_bases_de_datos'),
+    children: [
+      {
+        title: 'Registro civil',
+        icon: 'bi-person-lines-fill',
+        link: 'registro-civil',
+      },
+      {
+        title: 'Iess',
+        icon: 'bi-person-lines-fill',
+        link: 'iess',
+      },
+      {
+        title: 'Ant',
+        icon: 'bi-person-lines-fill',
+        link: 'ant',
+      },
+    ],
+  },
+  {
     title: 'Formulario de contacto',
     icon: 'bi-bell',
     link: 'formulario-contacto',
@@ -80,7 +102,7 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     title: 'Mi puntuación',
     icon: 'bi-person-check',
     link: 'puntuacion-cliente',
-    can: store.can('acceder.puntuacion_cliente'),// && !appActivada,
+    can: store.can('acceder.puntuacion_cliente'), // && !appActivada,
   },
   {
     title: esCliente.value ? 'Mi Buró' : 'Compartir archivos a clientes',

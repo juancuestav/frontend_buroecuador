@@ -1,0 +1,31 @@
+import { EntidadAuditable } from 'shared/entidad/domain/entidadAuditable'
+
+export class Ant extends EntidadAuditable {
+  placa: string | null = null
+  tipo_identificacion: string | null = null
+  identificacion: string | null = null
+  nombre_propietario: string | null = null
+  telefono: string | null = null
+  tipo_direccion: string | null = null
+  direccion: string | null = null
+  correo_electronico: string | null = null
+  motor: string | null = null
+  cilindraje: string | null = null
+  chasis: string | null = null
+  clase: string | null = null
+  tipo: string | null = null
+  marca: string | null = null
+  modelo: string | null = null
+  anio: string | null = null
+  servicio: string | null = null
+  anio_pagado: string | null = null
+  carga_util: string | null = null
+  tipo_peso: string | null = null
+  peso: string | null = null
+  exoneracion: string | null = null
+  matriculado: string | null = null
+  ultima_matricula: string | null = null
+  ramv: string | null = null
+  canton: string | null = null
+  avaluo: string | null = null
+}

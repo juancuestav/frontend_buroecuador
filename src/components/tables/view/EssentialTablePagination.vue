@@ -12,7 +12,6 @@
     flat
     bordered
     ref="refTable"
-    title="Treats"
     :rows="listado"
     color="primary"
     :columns="configuracionColumnas"

@@ -14,9 +14,9 @@ export default defineComponent({
       let url: string
 
       if (window.innerWidth < 768) {
-        url = `https://api.whatsapp.com/send?phone=${phone}`
+        url = `https://api.whatsapp.com/send?phone=${phone}&text=Quiero%20mas%20informacion%20de%20mi%20buro%20de%20credito%20`
       } else {
-        url = `https://web.whatsapp.com/send?phone=${phone}`
+        url = `https://web.whatsapp.com/send?phone=${phone}&text=Quiero%20mas%20informacion%20de%20mi%20buro%20de%20credito%20`
       }
 
       window.open(url, '_blank')

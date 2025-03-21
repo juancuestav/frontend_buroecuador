@@ -202,6 +202,24 @@ const routes: RouteRecordRaw[] = [
           import('pages/accesoDirecto/view/AccesoDirectoPage.vue'),
         meta: { requiresAuth: true },
       },
+      {
+        path: 'registro-civil',
+        name: 'registro_civil',
+        component: () => import('pages/basesDeDatos/view/RegistroCivilPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'iess',
+        name: 'iess',
+        component: () => import('pages/basesDeDatos/iess/view/IessPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'ant',
+        name: 'ant',
+        component: () => import('pages/basesDeDatos/ant/view/AntPage.vue'),
+        meta: { requiresAuth: true },
+      },
       /******************
        * Administracion
        ******************/

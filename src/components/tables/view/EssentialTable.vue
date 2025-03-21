@@ -21,6 +21,7 @@
     :separator="$q.screen.xs ? 'horizontal' : separador"
     :hide-bottom="!mostrarFooter"
     flat
+    dense
     bordered
     square
     :selection="tipoSeleccion"
