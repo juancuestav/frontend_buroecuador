@@ -344,9 +344,52 @@
       <div class="row q-col-gutter-sm q-py-md">
         <div class="col-12 col-md-3 q-mb-md">
           <label class="q-mb-sm block">Whatsapp</label>
-          <q-input v-model="configuracion.whatsapp" outlined dense>
+          <q-input
+            v-model="configuracion.whatsapp"
+            placeholder="593#########"
+            outlined
+            dense
+          >
             <template #prepend>
               <q-icon name="bi-whatsapp" size="xs"></q-icon>
+            </template>
+          </q-input>
+        </div>
+
+        <div class="col-12 col-md-3 q-mb-md">
+          <label class="q-mb-sm block">Mensaje whatsapp</label>
+          <q-input v-model="configuracion.mensaje_whatsapp" outlined dense>
+            <template #prepend>
+              <q-icon name="bi-chat-square-text" size="xs"></q-icon>
+            </template>
+          </q-input>
+        </div>
+
+        <div class="col-12 col-md-3 q-mb-md">
+          <label class="q-mb-sm block">Whatsapp soluciones empresas</label>
+          <q-input
+            v-model="configuracion.whatsapp_soluciones_empresas"
+            placeholder="593#########"
+            outlined
+            dense
+          >
+            <template #prepend>
+              <q-icon name="bi-whatsapp" size="xs"></q-icon>
+            </template>
+          </q-input>
+        </div>
+
+        <div class="col-12 col-md-3 q-mb-md">
+          <label class="q-mb-sm block"
+            >Mensaje whatsapp soluciones empresas</label
+          >
+          <q-input
+            v-model="configuracion.mensaje_whatsapp_soluciones_empresas"
+            outlined
+            dense
+          >
+            <template #prepend>
+              <q-icon name="bi-chat-square-text" size="xs"></q-icon>
             </template>
           </q-input>
         </div>
@@ -526,7 +569,14 @@
 
       <div class="row q-pt-md">
         <!-- Boton guardar -->
-        <q-btn color="primary" class="full-width" no-caps square unelevated @click="guardar(configuracion)">
+        <q-btn
+          color="primary"
+          class="full-width"
+          no-caps
+          square
+          unelevated
+          @click="guardar(configuracion)"
+        >
           <q-icon name="bi-save" size="xs" class="q-pr-sm"></q-icon>
           <span>Guardar cambios</span>
         </q-btn>

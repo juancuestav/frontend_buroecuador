@@ -20,6 +20,7 @@ export default defineComponent({
     let fechaProximaFacturacion
     let pagado
     const verPlanes = ref(false)
+    const verSolucionesEmpresas = ref(false)
 
     const planes = ref()
 
@@ -59,6 +60,7 @@ export default defineComponent({
     return {
       fechaProximaFacturacion,
       verPlanes,
+      verSolucionesEmpresas,
       planes,
       pagado,
       abrirWhatsapp,

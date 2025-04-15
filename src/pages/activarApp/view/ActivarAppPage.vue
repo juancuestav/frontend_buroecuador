@@ -35,68 +35,154 @@
       class="q-mb-md"
     ></CalloutComponent>
 
-    <div class="row q-gutter-sm q-mb-lg justify-center">
-      <q-btn
-        unelevated
-        no-caps
-        color="primary"
-        @click="() => (verPlanes = !verPlanes)"
-      >
-        Ver planes
-      </q-btn>
-
+    <div class="row justify-center q-mb-sm">
       <q-btn color="positive" no-caps unelevated @click="abrirWhatsapp()">
         <q-icon name="bi-whatsapp" size="xs" class="q-mr-sm"></q-icon>
         ¿Necesitas ayuda?</q-btn
       >
     </div>
 
-    <div v-show="verPlanes" class="row q-col-gutter-xs">
-      <!-- :class="{ col: !$q.screen.xs, 'col-12': $q.screen.xs }" -->
-      <q-card
-        v-for="plan in planes"
-        :key="plan.id"
-        flat
-        square
-        class="col-12 col-md-3 squared text-center"
+    <div class="row q-gutter-sm q-mb-sm justify-center">
+      <q-btn
+        unelevated
+        no-caps
+        color="primary"
+        @click="
+          () => {
+            verPlanes = !verPlanes
+            verSolucionesEmpresas = false
+          }
+        "
       >
-        <q-card-section>
-          <!--<q-img :src="plan.imagen" alt="" class="full-width" />-->
-          <div class="text-center text-bold text-h6 q-mb-md">
-            {{ plan.nombre }}
-          </div>
-          <div class="bg-desenfoque rounded-card text-dark q-py-sm q-mb-md">
-            <div v-html="plan.descripcion"></div>
-          </div>
-          <div class="text-center text-h5">
-            $
-            {{ parseFloat(plan.precio_unitario) + parseFloat(plan.iva) }}
-          </div>
-          <div v-if="plan.gravable" class="text-center">IVA incluido</div>
-          <div v-else class="text-center">Precio final (No incluye IVA)</div>
-          <q-btn
-            v-if="plan.url_destino"
-            :href="plan.url_destino"
-            target="_blank"
-            type="a"
-            color="warning"
-            no-caps
-            rounded
-            unelevated
-            class="full-width q-my-md"
-            >Obtener ahora</q-btn
-          >
-          <div class="text-center mb-3">
-            <q-icon
-              name="bi-bookmark-check-fill"
-              class="q-mr-sm"
-              color="positive"
-            ></q-icon
-            >TU COMPRA ES SEGURA
-          </div>
-        </q-card-section>
-      </q-card>
+        ¿Soy cliente?
+      </q-btn>
+
+      <q-btn
+        unelevated
+        no-caps
+        color="primary"
+        @click="
+          () => {
+            verSolucionesEmpresas = !verSolucionesEmpresas
+            verPlanes = false
+          }
+        "
+      >
+        ¿Soy empresa?
+      </q-btn>
     </div>
+
+    <transition name="scale" mode="out-in">
+      <div v-show="verPlanes" class="row q-gutter-xs">
+        <div class="col-12">
+          <CalloutComponent
+            mensaje="Sólo podrás ver tu reporte  personal de crédito"
+            tipo="success"
+            class="q-mb-md"
+          ></CalloutComponent>
+          Planes para clientes
+        </div>
+
+        <q-card
+          v-for="plan in planes"
+          :key="plan.id"
+          square
+          class="col-12 col-md-3 squared text-center q-pa-xs rounded-card"
+        >
+          <q-card-section>
+            <!--<q-img :src="plan.imagen" alt="" class="full-width" />-->
+            <div class="text-center text-bold text-h6 q-mb-md">
+              {{ plan.nombre }}
+            </div>
+            <div class="bg-desenfoque rounded-card text-dark q-py-sm q-mb-md">
+              <div v-html="plan.descripcion"></div>
+            </div>
+            <div class="text-center text-h5">
+              $
+              {{ parseFloat(plan.precio_unitario) + parseFloat(plan.iva) }}
+            </div>
+            <div v-if="plan.gravable" class="text-center">IVA incluido</div>
+            <div v-else class="text-center">Precio final (No incluye IVA)</div>
+            <q-btn
+              v-if="plan.url_destino"
+              :href="plan.url_destino"
+              target="_blank"
+              type="a"
+              color="warning"
+              no-caps
+              rounded
+              unelevated
+              class="full-width q-my-md"
+              >Obtener ahora</q-btn
+            >
+            <div class="text-center mb-3">
+              <q-icon
+                name="bi-bookmark-check-fill"
+                class="q-mr-sm"
+                color="positive"
+              ></q-icon
+              >TU COMPRA ES SEGURA
+            </div>
+          </q-card-section>
+        </q-card>
+      </div>
+    </transition>
+
+    <transition name="scale" mode="out-in">
+      <div v-show="verSolucionesEmpresas" class="row q-gutter-xs">
+        <div class="col-12">
+          <CalloutComponent
+            mensaje="Podrás consultar reportes de varios clientes"
+            tipo="success"
+            class="q-mb-md"
+          ></CalloutComponent>
+        </div>
+
+        <q-card
+          v-for="plan in planes"
+          :key="plan.id"
+          flat
+          square
+          class="col-12 col-md-3 squared text-center q-pa-xs"
+        >
+          <q-card-section>
+            <!--<q-img :src="plan.imagen" alt="" class="full-width" />-->
+            <div class="text-center text-bold text-h6 q-mb-md">
+              {{ plan.nombre }}
+            </div>
+            <div class="bg-desenfoque rounded-card text-dark q-py-sm q-mb-md">
+              <div v-html="plan.descripcion"></div>
+            </div>
+            <div class="text-center text-h5">
+              $
+              {{ parseFloat(plan.precio_unitario) + parseFloat(plan.iva) }}
+            </div>
+            <div v-if="plan.gravable" class="text-center">IVA incluido</div>
+            <div v-else class="text-center">Precio final (No incluye IVA)</div>
+            <q-btn
+              v-if="plan.url_destino"
+              :href="plan.url_destino"
+              target="_blank"
+              type="a"
+              color="warning"
+              no-caps
+              rounded
+              unelevated
+              class="full-width q-my-md"
+              >Obtener ahora</q-btn
+            >
+            <div class="text-center mb-3">
+              <q-icon
+                name="bi-bookmark-check-fill"
+                class="q-mr-sm"
+                color="positive"
+              ></q-icon
+              >TU COMPRA ES SEGURA
+            </div>
+          </q-card-section>
+        </q-card>
+      </div>
+    </transition>
   </q-page>
 </template>
 

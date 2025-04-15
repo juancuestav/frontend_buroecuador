@@ -32,6 +32,9 @@ export class Configuracion extends EntidadAuditable {
   identificacion_propietario_cuenta: string | null
   numero_contacto: string | null
   whatsapp: string | null
+  mensaje_whatsapp: string | null = null
+  whatsapp_soluciones_empresas: string | null = null
+  mensaje_whatsapp_soluciones_empresas: string | null = null
   facebook: string | null
   instagram: string | null
   twitter: string | null

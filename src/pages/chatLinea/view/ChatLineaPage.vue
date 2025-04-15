@@ -32,7 +32,7 @@
           class="q-mx-auto block q-mb-md block"
           unelevated
           target="_blank"
-          @click="abrirWhatsapp()"
+          @click="abrirWhatsappSolucionesEmpresas()"
         >
           <q-icon name="bi-whatsapp" size="xs" class="q-mr-sm"></q-icon>
           Soluciones empresas</q-btn
