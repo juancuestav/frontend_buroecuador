@@ -3,12 +3,14 @@
     <template #tab1>
       <q-page padding>
         <div class="row justify-between items-center q-mb-md">
-          <span class="text-h6 text-bold q-mb-md">Accesos directos</span>
+          <span class="text-h5 text-bold q-mb-md">Accesos directos</span>
+          <p class="text-justify full-width">
+            Accede rápidamente a sitios web que utilizas con mucha frecuencia.
+          </p>
           <q-btn
             v-if="authenticationStore.can('crear.accesos_directos')"
             :color="mostrarCrearAccesoDirecto ? 'blue-10' : 'primary'"
             @click="mostrarCrearAccesoDirecto = !mostrarCrearAccesoDirecto"
-            rounded
             no-wrap
             unelevated
             no-caps
@@ -22,7 +24,7 @@
             ></q-icon
             >{{
               (mostrarCrearAccesoDirecto ? 'Ocultar' : 'Mostrar') +
-              ' formulario Crear nuevo acceso directo'
+              ' formulario'
             }}
           </q-btn>
         </div>
@@ -65,7 +67,7 @@
           <div
             v-for="accesoDirecto in listado"
             :key="accesoDirecto.id"
-            class="col-6 col-md-2 col-sm-3"
+            class="col-6 col-md-3 col-sm-4"
           >
             <card-acceso-directo
               :acceso-directo="accesoDirecto"

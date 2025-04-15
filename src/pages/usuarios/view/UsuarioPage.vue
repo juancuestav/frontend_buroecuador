@@ -362,6 +362,35 @@
             >
             </q-input>
           </div>
+
+          <div v-if="mostrarLimiteConsultas" class="col-12 col-md-3 q-mb-md">
+            <label class="q-mb-sm block">Limite de consultas permitidas</label>
+            <q-input v-model="usuario.limite_consultas" disable outlined dense>
+              <template #after>
+                <q-btn
+                  color="grey-4"
+                  @click="ampliarLimiteConsultas()"
+                  outline
+                  no-caps
+                  unelevated
+                >
+                  <q-icon name="bi-plus" class="text-grey-8"></q-icon>
+                  <span class="text-grey-8">Ampliar</span>
+                </q-btn>
+              </template>
+            </q-input>
+          </div>
+
+          <div class="col-12 col-md-3 q-mb-md">
+            <label class="q-mb-sm block">Consultas realizadas</label>
+            <q-input
+              v-model="usuario.consultas_realizadas"
+              disable
+              outlined
+              dense
+            >
+            </q-input>
+          </div>
         </div>
       </q-form>
     </template>

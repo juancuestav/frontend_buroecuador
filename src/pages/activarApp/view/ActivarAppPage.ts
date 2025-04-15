@@ -4,7 +4,10 @@ import { useConfiguracionGeneralStore } from 'stores/configuracion_general'
 import { defineComponent, ref } from 'vue'
 import { endpoints } from 'config/api'
 
+import CalloutComponent from 'components/CalloutComponent.vue'
+
 export default defineComponent({
+  components: { CalloutComponent },
   setup() {
     /********
      * Store

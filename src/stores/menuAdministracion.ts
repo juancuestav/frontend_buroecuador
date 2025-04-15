@@ -8,13 +8,6 @@ const store = useAuthenticationStore()
 // State
 export const menuAdministracion: Ref<MenuOption[]> = computed(() => [
   {
-    title: 'Políticas de privacidad',
-    icon: 'bi-shield-lock',
-    link: 'https://burodecredito.ec/politicas-privacidad',
-    target: '_blank',
-    can: true,
-  },
-  {
     header: 'Administración',
     can: store.can('acceder.modulo_administracion'),
   },

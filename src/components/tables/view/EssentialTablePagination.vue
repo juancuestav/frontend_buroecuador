@@ -10,7 +10,6 @@
 
   <q-table
     flat
-    bordered
     ref="refTable"
     :rows="listado"
     color="primary"
@@ -29,7 +28,7 @@
     :separator="$q.screen.xs ? 'horizontal' : separador"
     :hide-bottom="!mostrarFooter"
     :style="estilos"
-    class="bg-body-table my-sticky-column-table my-sticky-header-column-table borde rounded"
+    class="bg-body-table my-sticky-column-table my-sticky-header-column-table"
     :class="{
       'alto-fijo-desktop': !inFullscreen && altoFijo && !$q.screen.xs,
       'alto-fijo-mobile': !inFullscreen && altoFijo && $q.screen.xs,
@@ -197,7 +196,7 @@
       <transition name="scale" mode="out-in">
         <div
           v-if="titulo && !mostrarFiltros"
-          class="row text-primary text-subtitle2 q-mb-lg items-center justify-between col-12"
+          class="row text-primary text-subtitle2 q-mb-lg items-center justify-between col-12 text-black"
           :class="{
             'titulo-tabla2': !$q.screen.xs,
             'justify-center': $q.screen.xs,
@@ -206,8 +205,7 @@
           <span>
             <q-icon
               v-if="!$q.screen.xs"
-              name="bi-grip-vertical"
-              color="primary"
+              name="bi-database"
               class="q-mr-sm"
             ></q-icon>
             <span>{{ titulo }}</span>
@@ -284,13 +282,14 @@
       <div
         class="row full-width justify-between q-col-gutter-x-sm items-center q-mb-md"
       >
-        <span class="row items-center q-px-md">
+        <span class="row items-center text-black">
+          {{ '# registros: ' }}
           <q-icon
-            name="bi-circle-fill"
-            color="positive"
-            class="q-mr-sm"
+            name="bi-check-circle-fill"
+            color="primary"
+            class="q-mx-sm"
           ></q-icon>
-          {{ 'Total de elementos: ' }} <b>{{ pagination.total }}</b>
+          <b>{{ pagination.total }}</b>
         </span>
 
         <div class="row q-gutter-xs justify-end q-mb-md">
@@ -334,9 +333,9 @@
           > -->
           <q-btn
             v-if="mostrarExportar"
-            color="positive"
             icon="archive"
             label="Exportar a csv"
+            class="bg-body-table hite text-primary"
             no-caps
             rounded
             unelevated
@@ -549,13 +548,13 @@
     <template #body-cell-acciones="props">
       <q-td v-if="!$q.screen.xs" :props="props">
         <div class="row inline full-width block q-col-gutter-x-xs text-left">
-          <q-btn-group
+          <!-- <q-btn-group
             v-if="permitirConsultar || permitirEditar || permitirEliminar"
             rounded
             unelevated
             class="inline text-left"
           >
-            <!-- Consultar -->
+
             <q-btn
               v-if="permitirConsultar"
               class="bg-primary q-px-md"
@@ -568,7 +567,7 @@
               <q-tooltip class="bg-dark"> Consultar </q-tooltip>
             </q-btn>
 
-            <!-- Editar -->
+
             <q-btn
               v-if="permitirEditar"
               class="bg-secondary q-px-md"
@@ -579,7 +578,6 @@
               <q-tooltip class="bg-dark"> Editar </q-tooltip>
             </q-btn>
 
-            <!-- Eliminar -->
             <q-btn
               v-if="permitirEliminar"
               class="bg-negative q-px-md"
@@ -591,7 +589,57 @@
               <q-icon name="bi-trash3" size="xs" color="white"></q-icon>
               <q-tooltip class="bg-dark"> Eliminar </q-tooltip>
             </q-btn>
-          </q-btn-group>
+          </q-btn-group> -->
+
+          <!--<q-btn-group
+            v-if="permitirConsultar || permitirEditar || permitirEliminar"
+            unelevated
+            outline
+            class="inline text-left"
+          > -->
+          <!-- Consultar -->
+          <q-btn
+            v-if="permitirConsultar"
+            color="grey-4"
+            class="q-pa-sm q-mr-xs"
+            size="sm"
+            dense
+            outline
+            @click="consultar({ entidad: props.row, posicion: props.rowIndex })"
+          >
+            <q-icon name="bi-eye" color="secondary"></q-icon>
+            <q-tooltip class="bg-dark"> Consultar </q-tooltip>
+          </q-btn>
+
+          <!-- Editar -->
+          <q-btn
+            v-if="permitirEditar"
+            color="grey-4"
+            class="q-pa-sm q-mr-xs"
+            size="sm"
+            dense
+            outline
+            no-wrap
+            no-caps
+            @click="editar({ entidad: props.row, posicion: props.rowIndex })"
+          >
+            <q-icon name="bi-pencil-square" color="secondary"></q-icon>
+            <q-tooltip class="bg-dark"> Editar </q-tooltip>
+          </q-btn>
+
+          <!-- Eliminar -->
+          <q-btn
+            v-if="permitirEliminar"
+            color="grey-4"
+            outline
+            class="q-pa-sm q-mr-xs"
+            size="sm"
+            dense
+            @click="eliminar({ entidad: props.row, posicion: props.rowIndex })"
+          >
+            <q-icon name="bi-trash3" color="secondary"></q-icon>
+            <q-tooltip class="bg-dark"> Eliminar </q-tooltip>
+          </q-btn>
 
           <CustomButtons
             v-if="accion1"

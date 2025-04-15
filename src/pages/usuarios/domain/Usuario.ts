@@ -13,7 +13,7 @@ export class Usuario extends EntidadAuditable {
   direccion: string | null
   codigo_verificacion: string | null
   edad: string | null
-  rol: []
+  rol: number[]
   puede_recibir_notificaciones: boolean
   created_at: string | null
   verificado: boolean
@@ -26,6 +26,8 @@ export class Usuario extends EntidadAuditable {
   tipo_cliente: string | null = null
   provincia: number | null = null
   canton: number | null = null
+  limite_consultas: number = 0
+  consultas_realizadas: number = 0
 
   constructor() {
     super()

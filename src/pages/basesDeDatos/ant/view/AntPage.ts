@@ -2,9 +2,19 @@ import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/applicat
 import { AntController } from '../infraestructure/AntController'
 import { defineComponent, ref } from 'vue'
 import { Ant } from '../domain/Ant'
+import { useNotificaciones } from 'shared/notificaciones'
+import { useLimiteConsultaStore } from 'stores/limiteConsulta'
+
+import LimiteConsultas from 'pages/basesDeDatos/limiteConsultas/view/LimiteConsultaComponent.vue'
 
 export default defineComponent({
+  components: { LimiteConsultas },
   setup() {
+    /*********
+     * Stores
+     *********/
+    const limiteConsultaStore = useLimiteConsultaStore()
+
     /********
      * Mixin
      *********/
@@ -13,7 +23,32 @@ export default defineComponent({
     const { listar } = mixin.useComportamiento()
     const { onListado } = mixin.useHooks()
 
-    onListado(() => ant.hydrate(listado.value[0]))
+    /************
+     * Variables
+     ************/
+    const { notificarAdvertencia, notificarInformacion } = useNotificaciones()
+
+    const buscar = (busqueda) => {
+      if (!busqueda) return notificarAdvertencia('Ingrese el número de cedula')
+      if (
+        limiteConsultaStore.consultasRealizadas >=
+        limiteConsultaStore.consultasPermitidas
+      )
+        return notificarAdvertencia(
+          'Ha alcanzado el <b>límite de consultas disponibles</b>. Por favor, <b>contáctenos si desea ampliar su cuota</b>.'
+        )
+      listar({ search: busqueda })
+    }
+
+    onListado(() => {
+      limiteConsultaStore.incrementarConsultasRealizadas()
+      notificarInformacion('Busqueda finalizada')
+    })
+
+    /*******
+     * Init
+     *******/
+    limiteConsultaStore.consultarCantidadesRealizadasPermitidas()
 
     return {
       mixin,
@@ -21,6 +56,7 @@ export default defineComponent({
       listado,
       listar,
       busqueda: ref(),
+      buscar,
     }
   },
 })

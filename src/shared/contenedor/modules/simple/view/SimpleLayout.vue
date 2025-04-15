@@ -4,7 +4,7 @@
       <slot name="modales" />
     </transition>
 
-    <div v-if="titulo" class="text-h6 q-mb-md">{{ titulo }}</div>
+    <div v-if="titulo" class="text-h5 text-bold q-mb-md">{{ titulo }}</div>
 
     <div class="bg-redsq-pa-md">
       <slot name="formulario" />

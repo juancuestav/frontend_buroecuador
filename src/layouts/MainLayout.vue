@@ -1,7 +1,10 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <!-- Navbar -->
-    <q-header class="bg-desenfoque-0 text-dark rounded-card">
+    <q-header
+      class="bg-body-background text-dark"
+      :class="{ 'q-px-lg': !$q.screen.xs }"
+    >
       <transition name="slide-fade" mode="out-in">
         <div v-if="mostrarBuscar" class="q-pa-xs">
           <q-input
@@ -62,16 +65,17 @@
         </div>
       </transition>
 
-      <q-toolbar class="row justify-between">
+      <q-toolbar class="row justify-between border-bottom q-py-md">
         <span>
           <q-btn
             color="primary"
             dense
             aria-label="Menu"
             unelevated
-            square
+            flat
+            icon="menu"
             @click="toggleLeftDrawer"
-            ><svg
+            ><!--<svg
               width="24"
               height="24"
               viewBox="0 0 24 24"
@@ -96,7 +100,7 @@
                 d="M3 15C3 14.4477 3.44772 14 4 14H10C10.5523 14 11 14.4477 11 15C11 15.5523 10.5523 16 10 16H4C3.44772 16 3 15.5523 3 15Z"
                 fill="#fff"
               />
-            </svg>
+            </svg> -->
           </q-btn>
 
           <q-btn @click="mostrarBuscar = !mostrarBuscar" unelevated no-caps>
@@ -105,9 +109,11 @@
               size="xs"
               class="bg-icon color-icon-navbar q-pa-xs rounded-field q-mr-xs"
             ></q-icon>
-            <span v-if="!$q.screen.xs" class="text-color">Buscar</span>
+            <span v-if="!$q.screen.xs" class="">Módulos del sistema</span>
           </q-btn>
         </span>
+
+        <!--<b v-if="$q.screen.xs">{{ appName }}</b> -->
 
         <span>
           <!-- <q-toggle
@@ -117,7 +123,14 @@
             unchecked-icon="bi-sun-fill"
             @click="toggleDarkMode()"
           /> -->
-
+          <q-btn
+            color="primary"
+            label="Descarga la app móvil"
+            href="https://play.google.com/store/apps/details?id=org.capacitor.quasar.buroecuador&pcampaignid=web_share&pli=1"
+            target="_blank"
+            unelevated
+            no-caps
+          ></q-btn>
           <!-- Notificaciones -->
           <boton-notificaciones></boton-notificaciones>
 
@@ -157,28 +170,27 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      class="q-px-s5m my-font custom-shadow5 rounded-drawer"
+      class="bg-drawer my-font border-right"
       :class="{ 'bg-solid': $q.screen.xs }"
     >
       <!-- Drawer Header -->
-      <div class="absolute-top text-center q-pa-md">
-        <q-avatar size="60px" class="rounded-card custom-shadow25">
-          <img
-            :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''"
-            class="q-mx-auto block"
-          />
+      <div class="absolute-top row items-center q-pa-md border-bottom q-mx-md">
+        <q-avatar size="35px" class="rounded-card q-mr-md">
+          <img :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''" />
         </q-avatar>
+
+        <div class="text-center text-bold">
+          {{ appName }}
+        </div>
       </div>
 
       <!-- Drawer Body -->
-      <q-scroll-area style="height: calc(100% - 102px); margin-top: 100px">
-        <div class="text-center">
-          {{ 'Buró de crédito Ecuador' }}
-        </div>
+      <q-scroll-area style="height: calc(100% - 102px); margin-top: 86px">
         <q-list>
           <div v-for="item in links" :key="item.title">
             <q-item-label
               v-if="item.hasOwnProperty('header') && item.can"
+              class="text-color"
               header
               >{{ item.header }}</q-item-label
             >
@@ -198,14 +210,26 @@
     </q-drawer>
 
     <!-- Router -->
-    <q-page-container class="bg-body-background my-font rounded-card">
+    <q-page-container
+      class="bg-body-bacskground my-font"
+      :style="{
+        backgroundImage: `url(${fondo})`,
+        backgroundSize: 'auto',
+        backgroundPosition: 'top right',
+        backgroundRepeat: 'no-repeat',
+        marginTop: '90px',
+      }"
+    >
       <!-- <q-page-container class="bg-body-background q-pb-xl"> -->
       <simple-chat></simple-chat>
 
       <router-view v-slot="{ Component }">
         <!-- <essential-loading></essential-loading> -->
         <!-- <transition name="scale" mode="out-in"> -->
-        <keep-alive :exclude="['tablero_principal', 'puntuacion_cliente']" class="bg-body-background-inverso rounded-card">
+        <keep-alive
+          :exclude="['tablero_principal', 'puntuacion_cliente']"
+          class="bg-body-background-inverso rounded-carfd"
+        >
           <component :is="Component" />
         </keep-alive>
         <!-- </transition> -->
@@ -233,6 +257,7 @@ import { defineComponent, ref, computed, watchEffect, watch } from 'vue'
 import { LocalStorage, Platform, useQuasar } from 'quasar'
 import { useMenuStore } from 'src/stores/menu'
 import { useRouter } from 'vue-router'
+import fondo from 'src/assets/img/bg.svg'
 
 // Dependencias - Capacitor
 import { StatusBar, Style } from '@capacitor/status-bar'
@@ -453,6 +478,7 @@ export default defineComponent({
       resultadosBusqueda,
       posicionResultados,
       refListadoBusqueda,
+      fondo,
     }
   },
 })

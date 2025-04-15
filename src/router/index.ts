@@ -88,18 +88,24 @@ const routerAutenticadoBuroCreditoEcuador = (
   correoVerificado: boolean
 ) => {
   const authentication = useAuthenticationStore()
+  console.log(to.name)
   if (sessionIniciada) {
     if (correoVerificado) {
       if (authentication.can('acceder.' + to.name?.toString())) {
+        console.log('dentro del puede acceder')
+
         next()
       } else {
+        console.log('dentro del else')
         sessionIniciadaCorreoVerificado(next)
         // next({ name: '404' })
       }
     } else {
+      console.log('dentro de codigo verificacion')
       next({ name: 'codigo_verificacion' })
     }
   } else {
+    console.log('dentro de login')
     next({ name: 'Login' })
   }
 }
@@ -115,6 +121,7 @@ const routerAutenticadoTrabajosEcuador = (
   }
 }
 
+// revisar logica de loginRedirect en utils.ts
 const sessionIniciadaCorreoVerificado = (
   next: (params?: Record<string, string>) => void
 ) => {
@@ -126,6 +133,8 @@ const sessionIniciadaCorreoVerificado = (
     } else {
       next({ name: 'archivos_reportes' })
     }
+  } else if (authentication.hasRole('EMPRESA')) {
+    next({ name: 'busqueda_general' })
   } else {
     next({ name: 'tablero' })
   }

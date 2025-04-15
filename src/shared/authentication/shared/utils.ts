@@ -4,6 +4,7 @@ const store = useAuthenticationStore()
 
 // Buro de credito ecuador
 export const loginRedirect = (roles: string[], router) => {
+  console.log(roles)
   if (store.extraerRol(roles, 'CLIENTE')) {
     /****************************
      * Seccion Buro (si funciona)
@@ -13,6 +14,8 @@ export const loginRedirect = (roles: string[], router) => {
     } else {
       router.replace('/archivos-reportes')
     }
+  } else if (store.extraerRol(roles, 'EMPRESA')) {
+    router.replace({ name: 'busqueda_general' })
   } else {
     router.replace('/')
   }

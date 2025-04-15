@@ -1,8 +1,9 @@
 /*body {
   background-color: $grey-4 !important;
 }*/
-$border-color: #fff;
-$bg-body: $grey-4;
+$border-color: $grey-4;
+$bg-body: #f5f5fa;
+$text-color: #51547a;
 
 .body--light {
   .bg-toolbars {
@@ -11,7 +12,7 @@ $bg-body: $grey-4;
   }
 
   .bg-body {
-    background-color: #f0f4f7 !important;
+    background-color: $bg-body !important;
   }
 
   .bg-grey-form {
@@ -19,11 +20,13 @@ $bg-body: $grey-4;
   }
 
   .bg-body-background {
-    background: linear-gradient(to bottom, #e2e4ec, #e2e4ec);
-    backdrop-filter: blur(10px);
+    //background: linear-gradient(to bottom, #e2e4ec, #e2e4ec);
+    background-color: #fcfcfd;
+    // backdrop-filter: blur(10px);
   }
   .bg-body-background-inverso {
-    background: linear-gradient(to bottom right, #a9abbe, #e2e4ec);
+    //background: linear-gradient(to bottom right, #a9abbe, #e2e4ec);
+    background-color: #fff;
     // background: linear-gradient(to bottom right, #a9abbe, #e2e4ec);
   }
 
@@ -51,7 +54,8 @@ $bg-body: $grey-4;
   }
 
   .bg-solid {
-    background-color: #e6e7f0;
+    // background-color: #e6e7f0;
+    background-color: #fff;
   }
 
   .bg-border {
@@ -68,17 +72,18 @@ $bg-body: $grey-4;
 
   .tab-active {
     background-color: rgba($grey-2, 0.6);
-    border-radius: 16px;
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 5px 15px;
-    border: 1px solid $border-color;
-    color: $primary;
-    text-shadow: rgba($primary, 0.5) 2px 2px 4px;
+    // border-radius: 16px;
+    //box-shadow: rgba(0, 0, 0, 0.12) 0px 5px 15px;
+    // border: 1px solid $border-color;
+    //color: $primary;
+    //text-shadow: rgba($primary, 0.5) 2px 2px 4px;
   }
 
   .tab-inactive {
     background-color: transparent !important;
-    border-radius: 16px;
-    color: rgba($primary, 0.8);
+    // border-radius: 16px;
+    font-weight: 100 !important;
+    color: rgba($text-color, 1);
   }
 
   .tab-inactive-square {
@@ -91,13 +96,7 @@ $bg-body: $grey-4;
   }
 
   .bg-drawer {
-    // background-color: white;
-    /* Versión con rgba para mayor control de opacidad si se necesita */
-    background: linear-gradient(
-      180deg,
-      rgba(75, 46, 131, 1) 0%,
-      rgba(30, 58, 138, 1) 100%
-    );
+    background-color: #f5f5fa;
   }
 
   .bg-icon {
@@ -146,7 +145,11 @@ $bg-body: $grey-4;
   }
 
   .text-color {
-    color: #000 !important;
+    color: $text-color !important;
+  }
+
+  .text-uppercase {
+    text-transform: uppercase;
   }
 
   // Toggle
@@ -175,7 +178,7 @@ $bg-body: $grey-4;
   // Tabla
   .q-table__top,
   .q-table__bottom {
-    box-shadow: rgba(30, 58, 138, 0.25) 1px 2px 20px;
+    //box-shadow: rgba(30, 58, 138, 0.25) 1px 2px 20px;
     border: 1px solid rgba(255, 255, 255, 0.4);
   }
 
@@ -189,7 +192,7 @@ $bg-body: $grey-4;
 
   .q-table__top,
   thead tr:first-child th {
-    background-color: #e2e4ec;
+    background-color: white;
     color: $primary;
   }
 
@@ -230,7 +233,8 @@ $bg-body: $grey-4;
   .q-field .q-field__inner {
     // text-transform: uppercase;
     background-color: #fff;
-    border-radius: 50px;
+    border-radius: 4px;
+    border: 1px solid $grey-5;
   }
 
   .q-field__inner .q-field-control {
@@ -239,7 +243,8 @@ $bg-body: $grey-4;
 
   .q-field--disabled .q-field__inner {
     background-color: #9ba5bb23;
-    //color: $accent !important;
+    border: 1px solid $grey-5;
+    // background-color: #9ba5bb23;
   }
 
   .q-field--disabled .q-field__inner .q-field__native {
@@ -279,34 +284,38 @@ $bg-body: $grey-4;
 
   // Menu item drawer
   .link-active {
-    background: linear-gradient(
+    /*background: linear-gradient(
       180deg,
       rgba(75, 46, 131, 1) 0%,
       rgba(30, 58, 138, 1) 100%
-    );
-    box-shadow: rgba(30, 58, 138, 0.8) 1px 2px 15px;
-    backdrop-filter: blur(10px);
-    border-radius: 8px;
-    color: #fff;
+    );*/
+    //box-shadow: rgba(30, 58, 138, 0.8) 1px 2px 15px;
+    //backdrop-filter: blur(10px);
+    border-left: 1px solid $primary !important;
+    color: $primary !important;
 
     i {
-      color: #fff;
+      color: $primary;
     }
 
     .q-item__label {
-      font-weight: bold;
+      font-weight: 500;
     }
   }
 
+  .q-item {
+    min-height: 14px;
+  }
+
   .color-icono {
-    color: white; //#575b6e;
-    background: linear-gradient(
+    color: #5a5e9a; //#575b6e;
+    /*background: linear-gradient(
       180deg,
       rgba(75, 46, 131, 1) 0%,
       rgba(30, 58, 138, 1) 100%
-    );
-    padding: 6px;
-    border-radius: 4px;
+    );*/
+    padding: 4px;
+    //border-radius: 4px;
   }
 
   .q-card {
@@ -344,7 +353,11 @@ $bg-body: $grey-4;
 
   // Drawer
   .border-right {
-    border-right: 1px dashed $grey; //$border-color;
+    border-right: 1px solid $border-color;
+  }
+
+  .border-left {
+    border-left: 1px solid $border-color;
   }
 
   .border-bottom {
@@ -487,7 +500,8 @@ ul.circles {
 
 // Card Capas
 .card-capas {
-  background: #e6e7f0;
+  background: $bg-body;
+  border: 1px solid $border-color;
   border-radius: 12px;
   position: relative;
   transition: transform 0.3s ease;

@@ -203,9 +203,28 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: 'dashboard-precalifica',
+        name: 'dashboard_precalifica',
+        component: () =>
+          import(
+            'pages/basesDeDatos/dashboardPrecalifica/view/DashboardPrecalificaPage.vue'
+          ),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'busqueda-general',
+        name: 'busqueda_general',
+        component: () =>
+          import(
+            'pages/basesDeDatos/busquedaGeneral/view/BusquedaGeneralPage.vue'
+          ),
+        meta: { requiresAuth: true },
+      },
+      {
         path: 'registro-civil',
         name: 'registro_civil',
-        component: () => import('pages/basesDeDatos/view/RegistroCivilPage.vue'),
+        component: () =>
+          import('pages/basesDeDatos/registroCivil/view/RegistroCivilPage.vue'),
         meta: { requiresAuth: true },
       },
       {
@@ -218,6 +237,18 @@ const routes: RouteRecordRaw[] = [
         path: 'ant',
         name: 'ant',
         component: () => import('pages/basesDeDatos/ant/view/AntPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'banco',
+        name: 'banco',
+        component: () => import('pages/basesDeDatos/banco/view/BancoPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'sri',
+        name: 'sri',
+        component: () => import('pages/basesDeDatos/sri/view/SriPage.vue'),
         meta: { requiresAuth: true },
       },
       /******************

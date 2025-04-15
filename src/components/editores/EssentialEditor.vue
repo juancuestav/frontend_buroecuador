@@ -4,9 +4,9 @@
     min-height="5rem"
     :toolbar="toolbar"
     :disable="disable"
-    toolbar-bg="blue-grey-2"
-    toolbar-text-color="black"
-    toolbar-toggle-color="primary"
+    toolbar-bg="white"
+    toolbar-text-color="primary"
+    toolbar-toggle-color="warning"
     @input="updateValue"
   >
   </q-editor>
@@ -19,17 +19,17 @@ import { ref } from 'vue'
 const props = defineProps({
   value: {
     type: String,
-    default: ''
+    default: '',
   },
   disable: {
     type: Boolean,
-    required: true
+    required: true,
   },
   barraHerramientas: {
     // type: Object as  Array,
     type: Array,
-    default: null
-  }
+    default: null,
+  },
 })
 
 const emit = defineEmits(['update:value'])
@@ -46,8 +46,8 @@ const toolbar =
             icon: $q.iconSet.editor.align,
             fixedLabel: true,
             list: 'only-icons',
-            options: ['left', 'center', 'right', 'justify']
-          }
+            options: ['left', 'center', 'right', 'justify'],
+          },
         ],
         ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
         ['token', 'hr', 'link', 'custom_btn'],
@@ -57,17 +57,17 @@ const toolbar =
             label: $q.lang.editor.formatting,
             icon: $q.iconSet.editor.formatting,
             list: 'no-icons',
-            options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code']
+            options: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code'],
           },
-          'removeFormat'
+          'removeFormat',
         ],
         ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
 
-        ['undo', 'redo']
+        ['undo', 'redo'],
       ]
     : props.barraHerramientas
 
-const updateValue = value => {
+const updateValue = (value) => {
   internalValue.value = value
   emit('update:value', value)
 }

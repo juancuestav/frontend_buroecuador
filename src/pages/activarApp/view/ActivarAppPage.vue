@@ -1,13 +1,15 @@
 <template>
   <q-page padding>
-    <h1 class="text-h5 text-center q-mb-lg">BURÓ DE CRÉDITO ECUADOR</h1>
+    <h1 class="text-h5 text-bold text-center q-mb-lg">
+      BURÓ DE CRÉDITO ECUADOR
+    </h1>
     <p class="text-center">
       El más completo del mercado. Tu Informe de Crédito contiene el detalle de
       todas tus deudas y te permite conocer de qué forma te evalúan los bancos y
       otras instituciones financieras para obtener un crédito.
     </p>
 
-    <div class="q-mb-lg">
+    <!--<div class="q-mb-lg">
       <div v-if="pagado">
         <p class="text-positive text-bold pt-2">
           <i class="bi-check-circle-fill me-2"></i>SU APP SE ENCUENTRA ACTIVADA
@@ -17,11 +19,25 @@
       <div v-else class="text-bold text-negative">
         PENDIENTE DE ACTIVACIÓN. DEBES ADQUIRIR UN PLAN.
       </div>
-    </div>
+    </div> -->
+
+    <CalloutComponent
+      v-if="pagado"
+      :mensaje="`Su app se encuentra activada. Próxima facturación: <b>${fechaProximaFacturacion}</b>`"
+      tipo="success"
+      class="q-mb-md"
+    ></CalloutComponent>
+
+    <CalloutComponent
+      v-else
+      mensaje="Pendiente de activación. <b>Debes adquirir un plan</b>."
+      tipo="info"
+      class="q-mb-md"
+    ></CalloutComponent>
 
     <div class="row q-gutter-sm q-mb-lg justify-center">
       <q-btn
-        push
+        unelevated
         no-caps
         color="primary"
         @click="() => (verPlanes = !verPlanes)"
@@ -29,7 +45,7 @@
         Ver planes
       </q-btn>
 
-      <q-btn color="positive" no-caps push @click="abrirWhatsapp()">
+      <q-btn color="positive" no-caps unelevated @click="abrirWhatsapp()">
         <q-icon name="bi-whatsapp" size="xs" class="q-mr-sm"></q-icon>
         ¿Necesitas ayuda?</q-btn
       >
@@ -41,14 +57,17 @@
         v-for="plan in planes"
         :key="plan.id"
         flat
-        class="col-12 col-md-4 text-center"
+        square
+        class="col-12 col-md-3 squared text-center"
       >
         <q-card-section>
-          <q-img :src="plan.imagen" alt="" class="full-width" />
+          <!--<q-img :src="plan.imagen" alt="" class="full-width" />-->
           <div class="text-center text-bold text-h6 q-mb-md">
             {{ plan.nombre }}
           </div>
-          <div v-html="plan.descripcion" class="q-mb-lg"></div>
+          <div class="bg-desenfoque rounded-card text-dark q-py-sm q-mb-md">
+            <div v-html="plan.descripcion"></div>
+          </div>
           <div class="text-center text-h5">
             $
             {{ parseFloat(plan.precio_unitario) + parseFloat(plan.iva) }}
@@ -60,7 +79,10 @@
             :href="plan.url_destino"
             target="_blank"
             type="a"
-            color="positive"
+            color="warning"
+            no-caps
+            rounded
+            unelevated
             class="full-width q-my-md"
             >Obtener ahora</q-btn
           >

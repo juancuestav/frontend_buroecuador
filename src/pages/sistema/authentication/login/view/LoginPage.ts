@@ -79,11 +79,13 @@ export default defineComponent({
       } else {
         Router.replace('/')
       } */
+      console.log('redireccionar desde login')
       loginRedirect(roles, Router)
       notificaciones.notificarCorrecto('Bienvenido a Buró de Crédito Ecuador!')
     }
 
     const loginTrabajosEcuador = () => {
+      console.log('desde trabajos')
       Router.replace('/verificar-cuenta')
       notificaciones.notificarCorrecto('Bienvenido a Trabajos Ecuador!')
     }

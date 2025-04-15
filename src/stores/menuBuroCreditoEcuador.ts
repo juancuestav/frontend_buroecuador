@@ -4,13 +4,15 @@ import { Ref, computed } from 'vue'
 
 const store = useAuthenticationStore()
 const esCliente = computed(() => store.hasRole('CLIENTE'))
-const appActivada = esCliente.value ? store.planPagado : true
+const esAdministrador = computed(() => store.hasRole('ADMINISTRADOR'))
+const esEmpleado = computed(() => store.hasRole('EMPLEADO'))
+const appActivada = computed(() => (esCliente.value ? store.planPagado : true))
 
 // State
 export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
   {
     header: 'Menu',
-    can: store.can('acceder.tablero'),
+    can: true, //store.can('acceder.tablero'),
   },
   {
     title: 'Tablero',
@@ -25,23 +27,44 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: store.can('acceder.accesos_directos'),
   },
   {
-    title: 'Bases de datos',
-    icon: 'bi-database',
+    title: 'Dashboard Precalifica',
+    icon: 'bi-pie-chart',
+    link: 'dashboard-precalifica',
+    can: store.can('acceder.dashboard_precalifica'),
+  },
+  {
+    title: 'Precalifica',
+    icon: 'bi-person-lines-fill',
     can: store.can('acceder.modulo_bases_de_datos'),
     children: [
       {
+        title: 'Reporte precalifica BRC',
+        icon: 'bi-database',
+        link: 'busqueda-general',
+      },
+      {
         title: 'Registro civil',
-        icon: 'bi-person-lines-fill',
+        icon: 'bi-database',
         link: 'registro-civil',
       },
       {
+        title: 'Buró de crédito',
+        icon: 'bi-database',
+        link: 'banco',
+      },
+      {
         title: 'Iess',
-        icon: 'bi-person-lines-fill',
+        icon: 'bi-database',
         link: 'iess',
       },
       {
+        title: 'SRI',
+        icon: 'bi-database',
+        link: 'sri',
+      },
+      {
         title: 'Ant',
-        icon: 'bi-person-lines-fill',
+        icon: 'bi-database',
         link: 'ant',
       },
     ],
@@ -89,14 +112,10 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     ],
   },
   {
-    header: 'Modulos',
-    can: true,
-  },
-  {
     title: 'Activar app',
     icon: 'bi-toggle-on',
     link: 'activar-app',
-    can: store.can('acceder.activar_app') && !appActivada,
+    can: store.can('acceder.activar_app') && !appActivada.value,
   },
   {
     title: 'Mi puntuación',
@@ -108,10 +127,70 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     title: esCliente.value ? 'Mi Buró' : 'Compartir archivos a clientes',
     icon: 'bi-archive',
     link: 'archivos-reportes',
-    can: store.can('acceder.archivos_reportes') && appActivada,
+    can: store.can('acceder.archivos_reportes') && appActivada.value,
   },
   {
-    title: 'Planes y servicios',
+    title: 'Score crediticio',
+    icon: 'bi-journal-arrow-up',
+    link: 'score-crediticio',
+    can: store.can('acceder.score_crediticio') && !appActivada.value,
+  },
+  {
+    title: 'Adquirir servicio',
+    icon: 'bi-person-workspace',
+    link: 'adquirir-servicios',
+    can: store.can('acceder.adquirir_servicio') && !appActivada.value,
+  },
+  {
+    title: 'Solicitar mejoramiento',
+    icon: 'bi-graph-up-arrow',
+    link: 'mejoramiento',
+    can: store.can('acceder.mejoramiento'),
+  },
+  {
+    title: 'Reporte de crédito',
+    icon: 'bi-star',
+    link: 'reporte-credito',
+    can: store.can('acceder.reporte_credito') && !appActivada.value,
+  },
+  {
+    title: 'Mis reportes',
+    icon: 'bi-clipboard',
+    link: 'mis-reportes',
+    can: store.can('acceder.mis_reportes') && !appActivada.value,
+  },
+  {
+    title: 'Chat en línea',
+    icon: 'bi-whatsapp',
+    link: 'chat-en-linea',
+    can: store.can('acceder.chat_linea'),
+  },
+  {
+    title: 'Novedades',
+    icon: 'bi-envelope-check',
+    link: 'notificaciones-generales',
+    can: store.can('acceder.notificaciones_generales'),
+  },
+  {
+    title: 'Solicitud de crédito',
+    icon: 'bi-box-arrow-up-right',
+    link: 'https://burodecredito.ec/solicitud-credito',
+    target: '_blank',
+    can: true,
+  },
+  {
+    title: 'Políticas de privacidad',
+    icon: 'bi-box-arrow-up-right',
+    link: 'https://burodecredito.ec/politicas-privacidad',
+    target: '_blank',
+    can: true,
+  },
+  {
+    header: 'Módulos de administración',
+    can: esAdministrador.value || esEmpleado.value,
+  },
+  {
+    title: 'Nuestros servicios',
     icon: 'bi-person-workspace',
     link: 'servicios',
     can: store.can('acceder.servicios'),
@@ -128,61 +207,11 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     link: 'usuarios',
     can: store.can('acceder.usuarios'),
   },
-
-  {
-    title: 'Score crediticio',
-    icon: 'bi-journal-arrow-up',
-    link: 'score-crediticio',
-    can: store.can('acceder.score_crediticio') && !appActivada,
-  },
-  {
-    title: 'Adquirir servicio',
-    icon: 'bi-person-workspace',
-    link: 'adquirir-servicios',
-    can: store.can('acceder.adquirir_servicio') && !appActivada,
-  },
-  {
-    title: 'Solicitar mejoramiento',
-    icon: 'bi-graph-up-arrow',
-    link: 'mejoramiento',
-    can: store.can('acceder.mejoramiento'),
-  },
-  {
-    title: 'Reporte de crédito',
-    icon: 'bi-star',
-    link: 'reporte-credito',
-    can: store.can('acceder.reporte_credito') && !appActivada,
-  },
-  {
-    title: 'Mis reportes',
-    icon: 'bi-clipboard',
-    link: 'mis-reportes',
-    can: store.can('acceder.mis_reportes') && !appActivada,
-  },
-  {
-    title: 'Chat en línea',
-    icon: 'bi-whatsapp',
-    link: 'chat-en-linea',
-    can: store.can('acceder.chat_linea'),
-  },
   {
     title: 'Notificar a clientes',
     icon: 'bi-envelope-plus',
     link: 'notificar-clientes',
     can: store.can('acceder.notificar_clientes'),
-  },
-  {
-    title: 'Novedades',
-    icon: 'bi-envelope-check',
-    link: 'notificaciones-generales',
-    can: store.can('acceder.notificaciones_generales'),
-  },
-  {
-    title: 'Solicitud de crédito',
-    icon: 'bi-check-circle',
-    link: 'https://bit.ly/SOLIBRC',
-    target: '_blank',
-    can: true,
   },
   {
     title: 'Email marketing',

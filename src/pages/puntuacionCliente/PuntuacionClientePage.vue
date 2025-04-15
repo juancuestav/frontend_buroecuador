@@ -1,8 +1,10 @@
 <template>
   <q-page padding>
+    <div class="text-h5 text-bold q-mb-md">Mi puntuación</div>
+
     <div
       v-if="puedeCrear"
-      class="row bg-solid rounded-card q-px-md q-pt-xs q-pb-lg q-mb-md"
+      class="row bg-solid rounded-card q-pt-xs q-pb-lg q-mb-md"
     >
       <div class="col-12 q-mb-md">
         <SelectorUsuario
@@ -36,6 +38,7 @@
     </div>
 
     <div class="row card-capas q-pa-md">
+      <div class="col-12"></div>
       <div class="col-12 col-md-6 q-mb-md">
         <div class="text-h6 q-mb-xl">
           Puntuación del cliente

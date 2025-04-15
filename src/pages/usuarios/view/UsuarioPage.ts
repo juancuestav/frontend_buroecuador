@@ -2,7 +2,7 @@
 import { configuracionColumnasUsuarios } from '../domain/configuracionColumnasUsuarios'
 import { required } from '@vuelidate/validators'
 import useVuelidate from '@vuelidate/core'
-import { defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 
 // Componentes
 import TabLayout from 'shared/contenedor/modules/simple/view/TabLayout.vue'
@@ -17,6 +17,9 @@ import { ProvinciaController } from 'shared/ubicacion/provincia/infraestructure/
 import { CantonController } from 'shared/ubicacion/canton/infraestructure/CantonController'
 import { useFiltrosGenerales } from 'shared/filtrosGenerales'
 import { tiposClientes } from 'config/utils'
+import { CustomActionPrompt } from 'components/tables/domain/CustomActionPrompt'
+import { useNotificaciones } from 'shared/notificaciones'
+import { Rol } from 'pages/sistema/roles/domain/Rol'
 
 export default defineComponent({
   components: { TabLayout },
@@ -60,6 +63,17 @@ export default defineComponent({
       })
     })
 
+    /************
+     * Variables
+     ************/
+    const { prompt } = useNotificaciones()
+    const mostrarLimiteConsultas = computed(() => {
+      const idEmpresa = listadosAuxiliares.roles.find(
+        (rol: Rol) => rol.name === 'EMPRESA'
+      )?.id
+      return usuario.rol.includes(idEmpresa)
+    })
+
     /*************
      * Funciones
      *************/
@@ -76,6 +90,18 @@ export default defineComponent({
         })
         cantones.value = listadosAuxiliares.cantones
       })
+    }
+
+    const ampliarLimiteConsultas = () => {
+      const data: CustomActionPrompt = {
+        titulo: 'Ampliar limite de consultas',
+        mensaje:
+          'Ingrese la cantidad que se va a ampliar. Esta cantidad se sumará a la cantidad actual.',
+        tipo: 'number',
+        accion: async (cantidad) => (usuario.limite_consultas += cantidad),
+      }
+
+      prompt(data)
     }
 
     /********
@@ -100,6 +126,8 @@ export default defineComponent({
       filtrarCantones,
       obtenerCantones,
       tiposClientes,
+      ampliarLimiteConsultas,
+      mostrarLimiteConsultas,
     }
   },
 })

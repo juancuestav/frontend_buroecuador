@@ -1,6 +1,6 @@
 <template>
   <div class="col-12 col-md-12 q-mt-md">
-    <label class="q-mb-sm block">Seleccionar usuario</label>
+    <label class="q-mb-sm block">Seleccione un usuario</label>
     <div class="row q-col-gutter-x-xs">
       <div class="col-12 col-md-10 q-mb-md">
         <q-input
@@ -24,7 +24,6 @@
           :disable="disable"
           unelevated
           no-caps
-          rounded
           no-wrap
           >Buscar
         </q-btn>

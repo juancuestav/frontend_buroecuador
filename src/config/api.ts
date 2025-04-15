@@ -50,6 +50,13 @@ export const endpoints = {
   registro_civil: new Endpoint('registro-civil'),
   iess: new Endpoint('iess'),
   ant: new Endpoint('ant'),
+  banco: new Endpoint('banco'),
+  sri: new Endpoint('sri'),
+  busqueda_general: new Endpoint('busqueda-general'),
+  dashboard_precalifica: new Endpoint('dashboard-precalifica'),
+  usuarios_dashboard_precalifica: new Endpoint(
+    'usuarios-dashboard-precalifica'
+  ),
   // Administracion
   permisos: new Endpoint('permisos'),
   permisos_administrar: new Endpoint('permisos_administrar'),

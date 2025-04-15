@@ -2,7 +2,10 @@
 import { useConfiguracionGeneralStore } from 'stores/configuracion_general'
 import { defineComponent } from 'vue'
 
+import CalloutComponent from 'components/CalloutComponent.vue'
+
 export default defineComponent({
+  components: { CalloutComponent },
   setup() {
     // const store = useAuthenticationStore()
     const store = useConfiguracionGeneralStore()

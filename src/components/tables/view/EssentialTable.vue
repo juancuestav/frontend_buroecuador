@@ -27,7 +27,7 @@
     :selection="tipoSeleccion"
     v-model:selected="selected"
     :style="estilos"
-    class="bg-body-table my-sticky-column-table my-sticky-header-column-table no-border rounded"
+    class="bg-body-table my-sticky-column-table my-sticky-header-column-table no-border"
     :class="{
       'alto-fijo-desktop': !inFullscreen && altoFijo && !$q.screen.xs,
       'alto-fijo-mobile': !inFullscreen && altoFijo && $q.screen.xs,
@@ -173,7 +173,7 @@
 
       <div
         v-if="titulo"
-        class="row text-subtitle2 q-mb-lg items-center justify-between col-12"
+        class="row text-subtitle2 q-mb-lg items-center justify-between col-12 text-black"
         :class="{
           'titulo-tabla2': !$q.screen.xs,
           'justify-center': $q.screen.xs,
@@ -183,7 +183,7 @@
         <span>
           <q-icon
             v-if="!$q.screen.xs"
-            name="bi-grip-vertical"
+            name="bi-database"
             class="q-mr-sm"
           ></q-icon>
           <span>{{ titulo }}</span>
@@ -253,7 +253,7 @@
         </div>
         <div class="col-12 col-md-12" v-if="false">
           <q-chip class="q-px-md" :class="{ 'bg-grey-8': $q.dark.isActive }">
-            {{ 'Total de elementos: ' }}
+            {{ 'Total de registros: ' }}
             <b>{{ datos == undefined ? 0 : datos.length }}</b>
           </q-chip>
         </div>
@@ -263,13 +263,14 @@
         v-if="permitirFiltrar || (true && mostrarCantidadElementos)"
         class="row full-width justify-between q-col-gutter-x-sm items-center q-mb-md"
       >
-        <span class="row items-center q-px-md">
+        <span class="row items-center text-black">
+          {{ '# registros: ' }}
           <q-icon
-            name="bi-circle-fill"
-            color="positive"
-            class="q-mr-sm"
+            name="bi-check-circle-fill"
+            color="primary"
+            class="q-mx-sm"
           ></q-icon>
-          {{ 'Total de elementos: ' }} <b>{{ datos.length }}</b>
+          <b>{{ datos.length }}</b>
         </span>
 
         <div class="row q-gutter-xs justify-end q-mb-md">
@@ -496,50 +497,57 @@
     <!-- Botones de acciones Desktop -->
     <template #body-cell-acciones="props">
       <q-td v-if="!$q.screen.xs" :props="props">
-        <div class="row inline full-width block q-col-gutter-x-xs text-left">
-          <q-btn-group
+        <div class="row inline full-width block q-col-gutter-xd-xs text-left">
+          <!--<q-btn-group
             v-if="permitirConsultar || permitirEditar || permitirEliminar"
-            rounded
             unelevated
+            outline
             class="inline text-left"
+          > -->
+          <!-- Consultar -->
+          <q-btn
+            v-if="permitirConsultar"
+            color="grey-4"
+            class="q-pa-sm q-mr-xs"
+            size="sm"
+            dense
+            outline
+            @click="consultar({ entidad: props.row, posicion: props.rowIndex })"
           >
-            <!-- Consultar -->
-            <q-btn
-              v-if="permitirConsultar"
-              class="bg-primary q-px-md"
-              dense
-              @click="
-                consultar({ entidad: props.row, posicion: props.rowIndex })
-              "
-            >
-              <q-icon name="bi-eye" size="xs" color="white"></q-icon>
-              <q-tooltip class="bg-dark"> Consultar </q-tooltip>
-            </q-btn>
+            <q-icon name="bi-eye" color="secondary"></q-icon>
+            <q-tooltip class="bg-dark"> Consultar </q-tooltip>
+          </q-btn>
 
-            <!-- Editar -->
-            <q-btn
-              v-if="permitirEditar"
-              class="bg-secondary q-px-md"
-              dense
-              @click="editar({ entidad: props.row, posicion: props.rowIndex })"
-            >
-              <q-icon name="bi-pencil-square" size="xs" color="white"></q-icon>
-              <q-tooltip class="bg-dark"> Editar </q-tooltip>
-            </q-btn>
+          <!-- Editar -->
+          <q-btn
+            v-if="permitirEditar"
+            color="grey-4"
+            class="q-pa-sm q-mr-xs"
+            size="sm"
+            dense
+            outline
+            no-wrap
+            no-caps
+            @click="editar({ entidad: props.row, posicion: props.rowIndex })"
+          >
+            <q-icon name="bi-pencil-square" color="secondary"></q-icon>
+            <q-tooltip class="bg-dark"> Editar </q-tooltip>
+          </q-btn>
 
-            <!-- Eliminar -->
-            <q-btn
-              v-if="permitirEliminar"
-              class="bg-negative q-px-md"
-              dense
-              @click="
-                eliminar({ entidad: props.row, posicion: props.rowIndex })
-              "
-            >
-              <q-icon name="bi-trash3" size="xs" color="white"></q-icon>
-              <q-tooltip class="bg-dark"> Eliminar </q-tooltip>
-            </q-btn>
-          </q-btn-group>
+          <!-- Eliminar -->
+          <q-btn
+            v-if="permitirEliminar"
+            color="grey-4"
+            outline
+            class="q-pa-sm q-mr-xs"
+            size="sm"
+            dense
+            @click="eliminar({ entidad: props.row, posicion: props.rowIndex })"
+          >
+            <q-icon name="bi-trash3" color="secondary"></q-icon>
+            <q-tooltip class="bg-dark"> Eliminar </q-tooltip>
+          </q-btn>
+          <!--</q-btn-group> -->
 
           <CustomButtons
             v-if="accion1"

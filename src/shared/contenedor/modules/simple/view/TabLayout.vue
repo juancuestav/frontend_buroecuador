@@ -1,5 +1,5 @@
 <template>
-  <q-page :padding="!$q.screen.xs">
+  <q-page padding>
     <transition name="scale" mode="out-in">
       <slot name="modales" />
     </transition>
@@ -9,15 +9,18 @@
     <!-- <q-icon name="bi-app-indicator" class="q-mr-sm"></q-icon> -->
     <!-- <small class="text-grey-9 text-bold">{{ subtituloPagina }}</small> -->
     <!-- </div> -->
+    <div v-if="tituloPagina" class="text-h5 text-bold q-mb-md">
+      {{ tituloPagina }}
+    </div>
 
     <!-- Tabs -->
     <q-tabs
       v-model="tabs"
       align="left"
-      switch-indicator
       active-class="tab-active"
-      indicator-color="transparent"
+      indicator-color="primary"
       dense
+      class="border-bottom"
     >
       <q-tab
         v-if="mostrarFormulario"
@@ -48,7 +51,7 @@
       animated
       transition-prev="scale"
       transition-next="scale"
-      class="bg-desenfoque rounded-tabpanel border-white custom-shadow"
+      class="borde q-mt-lg"
       keep-alive
     >
       <!-- Formulario -->
@@ -76,7 +79,7 @@
       </q-tab-panel>
 
       <!-- Listado -->
-      <q-tab-panel name="listado" class="borde">
+      <q-tab-panel name="listado">
         <essential-table-pagination
           v-if="paginate"
           ref="refTabla"

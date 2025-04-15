@@ -4,13 +4,13 @@
       v-if="tabsPage != '1'"
       flat
       :color="$q.dark.isActive ? 'grey-5' : 'primary'"
-      icon="bi-chevron-left"
-      class="q-mt-md q-ml-mdd"
+      icon="bi-arrow-left"
+      class="q-mt-md q-ml-sm"
+      label="Regresar"
       no-caps
       rounded
       @click="regresar()"
-      >Regresar</q-btn
-    >
+    ></q-btn>
     <q-tab-panels
       v-model="tabsPage"
       animated

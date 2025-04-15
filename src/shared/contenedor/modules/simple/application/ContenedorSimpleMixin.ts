@@ -164,9 +164,7 @@ export class ContenedorSimpleMixin<
       if (params?.hasOwnProperty('export'))
         return downloadFile(response.data, params.titulo, params.export)
       else if (result.length == 0)
-        this.notificaciones.notificarInformacion(
-          'Aún no se han agregado elementos.'
-        )
+        this.notificaciones.notificarInformacion('Registro no encontrado.')
 
       if (append) this.refs.listado.value.push(...result)
       else this.refs.listado.value = result

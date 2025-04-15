@@ -7,6 +7,8 @@
       tag="a"
       :to="link"
       active-class="link-active"
+      :class="{ 'border-left q-ml-lg': hasParent }"
+      class="text-color"
       exact
     >
       <q-item-section v-if="icon" avatar>
@@ -32,12 +34,18 @@
       </q-item-section>
 
       <q-item-section>
-        <q-item-label class="color-label-drawer">{{ title }}</q-item-label>
+        <q-item-label class="text-color">{{ title }}</q-item-label>
       </q-item-section>
     </q-item>
 
     <!-- Tiene submenus -->
-    <q-expansion-item v-if="children" clickable tag="a" active-class="link-active" exact>
+    <q-expansion-item
+      v-if="children"
+      clickable
+      tag="a"
+      active-class="link-active"
+      exact
+    >
       <template #header>
         <q-item-section v-if="icon" avatar>
           <q-icon :name="icon" size="xs" class="color-icono" />
@@ -48,16 +56,14 @@
         </q-item-section>
       </template>
 
-      <div v-for="child in children" :key="child.title">
+      <div v-for="child in children" :key="child.title" class="q-px-xs">
         <EssentialLink
           :title="child.title ?? ''"
           :link="child.link"
           :icon="child.icon"
           :children="child.children"
           :can="child.can"
-          :class="{
-            'bg-desenfoque border-white rounded q-mb-xs': !!child.children,
-          }"
+          hasParent
         ></EssentialLink>
       </div>
     </q-expansion-item>
@@ -93,6 +99,7 @@ export default defineComponent({
       required: false,
     },
     can: { type: Boolean, default: true },
+    hasParent: { type: Boolean, default: false },
   },
 })
 </script>

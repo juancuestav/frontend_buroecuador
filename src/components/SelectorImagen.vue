@@ -29,6 +29,15 @@
   </q-file>
 
   <div class="bg-desenfoque">
+    <q-btn
+      v-if="imagenCodificada"
+      class="closeButton"
+      color="negative"
+      icon="bi-x"
+      dense
+      unelevated
+      @click="limpiar()"
+    ></q-btn>
     <q-img
       v-show="imagenCodificada"
       :src="imagenCodificada ?? ''"

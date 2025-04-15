@@ -8,6 +8,7 @@ import { defineComponent, ref } from 'vue'
 // Componentes
 import TabLayout from 'shared/contenedor/modules/simple/view/TabLayout.vue'
 import SelectorImagen from 'components/SelectorImagen.vue'
+import EssentialEditor from 'components/editores/EssentialEditor.vue'
 
 // Logica y controladores
 import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
@@ -16,7 +17,7 @@ import { ServicioController } from '../infraestructure/ServicioController'
 import { Servicio } from '../domain/Servicio'
 
 export default defineComponent({
-  components: { TabLayout, SelectorImagen },
+  components: { TabLayout, SelectorImagen, EssentialEditor },
   setup() {
     const mixin = new ContenedorSimpleMixin(Servicio, new ServicioController())
 
@@ -29,6 +30,12 @@ export default defineComponent({
 
     const { setValidador, obtenerListados, cargarVista } =
       mixin.useComportamiento()
+
+    const tiposServicios = {
+      SERVICIO: 'SERVICIO',
+      PLAN: 'PLAN',
+      SOLUCIONES_EMPRESAS: 'SOLUCIONES EMPRESAS',
+    }
 
     // Reglas de validacion
     const reglas = {
@@ -57,6 +64,7 @@ export default defineComponent({
       configuracionColumnas: configuracionColumnasServicios,
       listadosAuxiliares,
       isPwd: ref(true),
+      tiposServicios,
     }
   },
 })

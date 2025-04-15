@@ -3,8 +3,18 @@ import { IessController } from '../infraestructure/IessController'
 import { defineComponent, ref } from 'vue'
 import { Iess } from '../domain/Iess'
 
+import LimiteConsultas from 'pages/basesDeDatos/limiteConsultas/view/LimiteConsultaComponent.vue'
+import { useLimiteConsultaStore } from 'stores/limiteConsulta'
+import { useNotificaciones } from 'shared/notificaciones'
+
 export default defineComponent({
+  components: { LimiteConsultas },
   setup() {
+    /*********
+     * Stores
+     *********/
+    const limiteConsultaStore = useLimiteConsultaStore()
+
     /********
      * Mixin
      *********/
@@ -13,8 +23,35 @@ export default defineComponent({
     const { listar } = mixin.useComportamiento()
     const { onListado } = mixin.useHooks()
 
-    // listar({ paginate: true, 'f_params[limit]': 30 }, false)
-    onListado(() => iess.hydrate(listado.value[0]))
+    /************
+     * Variables
+     ************/
+    const { notificarAdvertencia, notificarInformacion } = useNotificaciones()
+
+    const buscar = (busqueda) => {
+      if (!busqueda) return notificarAdvertencia('Ingrese el número de cedula')
+      if (
+        limiteConsultaStore.consultasRealizadas >=
+        limiteConsultaStore.consultasPermitidas
+      )
+        return notificarAdvertencia(
+          'Ha alcanzado el <b>límite de consultas disponibles</b>. Por favor, <b>contáctenos si desea ampliar su cuota</b>.'
+        )
+      listar({ search: busqueda })
+    }
+
+    onListado(() => {
+      if (listado.value.length) iess.hydrate(listado.value[0])
+      else iess.hydrate(new Iess())
+
+      limiteConsultaStore.incrementarConsultasRealizadas()
+      notificarInformacion('Búsqueda finalizada')
+    })
+
+    /*******
+     * Init
+     *******/
+    limiteConsultaStore.consultarCantidadesRealizadasPermitidas()
 
     return {
       mixin,
@@ -22,6 +59,7 @@ export default defineComponent({
       listado,
       listar,
       busqueda: ref(),
+      buscar,
     }
   },
 })

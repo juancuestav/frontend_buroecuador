@@ -2,7 +2,7 @@
   <tab-layout
     :mixin="mixin"
     :configuracionColumnas="configuracionColumnas"
-    titulo-pagina="Planes y servicios"
+    titulo-pagina="Nuestros servicios"
   >
     <template #formulario>
       <q-form @submit.prevent>
@@ -15,7 +15,6 @@
               placeholder="Obligatorio"
               :disable="disabled"
               :error="!!v$.nombre.$errors.length"
-              @update:model-value="(v) => (servicio.nombre = v.toUpperCase())"
               outlined
               dense
             >
@@ -27,16 +26,53 @@
             </q-input>
           </div>
 
+          <!-- Es plan -->
+          <!--<div class="col-12 col-md-3 q-mb-md">
+            <br />
+            <q-checkbox v-model="servicio.es_plan" label="Es plan" />
+          </div> -->
+
+          <div class="col-12 col-md-6">
+            <label class="q-mb-sm block">Tipo de servicio</label>
+            <q-btn-toggle
+              v-model="servicio.tipo_servicio"
+              class="toggle-button-primary"
+              :disable="disabled"
+              spread
+              no-caps
+              toggle-color="primary"
+              no-wrap
+              unelevated
+              :options="[
+                {
+                  label: 'Servicio',
+                  value: tiposServicios.SERVICIO,
+                },
+                {
+                  label: 'Plan',
+                  value: tiposServicios.PLAN,
+                },
+                {
+                  label: 'Soluciones empresas',
+                  value: tiposServicios.SOLUCIONES_EMPRESAS,
+                },
+              ]"
+            />
+          </div>
+
           <!-- Categoria -->
-          <div class="col-12 col-md-3 q-mb-md">
-            <label class="q-mb-sm block">Categoría</label>
+          <div
+            v-if="servicio.tipo_servicio === tiposServicios.SERVICIO"
+            class="col-12 col-md-3 q-mb-md"
+          >
+            <label class="q-mb-sm block">Categoría del servicio</label>
             <q-select
               v-model="servicio.categoria"
               :options="listadosAuxiliares.categorias"
               hint="Agregue elementos desde el panel de categorías"
               transition-show="flip-up"
               transition-hide="flip-down"
-              options-dense
+              :disable="disabled"
               dense
               outlined
               :option-label="(item) => item.nombre"
@@ -47,20 +83,17 @@
             </q-select>
           </div>
 
-          <!-- Es plan -->
-          <div class="col-12 col-md-3 q-mb-md">
-            <br />
-            <q-checkbox v-model="servicio.es_plan" label="Es plan" />
-          </div>
-
           <!-- Descripcion -->
           <div class="col-12 q-mb-md">
             <label class="q-mb-sm block">Descripción</label>
-            <q-editor v-model="servicio.descripcion" min-height="5rem" />
+            <essential-editor
+              v-model="servicio.descripcion"
+              :disable="disabled"
+            />
           </div>
 
           <!-- Estado -->
-          <div class="col-12 col-md-3 q-mb-md">
+          <!--<div class="col-12 col-md-3 q-mb-md">
             <label class="q-mb-sm block">Estado</label>
             <q-select
               v-model="servicio.estado"
@@ -82,7 +115,7 @@
                 </div>
               </template>
             </q-select>
-          </div>
+          </div> -->
 
           <!-- Precio unitario -->
           <div class="col-12 col-md-3 q-mb-md">
@@ -93,9 +126,6 @@
               :disable="disabled"
               prefix="$"
               :error="!!v$.precio_unitario.$errors.length"
-              @update:model-value="
-                (v) => (servicio.precio_unitario = v.toUpperCase())
-              "
               outlined
               dense
             >
@@ -113,7 +143,7 @@
           <!-- Cobrar IVA -->
           <div class="col-12 col-md-3 q-mb-md">
             <br />
-            <q-checkbox v-model="servicio.gravable" label="Cobrar IVA" />
+            <q-checkbox v-model="servicio.gravable" label="IVA incluido" />
           </div>
 
           <!-- Url video -->
