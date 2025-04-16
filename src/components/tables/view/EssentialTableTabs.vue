@@ -4,14 +4,13 @@
     v-model="tabSeleccionado"
     no-caps
     dense
-    switch-indicator
-    indicator-color="transparent"
+    indicator-color="primary"
     active-class="tab-active"
     class="tab-inactive"
     align="justify"
     @click="emit('tab-seleccionado', tabSeleccionado)"
   >
-    <!-- 
+    <!--
   :class="{ 'borde-header-tabla': !$q.screen.xs }"
     class="bg-white"
   active-color="white"

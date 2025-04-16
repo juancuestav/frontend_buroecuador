@@ -35,37 +35,43 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
   {
     title: 'Precalifica',
     icon: 'bi-person-lines-fill',
-    can: store.can('acceder.modulo_bases_de_datos'),
+    can: store.can('acceder.modulo_bases_de_datos') && appActivada.value,
     children: [
       {
         title: 'Reporte precalifica BRC',
         icon: 'bi-database',
         link: 'busqueda-general',
+        can: store.can('acceder.busqueda_general'),
       },
       {
         title: 'Registro civil',
         icon: 'bi-database',
         link: 'registro-civil',
+        can: store.can('acceder.registro_civil'),
       },
       {
         title: 'Buró de crédito',
         icon: 'bi-database',
         link: 'banco',
+        can: store.can('acceder.banco'),
       },
       {
         title: 'Iess',
         icon: 'bi-database',
         link: 'iess',
+        can: store.can('acceder.iess'),
       },
       {
         title: 'SRI',
         icon: 'bi-database',
         link: 'sri',
+        can: store.can('acceder.sri'),
       },
       {
         title: 'Ant',
         icon: 'bi-database',
         link: 'ant',
+        can: store.can('acceder.ant'),
       },
     ],
   },

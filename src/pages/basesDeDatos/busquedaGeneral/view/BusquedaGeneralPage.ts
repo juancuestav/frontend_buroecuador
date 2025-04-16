@@ -1,7 +1,7 @@
 import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
 import { BusquedaGeneralController } from '../infraestructure/BusquedaGeneralController'
 import { BusquedaGeneral } from '../domain/BusquedaGeneral'
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { RegistroCivil } from 'pages/basesDeDatos/registroCivil/domain/RegistroCivil'
 import { Banco } from 'pages/basesDeDatos/banco/domain/Banco'
 import { Iess } from 'pages/basesDeDatos/iess/domain/Iess'
@@ -14,6 +14,7 @@ import { configuracionColumnasBanco } from '../domain/configuracionColumnasBanco
 import EssentialTable from 'components/tables/view/EssentialTable.vue'
 import LimiteConsultas from 'pages/basesDeDatos/limiteConsultas/view/LimiteConsultaComponent.vue'
 import { useLimiteConsultaStore } from 'stores/limiteConsulta'
+import { useAuthenticationStore } from 'stores/authentication'
 
 export default defineComponent({
   components: { EssentialTable, LimiteConsultas },
@@ -22,6 +23,7 @@ export default defineComponent({
      * Stores
      *********/
     const limiteConsultaStore = useLimiteConsultaStore()
+    const authenticationStore = useAuthenticationStore()
 
     /********
      * Mixin
@@ -38,12 +40,14 @@ export default defineComponent({
      * Variables
      ************/
     const { notificarAdvertencia, notificarInformacion } = useNotificaciones()
+    const busqueda = ref()
 
     const buscar = (busqueda) => {
       if (!busqueda) return notificarAdvertencia('Ingrese el número de cedula')
       if (
+        authenticationStore.hasRole('EMPRESA') &&
         limiteConsultaStore.consultasRealizadas >=
-        limiteConsultaStore.consultasPermitidas
+          limiteConsultaStore.consultasPermitidas
       )
         return notificarAdvertencia(
           'Ha alcanzado el <b>límite de consultas disponibles</b>. Por favor, <b>contáctenos si desea ampliar su cuota</b>.'
@@ -87,15 +91,23 @@ export default defineComponent({
      *******/
     limiteConsultaStore.consultarCantidadesRealizadasPermitidas()
 
+    onMounted(() => {
+      if (authenticationStore.hasRole('CLIENTE')) {
+        busqueda.value = authenticationStore.user.identificacion
+        buscar(busqueda.value)
+      }
+    })
+
     return {
       mixin,
       general,
       listado,
       listar,
-      busqueda: ref(),
+      busqueda,
       buscar,
       descargarReportePdf,
       columnasBanco: configuracionColumnasBanco,
+      esCliente: authenticationStore.hasRole('CLIENTE'),
     }
   },
 })

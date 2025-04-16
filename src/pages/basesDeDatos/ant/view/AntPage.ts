@@ -28,7 +28,7 @@ export default defineComponent({
      ************/
     const { notificarAdvertencia, notificarInformacion } = useNotificaciones()
 
-    const buscar = (busqueda) => {
+    const buscarPorCedula = (busqueda) => {
       if (!busqueda) return notificarAdvertencia('Ingrese el número de cedula')
       if (
         limiteConsultaStore.consultasRealizadas >=
@@ -37,7 +37,19 @@ export default defineComponent({
         return notificarAdvertencia(
           'Ha alcanzado el <b>límite de consultas disponibles</b>. Por favor, <b>contáctenos si desea ampliar su cuota</b>.'
         )
-      listar({ search: busqueda })
+      listar({ cedula: busqueda })
+    }
+
+    const buscarPorPlaca = (busqueda) => {
+      if (!busqueda) return notificarAdvertencia('Ingrese el número de cedula')
+      if (
+        limiteConsultaStore.consultasRealizadas >=
+        limiteConsultaStore.consultasPermitidas
+      )
+        return notificarAdvertencia(
+          'Ha alcanzado el <b>límite de consultas disponibles</b>. Por favor, <b>contáctenos si desea ampliar su cuota</b>.'
+        )
+      listar({ placa: busqueda })
     }
 
     onListado(() => {
@@ -56,7 +68,9 @@ export default defineComponent({
       listado,
       listar,
       busqueda: ref(),
-      buscar,
+      buscarPorCedula,
+      buscarPorPlaca,
+      modoBusqueda: ref('CEDULA'),
     }
   },
 })

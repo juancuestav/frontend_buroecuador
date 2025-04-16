@@ -1,7 +1,7 @@
 // Dependencias
 import { configuracionColumnasServicios } from '../domain/configuracionColumnasServicios'
 import { required } from '@vuelidate/validators'
-import { estadosProducto } from 'config/utils'
+import { estadosProducto, tiposServicios } from 'config/utils'
 import useVuelidate from '@vuelidate/core'
 import { defineComponent, ref } from 'vue'
 
@@ -30,12 +30,6 @@ export default defineComponent({
 
     const { setValidador, obtenerListados, cargarVista } =
       mixin.useComportamiento()
-
-    const tiposServicios = {
-      SERVICIO: 'SERVICIO',
-      PLAN: 'PLAN',
-      SOLUCIONES_EMPRESAS: 'SOLUCIONES EMPRESAS',
-    }
 
     // Reglas de validacion
     const reglas = {

@@ -61,3 +61,9 @@ export const puntuaciones = [
 export const tiposReportes = ['GOLD', 'STANDAR', 'NORMAL']
 export const tiposContribuyente = ['PERSONA NATURAL', 'PERSONA JURÍDICA']
 export const tiposClientes = ['CLIENTE', 'EMPRENDEDOR', 'EMPRESA']
+
+export const tiposServicios = {
+  SERVICIO: 'SERVICIO',
+  PLAN: 'PLAN',
+  SOLUCIONES_EMPRESAS: 'SOLUCIONES EMPRESAS',
+}

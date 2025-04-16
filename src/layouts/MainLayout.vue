@@ -139,26 +139,90 @@
               <img v-bind:src="imagenPerfil" />
             </q-avatar>
             <q-menu>
-              <div class="row bg-desenfoque-2 no-wrap q-pa-md">
-                <div class="column items-center">
-                  {{ nombreUsuario }}
+              <div
+                class="bg-desenfoque-2 no-wrap q-pa-mdd"
+                style="width: 300px"
+              >
+                <div class="column items-center q-gutter-y-md bg-body q-pa-md">
                   <q-avatar size="68px" class="q-mb-md">
                     <img src="~assets/user.png" />
                   </q-avatar>
-
-                  <q-btn
-                    label="Cerrar sesión"
-                    color="primary"
-                    size="sm"
-                    class="full-screen block"
-                    v-close-popup
-                    no-wrap
-                    no-caps
-                    unelevated
-                    square
-                    @click="logout()"
-                  />
+                  {{ nombreUsuario }}
+                  <div class="text-bold">
+                    {{ authenticationStore?.user.rol }}
+                  </div>
                 </div>
+
+                <q-list>
+                  <q-item
+                    clickable
+                    v-ripple
+                    :to="{ name: 'notificaciones_generales' }"
+                  >
+                    <q-item-section avatar>
+                      <q-icon
+                        name="bi-envelope-check"
+                        size="xs"
+                        class="text-color"
+                      />
+                    </q-item-section>
+                    <q-item-section>Novedades</q-item-section>
+                  </q-item>
+
+                  <q-item clickable v-ripple :to="{ name: 'chat_linea' }">
+                    <q-item-section avatar>
+                      <q-icon name="bi-whatsapp" size="xs" class="text-color" />
+                    </q-item-section>
+                    <q-item-section>Chat en línea</q-item-section>
+                  </q-item>
+
+                  <q-separator />
+
+                  <q-item
+                    clickable
+                    v-ripple
+                    target="_blank"
+                    href="https://burodecredito.ec/solicitud-credito"
+                  >
+                    <q-item-section avatar>
+                      <q-icon
+                        name="bi-box-arrow-up-right"
+                        size="xs"
+                        class="text-color"
+                      />
+                    </q-item-section>
+                    <q-item-section>Solicitud de crédito</q-item-section>
+                  </q-item>
+
+                  <q-item
+                    clickable
+                    v-ripple
+                    href="https://burodecredito.ec/politicas-privacidad"
+                    target="_blank"
+                  >
+                    <q-item-section avatar>
+                      <q-icon
+                        name="bi-box-arrow-up-right"
+                        size="xs"
+                        class="text-color"
+                      />
+                    </q-item-section>
+                    <q-item-section>Políticas de privacidad</q-item-section>
+                  </q-item>
+
+                  <q-separator />
+
+                  <q-item clickable v-ripple @click="logout()">
+                    <q-item-section avatar>
+                      <q-icon
+                        name="bi-box-arrow-right"
+                        size="xs"
+                        class="text-color"
+                      />
+                    </q-item-section>
+                    <q-item-section>Cerrar sesión</q-item-section>
+                  </q-item>
+                </q-list>
               </div>
             </q-menu>
           </q-btn>
@@ -479,6 +543,7 @@ export default defineComponent({
       posicionResultados,
       refListadoBusqueda,
       fondo,
+      authenticationStore,
     }
   },
 })

@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="bg-transparent">
-    <limite-consultas></limite-consultas>
+    <limite-consultas v-if="!esCliente"></limite-consultas>
 
     <div class="row items-center q-mb-md">
       <span class="text-h5 text-bold">Reporte precalifica BRC</span>
@@ -13,6 +13,7 @@
           placeholder="Buscar por cédula"
           @keyup.enter="buscar(busqueda)"
           outlined
+          :disable="esCliente"
           type="number"
           clearable
           dense
@@ -21,6 +22,7 @@
             <q-btn
               color="primary"
               @click="buscar(busqueda)"
+              :disable="esCliente"
               no-caps
               unelevated
               icon="bi-search"

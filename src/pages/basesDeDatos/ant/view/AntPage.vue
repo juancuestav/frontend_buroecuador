@@ -10,12 +10,36 @@
       ></q-img> -->
       <span class="text-h5 text-bold">Buscador ANT</span>
     </div>
-    <div class="row q-mb-md">
+    <div class="row q-col-gutter-md q-mb-md">
       <div class="col-12 col-md-6">
+        <label class="q-mb-sm block">Modo de búsqueda</label>
+        <q-btn-toggle
+          v-model="modoBusqueda"
+          class="toggle-button-primary"
+          spread
+          no-caps
+          toggle-color="primary"
+          no-wrap
+          unelevated
+          :options="[
+            {
+              label: 'Por medio de cédula',
+              value: 'CEDULA',
+            },
+            {
+              label: 'Por medio de la placa',
+              value: 'PLACA',
+            },
+          ]"
+        />
+      </div>
+
+      <div v-if="modoBusqueda === 'CEDULA'" class="col-12 col-md-6">
+        <label class="q-mb-sm block">Ingrese la cédula</label>
         <q-input
           v-model="busqueda"
           placeholder="Buscar por número de cédula"
-          @keyup.enter="buscar(busqueda)"
+          @keyup.enter="buscarPorCedula(busqueda)"
           outlined
           type="number"
           clearable
@@ -24,7 +48,31 @@
           <template #after>
             <q-btn
               color="primary"
-              @click="buscar(busqueda)"
+              @click="buscarPorCedula(busqueda)"
+              no-caps
+              unelevated
+              icon="bi-search"
+              label="Buscar"
+            >
+            </q-btn>
+          </template>
+        </q-input>
+      </div>
+
+      <div v-if="modoBusqueda === 'PLACA'" class="col-12 col-md-6">
+        <label class="q-mb-sm block">Ingrese la placa</label>
+        <q-input
+          v-model="busqueda"
+          placeholder="Buscar por medio de la placa"
+          @keyup.enter="buscarPorPlaca(busqueda)"
+          outlined
+          clearable
+          dense
+        >
+          <template #after>
+            <q-btn
+              color="primary"
+              @click="buscarPorPlaca(busqueda)"
               no-caps
               unelevated
               icon="bi-search"

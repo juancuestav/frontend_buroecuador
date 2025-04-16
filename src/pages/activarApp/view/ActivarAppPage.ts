@@ -5,6 +5,7 @@ import { defineComponent, ref } from 'vue'
 import { endpoints } from 'config/api'
 
 import CalloutComponent from 'components/CalloutComponent.vue'
+import { tiposServicios } from 'config/utils'
 
 export default defineComponent({
   components: { CalloutComponent },
@@ -19,24 +20,25 @@ export default defineComponent({
      ************/
     let fechaProximaFacturacion
     let pagado
-    const verPlanes = ref(false)
-    const verSolucionesEmpresas = ref(false)
+    const tipoServicio = ref()
 
-    const planes = ref()
+    const planesClientes = ref()
+    const planesEmpresas = ref()
 
     /************
      * Funciones
      ************/
     function abrirWhatsapp() {
-      const celular = configuracionGeneralStore.configuracion?.whatsapp ?? ''
+      const phone = configuracionGeneralStore.configuracion?.whatsapp ?? ''
+      const message =
+        configuracionGeneralStore.configuracion?.mensaje_whatsapp ?? ''
 
-      const phone = '593' + celular.substring(1, celular.length)
       let url: string
 
       if (window.innerWidth < 768) {
-        url = `https://api.whatsapp.com/send?phone=${phone}`
+        url = `https://api.whatsapp.com/send?phone=${phone}&text=${message}`
       } else {
-        url = `https://web.whatsapp.com/send?phone=${phone}`
+        url = `https://web.whatsapp.com/send?phone=${phone}&text=${message}`
       }
 
       window.open(url, '_blank')
@@ -47,7 +49,8 @@ export default defineComponent({
       const response: any = await axios.get(
         axios.getEndpoint(endpoints.activar_app)
       )
-      planes.value = response.data.planes
+      planesClientes.value = response.data.planesClientes
+      planesEmpresas.value = response.data.planesEmpresas
       fechaProximaFacturacion = response.data.fecha_proximo_pago
       pagado = response.data.pagado
     }
@@ -59,11 +62,12 @@ export default defineComponent({
 
     return {
       fechaProximaFacturacion,
-      verPlanes,
-      verSolucionesEmpresas,
-      planes,
+      planesClientes,
+      planesEmpresas,
       pagado,
       abrirWhatsapp,
+      tipoServicio,
+      tiposServicios,
     }
   },
 })
