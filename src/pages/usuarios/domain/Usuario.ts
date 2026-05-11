@@ -28,6 +28,7 @@ export class Usuario extends EntidadAuditable {
   canton: number | null = null
   limite_consultas: number = 0
   consultas_realizadas: number = 0
+  link_verificacion: string | null = null
 
   constructor() {
     super()

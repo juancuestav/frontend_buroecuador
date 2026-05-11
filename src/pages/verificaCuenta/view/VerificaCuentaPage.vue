@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="text-center">
     <div class="text-h6 q-mb-md">Verifica tu cuenta</div>
-    <!-- <q-btn
+    <q-btn
       color="primary"
       href="https://bit.ly/VERIFICATUCUENTA"
       target="_blank"
@@ -10,7 +10,7 @@
       square
       >Completar formulario de verificación</q-btn
     >
-    <br /> -->
+    <!-- <br />
 
     <estados-component :propsTable="{ value: estadoVerificacion }" />
 
@@ -128,7 +128,7 @@
           </div>
         </div>
       </template>
-    </simple-layout>
+    </simple-layout> -->
   </q-page>
 </template>
 

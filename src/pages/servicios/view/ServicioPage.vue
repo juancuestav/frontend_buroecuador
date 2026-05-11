@@ -175,7 +175,7 @@
           <!-- Url destino -->
           <div class="col-12 q-mb-md">
             <label class="q-mb-sm block"
-              >URL para cobro con tarjeta de crédito o débito</label
+              >URL para cobro con tarjeta de crédito o débito (Nacional)</label
             >
             <q-input
               v-model="servicio.url_destino"
@@ -193,8 +193,11 @@
             </q-input>
           </div>
 
-          <!-- <div class="col-12 q-mb-md">
-            <label class="q-mb-sm block">URL para cobro con Paypal</label>
+          <div class="col-12 q-mb-md">
+            <label class="q-mb-sm block"
+              >URL para cobro con tarjeta de crédito o débito
+              (Internacional)</label
+            >
             <q-input
               v-model="servicio.url_paypal"
               placeholder="Opcional"
@@ -203,7 +206,7 @@
               dense
             >
             </q-input>
-          </div> -->
+          </div>
         </div>
       </q-form>
     </template>

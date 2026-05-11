@@ -2,7 +2,6 @@ import { CustomActionPrompt } from 'components/tables/domain/CustomActionPrompt'
 import { useQuasar } from 'quasar'
 import { useNotificacionStore } from 'stores/notificacion'
 
-
 export function useNotificaciones() {
   const $q = useNotificacionStore().$q ?? useQuasar()
 
@@ -14,13 +13,21 @@ export function useNotificaciones() {
   const base = {
     html: true,
     textColor: $q.dark.isActive ? 'white' : 'black',
-    position: 'bottom',
+    position: 'top-right',
     // multiLine: true,
     // progress: true,
-    classes: 'rounded-tabpanel q-py-sm shadow-notification bg-desenfoque border-white',
+    classes:
+      'rounded-tabpanel q-py-sm shadow-notification bg-desenfoque border-white',
     actions: [
-      { icon: 'close', color: 'negative', round: true, handler: () => { /* ... */ } }
-    ]
+      {
+        icon: 'close',
+        color: 'negative',
+        round: true,
+        handler: () => {
+          /* ... */
+        },
+      },
+    ],
   }
 
   function notificarInformacion(mensaje: string | string[]) {
@@ -32,7 +39,13 @@ export function useNotificaciones() {
       caption: obtenerMensaje(mensaje),
       progressClass: 'text-light-blue-7',
       actions: [
-        { label: 'Cerrar', color: 'light-blue-7', handler: () => { /* ... */ } }
+        {
+          label: 'Cerrar',
+          color: 'light-blue-7',
+          handler: () => {
+            /* ... */
+          },
+        },
       ],
     })
   }
@@ -59,7 +72,6 @@ export function useNotificaciones() {
     })
   }
 
-
   function notificarAdvertencia(mensaje: string | string[]) {
     $q.notify({
       ...base,
@@ -71,7 +83,11 @@ export function useNotificaciones() {
     })
   }
 
-  function confirmar(mensaje: string | string[], callback: () => void, cancel?: () => void) {
+  function confirmar(
+    mensaje: string | string[],
+    callback: () => void,
+    cancel?: () => void
+  ) {
     $q.dialog({
       html: true,
       title: 'Confirmación',
@@ -96,7 +112,7 @@ export function useNotificaciones() {
       prompt: {
         model: config.defecto,
         type: config.tipo ?? 'text', // optional
-        isValid: val => config.validacion ? config.validacion(val) : true, //val => val <= data.entidad.cantidad,
+        isValid: (val) => (config.validacion ? config.validacion(val) : true), //val => val <= data.entidad.cantidad,
       },
       cancel: true,
       persistent: true,
@@ -122,7 +138,10 @@ export function useNotificaciones() {
         model: config.defecto,
         // inline: true
         items: config.items,
-        isValid: val => config.hasOwnProperty('requerido') ? (!config.requerido || !!val) : (false || !!val),
+        isValid: (val) =>
+          config.hasOwnProperty('requerido')
+            ? !config.requerido || !!val
+            : false || !!val,
       },
     })
       .onOk((data) => {

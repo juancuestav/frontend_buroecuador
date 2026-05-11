@@ -35,7 +35,13 @@
             class="row q-col-gutter-sm q-px-lg"
           >
             <div class="col-12 q-mb-sm">
-              <h2>Registrate</h2>
+              <h2>
+                {{
+                  mostrarRegistrarPagar
+                    ? 'Registrate antes de continuar con la compra'
+                    : 'Registrate'
+                }}
+              </h2>
               <span>Estás a un paso de crear una cuenta</span>
             </div>
 
@@ -55,7 +61,7 @@
             <div class="col-12 col-md-6">
               <q-input
                 v-model="usuario.name"
-                label="Nombre"
+                label="Nombres"
                 placeholder="Ingrese su nombre"
                 :error="!!v$.name.$errors.length"
                 outlined
@@ -88,7 +94,7 @@
             </div>
 
             <!-- Edad -->
-            <div class="col-12 col-md-6">
+            <!-- <div class="col-12 col-md-6">
               <q-input
                 v-model="usuario.edad"
                 label="Edad"
@@ -104,7 +110,7 @@
                   </div>
                 </template>
               </q-input>
-            </div>
+            </div> -->
 
             <!-- Direccion -->
             <!-- <div class="col-12 col-md-6">
@@ -187,10 +193,11 @@
 
             <!--Provincia -->
             <div class="col-12 col-md-6 q-mb-md">
+              dd
               <q-select
                 v-model="usuario.provincia"
                 :options="provincias"
-                label="Provincia (Opcional)"
+                label="Provinciadd (Opcional)"
                 transition-show="jump-up"
                 transition-hide="jump-down"
                 options-dense
@@ -206,7 +213,7 @@
                 input-debounce="0"
                 @filter="filtrarProvincias"
                 :option-value="(v) => v.id"
-                :option-label="(v) => v.nombre"
+                :option-label="(v) => v.descripcion"
                 emit-value
                 map-options
                 ><template v-slot:no-option>
@@ -354,6 +361,20 @@
             <!-- Botones -->
             <div class="col-12 q-mb-xl">
               <q-btn
+                v-if="mostrarRegistrarPagar"
+                color="primary"
+                label="Registrarme y continuar con el pago"
+                class="full-width q-mb-sm"
+                no-caps
+                unelevated
+                icon="bi-credit-card"
+                rounded
+                @click="registrarPagar()"
+              >
+              </q-btn>
+
+              <q-btn
+                v-else
                 color="primary"
                 label="Registrar"
                 class="full-width q-mb-sm"
@@ -365,6 +386,7 @@
               </q-btn>
 
               <q-btn
+                v-if="!mostrarRegistrarPagar"
                 :to="{ name: 'Login' }"
                 label="Iniciar sesión"
                 class="full-width"

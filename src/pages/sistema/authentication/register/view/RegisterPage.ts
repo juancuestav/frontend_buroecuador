@@ -3,7 +3,7 @@ import { computed, defineComponent, reactive, ref } from 'vue'
 import { gestionarNotificacionError } from 'shared/utils'
 import { useNotificaciones } from 'shared/notificaciones'
 import loginJson from 'src/assets/lottie/login_work.json' // trabajos ecuador
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { required, email } from '@vuelidate/validators'
 import useVuelidate from '@vuelidate/core'
 
@@ -23,6 +23,8 @@ import { TipoIdentificacionController } from 'pages/sistema/tiposIdentificacione
 import { useFiltrosGenerales } from 'shared/filtrosGenerales'
 import { CantonController } from 'shared/ubicacion/canton/infraestructure/CantonController'
 import { tiposClientes } from 'config/utils'
+import { AxiosHttpRepository } from 'shared/http/infraestructure/AxiosHttpRepository'
+import { endpoints } from 'config/api'
 
 export default defineComponent({
   components: {
@@ -61,6 +63,9 @@ export default defineComponent({
 
     const enviando = ref(false)
     const router = useRouter()
+    const route = useRoute()
+    const servicioId = route.query.servicio_id
+    let servicio
 
     const dirigirLoginBuroCreditoEcuador = process.env.APP_ID === '1'
     const dirigirLoginTrabajosEcuador = process.env.APP_ID === '2'
@@ -69,7 +74,7 @@ export default defineComponent({
     const reglas = {
       name: { required },
       apellidos: { required },
-      edad: { required },
+      // edad: { required },
       // direccion: { required },
       celular: { required },
       email: { required, email },
@@ -93,7 +98,7 @@ export default defineComponent({
         await obtenerListados({
           cantones: {
             controller: new CantonController(),
-            params: { provincia: idProvincia },
+            params: { provincia_id: idProvincia },
           },
         })
       })
@@ -121,6 +126,33 @@ export default defineComponent({
       // .finally(() => (enviando.value = false))
     }
 
+    const registrarPagar = async () => {
+      if (!(await v$.value.$validate())) {
+        return notificaciones.notificarAdvertencia('Verifique el formulario')
+      }
+      registerController
+        .registrarUsuario(usuario)
+        .then(() => {
+          notificaciones.notificarCorrecto(
+            'Su cuenta ha sido registrada exitosamente!'
+          )
+          window.location.href = servicio.url_destino
+        })
+        .catch((error: any) => {
+          gestionarNotificacionError(error, notificaciones)
+        })
+    }
+
+    const obtenerServicio = async () => {
+      const axios = AxiosHttpRepository.getInstance()
+      const response: any = await axios.get(
+        axios.getEndpoint(endpoints.public_servicios) + '/' + servicioId
+      )
+
+      servicio = response.data.modelo
+      console.log(servicio)
+    }
+
     const enableLoginButton = computed(
       () =>
         usuario.name !== '' &&
@@ -140,6 +172,7 @@ export default defineComponent({
     }
 
     cargarConfiguracion()
+    obtenerServicio()
 
     return {
       logoClaro: computed(
@@ -166,6 +199,8 @@ export default defineComponent({
       obtenerCantones,
       listadosAuxiliares,
       tiposClientes,
+      mostrarRegistrarPagar: !!servicioId,
+      registrarPagar,
     }
   },
 })

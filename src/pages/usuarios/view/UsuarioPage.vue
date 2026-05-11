@@ -106,7 +106,7 @@
               input-debounce="0"
               @filter="filtrarProvincias"
               :option-value="(v) => v.id"
-              :option-label="(v) => v.nombre"
+              :option-label="(v) => v.descripcion"
               emit-value
               map-options
               ><template v-slot:no-option>
@@ -187,7 +187,7 @@
           </div>
 
           <!-- Tipo de cliente -->
-          <div class="col-12 col-md-3">
+          <!-- <div class="col-12 col-md-3">
             <label class="q-mb-sm block">Tipo cliente</label>
             <q-select
               v-model="usuario.tipo_cliente"
@@ -208,7 +208,7 @@
                 </div>
               </template>
             </q-select>
-          </div>
+          </div> -->
 
           <!-- Tipo de identificacion -->
           <div class="col-12 col-md-3 q-mb-md">
@@ -363,7 +363,7 @@
             </q-input>
           </div>
 
-          <div v-if="mostrarLimiteConsultas" class="col-12 col-md-3 q-mb-md">
+          <!-- <div v-if="mostrarLimiteConsultas" class="col-12 col-md-3 q-mb-md">
             <label class="q-mb-sm block">Limite de consultas permitidas</label>
             <q-input v-model="usuario.limite_consultas" disable outlined dense>
               <template #after>
@@ -386,6 +386,18 @@
             <q-input
               v-model="usuario.consultas_realizadas"
               disable
+              outlined
+              dense
+            >
+            </q-input>
+          </div> -->
+
+          <!-- Trabajos Ecuador -->
+          <div class="col-12 col-md-6 q-mb-md">
+            <label class="q-mb-sm block">Link de verificación</label>
+            <q-input
+              v-model="usuario.link_verificacion"
+              :disable="disabled"
               outlined
               dense
             >

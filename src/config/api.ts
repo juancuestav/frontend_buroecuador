@@ -21,6 +21,7 @@ export const endpoints = {
   usuarios: new Endpoint('usuarios'),
   roles: new Endpoint('roles'),
   servicios: new Endpoint('servicios'),
+  public_servicios: new Endpoint('public/servicios'),
   tipos_identificaciones: new Endpoint('public/tipos-identificaciones'),
   categorias: new Endpoint('categorias'),
   configuraciones_generales: new Endpoint('public/configuraciones-generales'),

@@ -203,6 +203,13 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: '/reportes-con-ia',
+        name: 'reportes_con_ia',
+        component: () =>
+          import('pages/reportesConIA/view/ReportesConIAPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: 'dashboard-precalifica',
         name: 'dashboard_precalifica',
         component: () =>
@@ -304,7 +311,17 @@ const routes: RouteRecordRaw[] = [
         path: '/register',
         name: 'register',
         component: () =>
-          import('pages/sistema/authentication/register/view/RegisterPage.vue'),
+          import(
+            'pages/sistema/authentication/register/view/RegisterModo2Page.vue'
+          ),
+      },
+      {
+        path: '/register-pay/:servicio_id?',
+        name: 'registerdfdf',
+        component: () =>
+          import(
+            'pages/sistema/authentication/register/view/RegisterPayPage.vue'
+          ),
       },
       {
         path: 'index.html',

@@ -109,7 +109,9 @@
               size="xs"
               class="bg-icon color-icon-navbar q-pa-xs rounded-field q-mr-xs"
             ></q-icon>
-            <span v-if="!$q.screen.xs" class="">Módulos del sistema</span>
+            <span v-if="!$q.screen.xs" class="my-font"
+              >Módulos del sistema</span
+            >
           </q-btn>
         </span>
 
@@ -123,16 +125,16 @@
             unchecked-icon="bi-sun-fill"
             @click="toggleDarkMode()"
           /> -->
-          <q-btn
+          <!-- <q-btn
             color="primary"
             label="Descarga la app móvil"
             href="https://play.google.com/store/apps/details?id=org.capacitor.quasar.buroecuador&pcampaignid=web_share&pli=1"
             target="_blank"
             unelevated
             no-caps
-          ></q-btn>
+          ></q-btn> -->
           <!-- Notificaciones -->
-          <boton-notificaciones></boton-notificaciones>
+          <!-- <boton-notificaciones></boton-notificaciones> -->
 
           <q-btn no-caps flat dense round>
             <q-avatar size="38px">
@@ -154,7 +156,7 @@
                 </div>
 
                 <q-list>
-                  <q-item
+                  <!-- <q-item
                     clickable
                     v-ripple
                     :to="{ name: 'notificaciones_generales' }"
@@ -208,7 +210,7 @@
                       />
                     </q-item-section>
                     <q-item-section>Políticas de privacidad</q-item-section>
-                  </q-item>
+                  </q-item> -->
 
                   <q-separator />
 
@@ -238,18 +240,22 @@
       :class="{ 'bg-solid': $q.screen.xs }"
     >
       <!-- Drawer Header -->
-      <div class="absolute-top row items-center q-pa-md border-bottom q-mx-md">
-        <q-avatar size="35px" class="rounded-card q-mr-md">
-          <img :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''" />
-        </q-avatar>
+      <div
+        class="absolute-top row items-center justify-center q-px-md q-py-md border-bottomold q-mx-msd"
+      >
+        <div class="bg-white row items-center rounded-card q-px-lg q-py-sm">
+          <q-avatar rounded size="38px" class="q-mr-sm">
+            <img :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''" />
+          </q-avatar>
 
-        <div class="text-center text-bold">
-          {{ appName }}
+          <div>
+            {{ appName }}
+          </div>
         </div>
       </div>
 
       <!-- Drawer Body -->
-      <q-scroll-area style="height: calc(100% - 102px); margin-top: 86px">
+      <q-scroll-area style="height: calc(100% - 102px); margin-top: 80px">
         <q-list>
           <div v-for="item in links" :key="item.title">
             <q-item-label
@@ -274,17 +280,7 @@
     </q-drawer>
 
     <!-- Router -->
-    <q-page-container
-      class="bg-body-bacskground my-font"
-      :style="{
-        backgroundImage: `url(${fondo})`,
-        backgroundSize: 'auto',
-        backgroundPosition: 'top right',
-        backgroundRepeat: 'no-repeat',
-        marginTop: '90px',
-      }"
-    >
-      <!-- <q-page-container class="bg-body-background q-pb-xl"> -->
+    <q-page-container class="my-font">
       <simple-chat></simple-chat>
 
       <router-view v-slot="{ Component }">

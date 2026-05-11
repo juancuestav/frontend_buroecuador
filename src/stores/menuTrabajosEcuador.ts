@@ -34,12 +34,14 @@ export const menuTrabajosEcuador: Ref<MenuOption[]> = computed(() => [
     title: 'Ver ofertas disponibles',
     icon: 'bi-collection',
     link: 'ofertas-disponibles',
-    can: store.user?.estado_verificacion === estadosVerificarCuenta.VERIFICADO || store.user?.rol === 'ADMINISTRADOR',
+    can:
+      store.user?.estado_verificacion === estadosVerificarCuenta.VERIFICADO ||
+      store.user?.rol === 'ADMINISTRADOR',
   },
   {
     title: 'Usuarios',
     icon: 'bi-person-fill',
     link: 'usuarios',
-    can: store.can('usuarios'),
+    can: store.can('acceder.usuarios'),
   },
 ])
