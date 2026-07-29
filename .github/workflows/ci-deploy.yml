@@ -36,6 +36,7 @@ jobs:
           name: dist-spa
           path: dist/spa
           retention-days: 1
+          include-hidden-files: true
 
   deploy:
     name: Deploy al servidor
