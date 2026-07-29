@@ -210,6 +210,13 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: 'dashboard-clientes',
+        name: 'dashboard_clientes',
+        component: () =>
+          import('pages/dashboard/clientes/view/DashboardClientesPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: 'dashboard-precalifica',
         name: 'dashboard_precalifica',
         component: () =>

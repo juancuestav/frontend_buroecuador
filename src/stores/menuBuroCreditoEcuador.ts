@@ -39,6 +39,12 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: store.can('acceder.dashboard_precalifica'),
   },
   {
+    title: 'Panel de Clientes',
+    icon: 'bi-people-fill',
+    link: 'dashboard-clientes',
+    can: store.can('acceder.dashboard_clientes'),
+  },
+  {
     title: 'Precalifica',
     icon: 'bi-person-lines-fill',
     can: store.can('acceder.modulo_bases_de_datos') && appActivada.value,

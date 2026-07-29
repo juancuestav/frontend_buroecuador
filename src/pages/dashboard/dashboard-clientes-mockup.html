@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Gestión de Clientes — Mockup</title>
+<style>
+  :root{
+    --purple:#7C3AED; --purple-dark:#5B21B6;
+    --orange:#F97316; --orange-dark:#EA580C;
+    --teal:#0D9488;   --teal-dark:#0F766E;
+    --blue:#2563EB;   --blue-dark:#1D4ED8;
+    --gold:#D97706;   --gold-dark:#B45309;
+    --indigo:#4F46E5; --indigo-dark:#4338CA;
+    --bg:#EEF1F7;
+    --card:#FFFFFF;
+    --text:#1E2333;
+    --text-soft:#6B7280;
+    --border:#E7E9F0;
+    --radius:16px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,255,255,0.12), transparent 40%),
+      linear-gradient(135deg, #6D5DFC 0%, #7C3AED 45%, #4338CA 100%);
+    min-height:100vh;
+    padding:36px 16px;
+    color:var(--text);
+  }
+
+  /* ---------- Ventana / marco de mockup ---------- */
+  .device-frame{
+    max-width:1500px;
+    margin:0 auto;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 40px 80px rgba(30,15,80,0.35), 0 10px 25px rgba(30,15,80,0.25);
+    background:var(--bg);
+  }
+  .window-bar{
+    background:#15121F;
+    padding:10px 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .dot{ width:12px; height:12px; border-radius:50%; }
+  .dot.red{ background:#FF5F57; }
+  .dot.yellow{ background:#FEBC2E; }
+  .dot.green{ background:#28C840; }
+  .window-bar .badge{
+    margin-left:auto;
+    background:rgba(255,255,255,0.08);
+    color:#D7D3EA;
+    font-size:11.5px;
+    padding:4px 12px;
+    border-radius:20px;
+    letter-spacing:.3px;
+  }
+
+  /* ---------- Layout general ---------- */
+  .dashboard{ display:block; }
+  .main{ padding:26px 30px 40px; min-width:0; }
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    display:flex; align-items:center; gap:20px; margin-bottom:24px; flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .mark{
+    width:38px; height:38px; border-radius:10px;
+    background:linear-gradient(135deg,var(--purple),var(--indigo));
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+  }
+  .brand h1{ font-size:20px; margin:0; letter-spacing:.2px; }
+  .brand span{ display:block; font-size:11.5px; color:var(--text-soft); }
+  .example-pill{
+    background:#FEF3C7; color:#92400E; font-size:11.5px; font-weight:600;
+    padding:5px 12px; border-radius:20px;
+  }
+  .searchbox{
+    margin-left:auto;
+    display:flex; align-items:center; gap:8px;
+    background:#fff; border:1px solid var(--border);
+    border-radius:10px; padding:9px 14px; width:260px; color:var(--text-soft); font-size:13px;
+  }
+  .icon-btn{
+    width:38px; height:38px; border-radius:10px; background:#fff;
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+
+  /* ---------- Stat cards ---------- */
+  .stats-row{ display:grid; grid-template-columns:repeat(5,1fr); gap:18px; margin-bottom:22px; }
+  .stat-card{
+    position:relative; overflow:hidden;
+    border-radius:var(--radius);
+    padding:20px 20px 26px;
+    color:#fff;
+    min-height:118px;
+  }
+  .stat-card::after{
+    content:""; position:absolute; left:-10%; right:-10%; bottom:-38px; height:70px;
+    background:rgba(255,255,255,0.14);
+    border-radius:50%;
+  }
+  .stat-card .top{ display:flex; justify-content:space-between; align-items:flex-start; }
+  .stat-card .icon{ font-size:20px; opacity:.95; }
+  .stat-card .num{ font-size:30px; font-weight:700; margin-top:14px; line-height:1; }
+  .stat-card .label{ font-size:13px; opacity:.95; margin-top:6px; font-weight:600; letter-spacing:.2px; }
+  .stat-card .sub{ font-size:11px; opacity:.85; margin-top:2px; }
+  .c-purple{ background:linear-gradient(135deg,var(--purple),var(--purple-dark)); }
+  .c-orange{ background:linear-gradient(135deg,var(--orange),var(--orange-dark)); }
+  .c-teal{ background:linear-gradient(135deg,var(--teal),var(--teal-dark)); }
+  .c-blue{ background:linear-gradient(135deg,var(--blue),var(--blue-dark)); }
+  .c-gold{ background:linear-gradient(135deg,var(--gold),var(--gold-dark)); }
+
+  /* ---------- Paneles genéricos ---------- */
+  .panel{
+    background:var(--card); border-radius:var(--radius);
+    padding:20px 22px; border:1px solid var(--border);
+  }
+  .panel-title{
+    display:flex; align-items:center; gap:8px; margin-bottom:14px;
+  }
+  .panel-title .bar{ width:3px; height:16px; background:var(--purple); border-radius:2px; }
+  .panel-title h3{ font-size:14.5px; margin:0; font-weight:700; }
+  .panel-title .legend{ margin-left:auto; display:flex; gap:14px; font-size:11.5px; color:var(--text-soft); }
+  .legend .dot-sm{ width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:5px; }
+
+  /* Row 1 */
+  .row-1{ display:grid; grid-template-columns:2fr 1.25fr 1.2fr; gap:18px; margin-bottom:18px; align-items:stretch; }
+
+  /* area chart */
+  .chart-wrap svg{ width:100%; height:190px; display:block; }
+  .chart-labels{ display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-soft); margin-top:6px; }
+
+  /* donuts grid */
+  .donut-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; height:100%; }
+  .donut-card{
+    background:#FAFAFD; border:1px solid var(--border); border-radius:12px;
+    padding:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  }
+  .donut-card .title{ font-size:12px; color:var(--text-soft); margin-bottom:8px; font-weight:600; }
+  .donut-card svg{ width:82px; height:82px; }
+  .donut-card .pct{ font-size:17px; font-weight:700; }
+
+  /* calendario */
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .cal-head .month{ font-weight:700; color:var(--purple); font-size:14px; }
+  .cal-nav{ color:var(--text-soft); font-size:13px; cursor:default; }
+  table.cal{ width:100%; border-collapse:collapse; font-size:12px; }
+  table.cal th{ color:var(--text-soft); font-weight:600; padding:4px 0; font-size:11px; }
+  table.cal td{ text-align:center; padding:6px 0; color:var(--text); }
+  table.cal td span{
+    display:inline-flex; width:26px; height:26px; align-items:center; justify-content:center; border-radius:50%;
+  }
+  .cal-today span{ background:var(--purple); color:#fff; font-weight:700; }
+  .cal-event span{ background:var(--blue); color:#fff; font-weight:700; }
+  .cal-cutoff span{ background:var(--gold); color:#fff; font-weight:700; }
+
+  /* Row 2 */
+  .row-2{
+    display:grid; grid-template-columns:2fr 1.25fr 1.2fr; grid-template-rows:auto auto; gap:18px;
+  }
+  .p-table{ grid-column:1; grid-row:1 / span 2; }
+  .p-bar{ grid-column:2; grid-row:1; }
+  .p-trend{ grid-column:2; grid-row:2; }
+  .p-featured{ grid-column:3; grid-row:1; }
+  .p-updates{ grid-column:3; grid-row:2; }
+
+  /* tabla asesores */
+  .manual-note{
+    background:#FFFBEA; border:1px dashed #F3D98B; color:#92400E;
+    font-size:11.5px; padding:8px 12px; border-radius:8px; margin-bottom:14px; display:flex; gap:8px; align-items:center;
+  }
+  table.advisors{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.advisors th{
+    text-align:left; font-size:11.5px; color:var(--text-soft); text-transform:uppercase; letter-spacing:.3px;
+    padding:8px 6px; border-bottom:2px solid var(--border);
+  }
+  table.advisors td{ padding:11px 6px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  .advisor-name{ display:flex; align-items:center; gap:10px; }
+  .advisor-avatar{
+    width:32px; height:32px; border-radius:50%; color:#fff; font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  td.editable{
+    background:#FFFDF3;
+    border-bottom:1px dashed #E9D9A5 !important;
+    cursor:text;
+  }
+  td.editable:focus{ outline:2px solid var(--gold); outline-offset:-2px; background:#FFF7DA; }
+  .save-btn{
+    margin-left:auto; background:var(--purple); color:#fff; border:none; font-size:12px; font-weight:600;
+    padding:8px 14px; border-radius:8px; cursor:default;
+  }
+  .table-foot{ margin-top:12px; font-size:11px; color:var(--text-soft); }
+  .total-row td{
+    font-weight:700; background:#F6F4FF; border-top:2px solid var(--purple);
+    border-bottom:none !important; color:var(--purple-dark);
+  }
+
+  /* bar chart */
+  .bars{ display:flex; align-items:flex-end; gap:18px; height:150px; padding-top:6px; }
+  .bar-group{ flex:1; display:flex; align-items:flex-end; justify-content:center; gap:4px; height:100%; }
+  .bar-group .bar{ width:9px; border-radius:4px 4px 0 0; }
+  .bar-cats{ display:flex; margin-top:8px; }
+  .bar-cats span{ flex:1; text-align:center; font-size:11px; color:var(--text-soft); }
+
+  /* trend line */
+  .trend-wrap svg{ width:100%; height:130px; display:block; }
+
+  /* destacado */
+  .featured-card{ display:flex; gap:12px; align-items:center; }
+  .featured-avatar{
+    width:52px; height:52px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,var(--teal),var(--blue));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:16px;
+  }
+  .featured-card h4{ margin:0 0 3px; font-size:13.5px; }
+  .featured-card .role{ font-size:11.5px; color:var(--text-soft); margin-bottom:6px; }
+  .badge-top{
+    display:inline-flex; align-items:center; gap:5px; background:#ECFDF5; color:#047857;
+    font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px;
+  }
+
+  /* novedades */
+  .updates-list{ list-style:none; margin:0; padding:0; font-size:12.5px; }
+  .updates-list li{ padding:9px 0; border-bottom:1px solid var(--border); display:flex; gap:8px; }
+  .updates-list li:last-child{ border-bottom:none; }
+  .updates-list .n{
+    width:19px; height:19px; border-radius:50%; background:var(--indigo); color:#fff;
+    font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;
+  }
+
+  .table-scroll{ overflow-x:auto; }
+  .spacer-col{}
+
+  @media (max-width:1180px){
+    .stats-row{ grid-template-columns:repeat(3,1fr); }
+    .row-1, .row-2{ grid-template-columns:1fr; grid-template-rows:auto; }
+    .p-table, .p-bar, .p-trend, .p-featured, .p-updates{ grid-column:1; grid-row:auto; }
+    .spacer-col{ display:none; }
+  }
+  @media (max-width:760px){
+    body{ padding:18px 8px; }
+    .stats-row{ grid-template-columns:repeat(2,1fr); gap:12px; }
+    .donut-grid{ grid-template-columns:1fr 1fr; gap:10px; }
+    .topbar{ gap:12px; }
+    .searchbox{ order:5; width:100%; }
+    .window-bar .badge{ display:none; }
+    .main{ padding:18px 14px 28px; }
+  }
+  @media (max-width:480px){
+    .stats-row{ grid-template-columns:1fr; }
+    .stat-card .num{ font-size:22px; }
+    .brand h1{ font-size:16.5px; }
+    .main{ padding:16px 10px 26px; }
+    .panel{ padding:14px; }
+    table.advisors{ font-size:12px; }
+    .bars{ height:120px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="device-frame">
+  <div class="window-bar">
+    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+    <span class="badge">panel.burodecredito.ec</span>
+  </div>
+
+  <div class="dashboard">
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="brand">
+          <div class="mark">💼</div>
+          <div>
+            <h1>Buró de Crédito Ecuador</h1>
+            <span>Panel de asesores comerciales</span>
+          </div>
+        </div>
+        <span class="example-pill">Mockup · datos de ejemplo</span>
+        <div class="searchbox">🔍 Buscar cliente o asesor…</div>
+        <div class="icon-btn">💬</div>
+        <div class="icon-btn">🔔</div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="stats-row">
+        <div class="stat-card c-purple">
+          <div class="top"><span class="icon">👥</span></div>
+          <div class="num">1,284</div>
+          <div class="label">CLIENTES JULIO</div>
+          <div class="sub">Julio 2026</div>
+        </div>
+        <div class="stat-card c-orange">
+          <div class="top"><span class="icon">✅</span></div>
+          <div class="num">872</div>
+          <div class="label">PERFIL APTO</div>
+          <div class="sub">68% del total</div>
+        </div>
+        <div class="stat-card c-teal">
+          <div class="top"><span class="icon">📥</span></div>
+          <div class="num">654</div>
+          <div class="label">CLIENTES INGRESADOS</div>
+          <div class="sub">75% de perfil apto</div>
+        </div>
+        <div class="stat-card c-blue">
+          <div class="top"><span class="icon">🏁</span></div>
+          <div class="num">398</div>
+          <div class="label">CLIENTES APROBADOS</div>
+          <div class="sub">61% de ingresados</div>
+        </div>
+        <div class="stat-card c-gold">
+          <div class="top"><span class="icon">💵</span></div>
+          <div class="num">$186,450</div>
+          <div class="label">MONTO APROBADO</div>
+          <div class="sub">Acumulado julio</div>
+        </div>
+      </div>
+
+      <!-- ROW 1 -->
+      <div class="row-1">
+        <div class="panel">
+          <div class="panel-title">
+            <span class="bar"></span><h3>Resumen diario — Ingresados vs. Aprobados</h3>
+            <span class="legend">
+              <span><span class="dot-sm" style="background:var(--teal)"></span>Ingresados</span>
+              <span><span class="dot-sm" style="background:var(--blue)"></span>Aprobados</span>
+            </span>
+          </div>
+          <div class="chart-wrap">
+            <svg viewBox="0 0 640 210" preserveAspectRatio="none">
+              <path d="M0,210 L0,115 L91,145 L183,135 L274,160 L366,150 L457,175 L548,165 L640,185 L640,210 Z" fill="var(--blue)" opacity="0.28"/>
+              <path d="M0,210 L0,80 L91,115 L183,100 L274,135 L366,120 L457,155 L548,140 L640,170 L640,210 Z" fill="var(--teal)" opacity="0.55"/>
+              <polyline points="0,115 91,145 183,135 274,160 366,150 457,175 548,165 640,185" fill="none" stroke="var(--blue)" stroke-width="2.5"/>
+              <polyline points="0,80 91,115 183,100 274,135 366,120 457,155 548,140 640,170" fill="none" stroke="var(--teal)" stroke-width="2.5"/>
+            </svg>
+            <div class="chart-labels">
+              <span>Hoy</span><span>Ayer</span><span>24/07</span><span>20/07</span><span>16/07</span><span>12/07</span><span>08/07</span><span>04/07</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><span class="bar"></span><h3>Indicadores clave</h3></div>
+          <div class="donut-grid">
+            <div class="donut-card">
+              <div class="title">Perfil apto</div>
+              <svg viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#F1F2F6" stroke-width="4"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--orange)" stroke-width="4"
+                  stroke-dasharray="97.4" stroke-dashoffset="31.2" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+              </svg>
+              <div class="pct">68%</div>
+            </div>
+            <div class="donut-card">
+              <div class="title">Cédulas revisadas</div>
+              <svg viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#F1F2F6" stroke-width="4"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--indigo)" stroke-width="4"
+                  stroke-dasharray="97.4" stroke-dashoffset="8.8" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+              </svg>
+              <div class="pct">91%</div>
+            </div>
+            <div class="donut-card">
+              <div class="title">Clientes ingresados</div>
+              <svg viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#F1F2F6" stroke-width="4"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--teal)" stroke-width="4"
+                  stroke-dasharray="97.4" stroke-dashoffset="24.4" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+              </svg>
+              <div class="pct">75%</div>
+            </div>
+            <div class="donut-card">
+              <div class="title">Tasa de aprobación</div>
+              <svg viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="#F1F2F6" stroke-width="4"/>
+                <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--blue)" stroke-width="4"
+                  stroke-dasharray="97.4" stroke-dashoffset="38.0" stroke-linecap="round" transform="rotate(-90 18 18)"/>
+              </svg>
+              <div class="pct">61%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="cal-head">
+            <span class="cal-nav">‹</span>
+            <span class="month">JULIO 2026</span>
+            <span class="cal-nav">›</span>
+          </div>
+          <div class="panel-title" style="margin-bottom:8px;">
+            <span class="legend" style="margin-left:0;">
+              <span><span class="dot-sm" style="background:var(--blue)"></span>Reunión</span>
+              <span><span class="dot-sm" style="background:var(--gold)"></span>Corte</span>
+            </span>
+          </div>
+          <table class="cal">
+            <tr><th>D</th><th>L</th><th>M</th><th>M</th><th>J</th><th>V</th><th>S</th></tr>
+            <tr><td></td><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+            <tr><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td></tr>
+            <tr><td>12</td><td>13</td><td>14</td><td class="cal-event"><span>15</span></td><td>16</td><td>17</td><td>18</td></tr>
+            <tr><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td></tr>
+            <tr><td>26</td><td>27</td><td class="cal-today"><span>28</span></td><td>29</td><td>30</td><td class="cal-cutoff"><span>31</span></td><td></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ROW 2 -->
+      <div class="row-2">
+
+        <div class="panel p-table">
+          <div class="panel-title">
+            <span class="bar"></span><h3>Detalle de asesores — Julio 2026</h3>
+            <button class="save-btn">💾 Guardar</button>
+          </div>
+          <div class="manual-note">✏️ Estos campos se completan manualmente cada mes por el equipo administrativo.</div>
+          <div class="table-scroll">
+          <table class="advisors">
+            <thead>
+              <tr><th>Asesor</th><th>Cédulas revisadas</th><th>Cédulas ingresadas</th><th>Monto aprobado</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="advisor-name"><span class="advisor-avatar" style="background:var(--purple)">DT</span>Diego Torres</div></td>
+                <td class="editable" contenteditable="true">185</td>
+                <td class="editable" contenteditable="true">140</td>
+                <td class="editable" contenteditable="true">$42,300</td>
+              </tr>
+              <tr>
+                <td><div class="advisor-name"><span class="advisor-avatar" style="background:var(--teal)">MS</span>María Fernanda Silva</div></td>
+                <td class="editable" contenteditable="true">220</td>
+                <td class="editable" contenteditable="true">168</td>
+                <td class="editable" contenteditable="true">$58,900</td>
+              </tr>
+              <tr>
+                <td><div class="advisor-name"><span class="advisor-avatar" style="background:var(--orange)">CA</span>Carlos Andrade</div></td>
+                <td class="editable" contenteditable="true">158</td>
+                <td class="editable" contenteditable="true">118</td>
+                <td class="editable" contenteditable="true">$31,750</td>
+              </tr>
+              <tr>
+                <td><div class="advisor-name"><span class="advisor-avatar" style="background:var(--blue)">ER</span>Estefanía Rojas</div></td>
+                <td class="editable" contenteditable="true">176</td>
+                <td class="editable" contenteditable="true">132</td>
+                <td class="editable" contenteditable="true">$37,600</td>
+              </tr>
+              <tr>
+                <td><div class="advisor-name"><span class="advisor-avatar" style="background:var(--gold)">XM</span>Xavier Morán</div></td>
+                <td class="editable" contenteditable="true">133</td>
+                <td class="editable" contenteditable="true">96</td>
+                <td class="editable" contenteditable="true">$15,900</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td>Total</td>
+                <td>872</td>
+                <td>654</td>
+                <td>$186,450</td>
+              </tr>
+            </tfoot>
+          </table>
+          </div>
+          <div class="table-foot">Última actualización manual: 28/07/2026 · haz clic sobre una celda resaltada para editarla</div>
+        </div>
+
+        <div class="panel p-bar">
+          <div class="panel-title">
+            <span class="bar"></span><h3>Comparativo de asesores</h3>
+            <span class="legend">
+              <span><span class="dot-sm" style="background:var(--indigo)"></span>Revisadas</span>
+              <span><span class="dot-sm" style="background:var(--teal)"></span>Ingresadas</span>
+              <span><span class="dot-sm" style="background:var(--blue)"></span>Aprobadas</span>
+            </span>
+          </div>
+          <div class="bars">
+            <div class="bar-group">
+              <div class="bar" style="height:70%; background:var(--indigo)"></div>
+              <div class="bar" style="height:55%; background:var(--teal)"></div>
+              <div class="bar" style="height:35%; background:var(--blue)"></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar" style="height:78%; background:var(--indigo)"></div>
+              <div class="bar" style="height:60%; background:var(--teal)"></div>
+              <div class="bar" style="height:40%; background:var(--blue)"></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar" style="height:85%; background:var(--indigo)"></div>
+              <div class="bar" style="height:68%; background:var(--teal)"></div>
+              <div class="bar" style="height:48%; background:var(--blue)"></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar" style="height:92%; background:var(--indigo)"></div>
+              <div class="bar" style="height:75%; background:var(--teal)"></div>
+              <div class="bar" style="height:55%; background:var(--blue)"></div>
+            </div>
+          </div>
+          <div class="bar-cats"><span>Abr</span><span>May</span><span>Jun</span><span>Jul</span></div>
+        </div>
+
+        <div class="panel p-featured">
+          <div class="panel-title"><span class="bar"></span><h3>Asesor destacado</h3></div>
+          <div class="featured-card">
+            <div class="featured-avatar">MS</div>
+            <div>
+              <h4>María Fernanda Silva</h4>
+              <div class="role">168 clientes ingresados este mes</div>
+              <span class="badge-top">🏆 Mejor tasa de aprobación</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel p-updates">
+          <div class="panel-title"><span class="bar"></span><h3>Novedades</h3></div>
+          <ul class="updates-list">
+            <li><span class="n">1</span>Meta mensual de monto aprobado actualizada a $200,000.</li>
+            <li><span class="n">2</span>Se incorporaron 2 nuevos asesores este mes.</li>
+            <li><span class="n">3</span>Corte de cédulas pendientes: 15 de julio.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- trend chart bajo el bar chart, mismo ancho de columna -->
+      <div class="row-2" style="margin-top:18px; grid-template-rows:auto;">
+        <div class="spacer-col"></div>
+        <div class="panel">
+          <div class="panel-title"><span class="bar"></span><h3>Tendencia de monto aprobado</h3></div>
+          <div class="trend-wrap">
+            <svg viewBox="0 0 640 200" preserveAspectRatio="none">
+              <path d="M0,200 L0,190 L107,167 L213,182 L320,128 L427,99 L533,70 L640,20 L640,200 Z" fill="var(--gold)" opacity="0.25"/>
+              <polyline points="0,190 107,167 213,182 320,128 427,99 533,70 640,20" fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+              <circle cx="0" cy="190" r="4" fill="var(--gold)"/>
+              <circle cx="107" cy="167" r="4" fill="var(--gold)"/>
+              <circle cx="213" cy="182" r="4" fill="var(--gold)"/>
+              <circle cx="320" cy="128" r="4" fill="var(--gold)"/>
+              <circle cx="427" cy="99" r="4" fill="var(--gold)"/>
+              <circle cx="533" cy="70" r="4" fill="var(--gold)"/>
+              <circle cx="640" cy="20" r="4" fill="var(--gold)"/>
+            </svg>
+          </div>
+          <div class="chart-labels">
+            <span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span><span>Jul</span>
+          </div>
+        </div>
+        <div class="spacer-col"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
