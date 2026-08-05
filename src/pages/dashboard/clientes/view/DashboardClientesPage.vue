@@ -1,5 +1,5 @@
 <template>
-  <q-page class="dashboard-clientes-page">
+  <q-page ref="paginaRef" class="dashboard-clientes-page">
     <div class="row justify-between items-center q-mb-md header-row">
       <div>
         <div class="text-h5 text-bold">Panel de Gestión de Clientes</div>
@@ -7,10 +7,29 @@
           Resumen mensual de gestión de clientes para asesores comerciales.
         </p>
       </div>
-      <q-btn color="primary" unelevated no-caps @click="modalAbierto = true">
-        <q-icon name="bi-pencil-square" size="xs" class="q-mr-xs"></q-icon
-        >Editar datos
-      </q-btn>
+      <div class="row items-center q-gutter-sm">
+        <q-btn
+          color="primary"
+          outline
+          unelevated
+          no-caps
+          @click="alternarPantallaCompleta"
+        >
+          <q-icon
+            :name="
+              estaEnPantallaCompleta
+                ? 'bi-fullscreen-exit'
+                : 'bi-arrows-fullscreen'
+            "
+            size="xs"
+            class="q-mr-xs"
+          ></q-icon
+          >{{ estaEnPantallaCompleta ? '' : 'Pantalla completa' }}
+        </q-btn>
+        <q-btn color="primary" unelevated no-caps @click="modalAbierto = true">
+          <q-icon name="bi-pencil-square" size="xs" class="q-mr-xs"></q-icon>
+        </q-btn>
+      </div>
     </div>
 
     <!-- STAT CARDS -->
@@ -44,29 +63,16 @@
             >
           </span>
         </div>
-        <div class="chart-wrap">
-          <svg viewBox="0 0 640 210" preserveAspectRatio="none">
-            <path :d="pathAprobadosDiaria" fill="var(--blue)" opacity="0.28" />
-            <path :d="pathIngresadosDiaria" fill="var(--teal)" opacity="0.55" />
-            <polyline
-              :points="puntosAprobadosDiaria"
-              fill="none"
-              stroke="var(--blue)"
-              stroke-width="2.5"
-            />
-            <polyline
-              :points="puntosIngresadosDiaria"
-              fill="none"
-              stroke="var(--teal)"
-              stroke-width="2.5"
-            />
-          </svg>
-          <div class="chart-labels">
-            <span v-for="(etiqueta, i) in etiquetasSerieDiaria" :key="i">{{
-              etiqueta
-            }}</span>
-          </div>
-        </div>
+        <transition name="chart-fade">
+          <VueApexCharts
+            :key="`area-diaria-${instanciaId}`"
+            type="area"
+            width="100%"
+            height="220"
+            :options="opcionesAreaDiaria"
+            :series="seriesAreaDiaria"
+          />
+        </transition>
       </div>
 
       <div class="panel" v-if="datos.visibilidad.indicadoresClave">
@@ -81,29 +87,14 @@
             :key="indicador.titulo"
           >
             <div class="title">{{ indicador.titulo }}</div>
-            <svg viewBox="0 0 36 36">
-              <circle
-                cx="18"
-                cy="18"
-                r="15.5"
-                fill="none"
-                stroke="#F1F2F6"
-                stroke-width="4"
-              />
-              <circle
-                cx="18"
-                cy="18"
-                r="15.5"
-                fill="none"
-                :stroke="indicador.colorVar"
-                stroke-width="4"
-                :stroke-dasharray="CIRCUNFERENCIA_DONUT"
-                :stroke-dashoffset="calcularDashoffset(indicador.pct)"
-                stroke-linecap="round"
-                transform="rotate(-90 18 18)"
-              />
-            </svg>
-            <div class="pct">{{ indicador.pct }}%</div>
+            <VueApexCharts
+              :key="`radial-${indicador.titulo}-${instanciaId}`"
+              type="radialBar"
+              width="100%"
+              height="120"
+              :options="opcionesRadial(indicador.colorVar)"
+              :series="[indicador.pct]"
+            />
           </div>
         </div>
       </div>
@@ -235,40 +226,14 @@
             >
           </span>
         </div>
-        <div class="bars">
-          <div
-            class="bar-group"
-            v-for="mes in serieEquipoCompleta"
-            :key="mes.mes"
-          >
-            <div
-              class="bar"
-              :style="{
-                height: alturaBarra(mes.revisadas),
-                background: 'var(--purple-pastel)',
-              }"
-            ></div>
-            <div
-              class="bar"
-              :style="{
-                height: alturaBarra(mes.ingresadas),
-                background: 'var(--teal)',
-              }"
-            ></div>
-            <div
-              class="bar"
-              :style="{
-                height: alturaBarra(mes.aprobadas),
-                background: 'var(--blue)',
-              }"
-            ></div>
-          </div>
-        </div>
-        <div class="bar-cats">
-          <span v-for="mes in serieEquipoCompleta" :key="mes.mes">{{
-            mes.mes
-          }}</span>
-        </div>
+        <VueApexCharts
+          :key="`barras-${instanciaId}`"
+          type="bar"
+          width="100%"
+          height="220"
+          :options="opcionesBarras"
+          :series="seriesBarras"
+        />
       </div>
 
       <div class="panel p-trend" v-if="datos.visibilidad.tendenciaMonto">
@@ -276,30 +241,16 @@
           <span class="bar"></span>
           <h3>Tendencia de monto aprobado</h3>
         </div>
-        <div class="trend-wrap">
-          <svg viewBox="0 0 640 200" preserveAspectRatio="none">
-            <path :d="pathTendencia" fill="var(--gold)" opacity="0.25" />
-            <polyline
-              :points="puntosTendencia"
-              fill="none"
-              stroke="var(--gold)"
-              stroke-width="2.5"
-            />
-            <circle
-              v-for="(punto, i) in puntosCoordTendencia"
-              :key="i"
-              :cx="punto.x"
-              :cy="punto.y"
-              r="4"
-              fill="var(--gold)"
-            />
-          </svg>
-        </div>
-        <div class="chart-labels">
-          <span v-for="mes in serieTendenciaCompleta" :key="mes.mes">{{
-            mes.mes
-          }}</span>
-        </div>
+        <transition name="chart-fade">
+          <VueApexCharts
+            :key="`tendencia-${instanciaId}`"
+            type="area"
+            width="100%"
+            height="190"
+            :options="opcionesTendencia"
+            :series="seriesTendencia"
+          />
+        </transition>
       </div>
 
       <div class="panel p-featured" v-if="datos.visibilidad.asesorDestacado">
@@ -348,7 +299,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import {
+  computed,
+  nextTick,
+  onActivated,
+  onDeactivated,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  watch,
+} from 'vue'
+import { ApexOptions } from 'apexcharts'
+import { useQuasar } from 'quasar'
+import VueApexCharts from 'vue3-apexcharts'
 import EditarDashboardClientesModal from 'pages/dashboard/clientes/components/EditarDashboardClientesModal.vue'
 import {
   AsesorDashboardClientes,
@@ -358,14 +322,34 @@ import {
   PALETA_AVATARES,
   TipoEventoCalendario,
   agruparMiles,
-  calcularDashoffset,
   calcularPorcentaje,
-  CIRCUNFERENCIA_DONUT,
   diasEnMes,
   formatearMonto,
   mesesCortosAnteriores,
   obtenerIniciales,
 } from 'pages/dashboard/clientes/domain/DashboardClientes'
+
+// Mismos valores que las variables CSS del tema (--teal, --blue, etc.) —
+// ApexCharts necesita colores reales, no puede leer var(--x) para sus cálculos internos.
+const COLOR_ORANGE = '#f97316'
+const COLOR_PURPLE_PASTEL = '#a78bfa'
+const COLOR_TEAL = '#0d9488'
+const COLOR_BLUE = '#2563eb'
+const COLOR_GOLD = '#d97706'
+const COLOR_TEXT_SOFT = '#6b7280'
+
+// Identificador que fuerza a Vue a crear instancias de ApexCharts nuevas
+// (en vez de reutilizar las anteriores) cada vez que esta página vuelve a
+// mostrarse. MainLayout.vue envuelve las rutas en <keep-alive>, así que al
+// navegar a otra página y volver este componente NUNCA se destruye/remonta
+// de verdad — solo se "desactiva" y "reactiva" (onDeactivated/onActivated),
+// sin volver a ejecutar <script setup>. Por eso una constante fija no sirve:
+// hay que regenerar este id explícitamente en onActivated para que el
+// binding `:key` de cada gráfico cambie y Vue los recree desde cero.
+function generarInstanciaId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+const instanciaId = ref(generarInstanciaId())
 
 const datos = reactive<DashboardClientesData>(
   crearDatosEjemploDashboardClientes()
@@ -376,6 +360,117 @@ const modalAbierto = ref(false)
 function onGuardarDatos(nuevosDatos: DashboardClientesData) {
   Object.assign(datos, nuevosDatos)
 }
+
+// Pantalla completa: solo del contenido del dashboard (no del navegador
+// entero), así al activarla se oculta el menú/toolbar de la app y queda
+// mejor para mostrar en una pantalla/TV.
+const $q = useQuasar()
+const paginaRef = ref<{ $el: HTMLElement } | null>(null)
+const estaEnPantallaCompleta = computed(() => $q.fullscreen.isActive)
+
+function alternarPantallaCompleta() {
+  const el = paginaRef.value?.$el as HTMLElement | undefined
+  $q.fullscreen.toggle(el).catch(() => {
+    $q.notify({
+      type: 'negative',
+      message: 'El navegador no permitió activar pantalla completa.',
+    })
+  })
+}
+
+// En pantalla completa, todo el dashboard debe caber sin necesidad de hacer
+// scroll. El contenido normalmente es más alto que una pantalla (5 tarjetas +
+// 3 paneles + 5 paneles), así que se mide su tamaño real y se aplica un
+// "zoom" (encoge todo por igual, texto incluido, sin recortar nada) que lo
+// ajuste exactamente al alto y ancho disponibles. Nunca amplía más allá del
+// 100% si el contenido ya cabe solo.
+function ajustarZoomPantallaCompleta() {
+  const el = paginaRef.value?.$el as HTMLElement | undefined
+  if (!el || !$q.fullscreen.isActive) return
+
+  el.style.zoom = '1'
+  void el.offsetHeight // fuerza a medir el tamaño real, sin zoom aplicado
+
+  const factor = Math.min(
+    window.innerHeight / el.scrollHeight,
+    window.innerWidth / el.scrollWidth,
+    1
+  )
+  el.style.zoom = String(factor)
+}
+
+function quitarZoomPantallaCompleta() {
+  const el = paginaRef.value?.$el as HTMLElement | undefined
+  if (el) el.style.zoom = ''
+}
+
+// El usuario puede salir de pantalla completa con Escape sin pasar por
+// alternarPantallaCompleta(), así que el ajuste/reset del zoom se maneja
+// reactivamente sobre el estado real, no solo al hacer clic en el botón.
+watch(
+  () => $q.fullscreen.isActive,
+  (activo) => {
+    if (activo) {
+      nextTick(ajustarZoomPantallaCompleta)
+    } else {
+      quitarZoomPantallaCompleta()
+    }
+  }
+)
+
+function manejarResizePantallaCompleta() {
+  if ($q.fullscreen.isActive) ajustarZoomPantallaCompleta()
+}
+onMounted(() =>
+  window.addEventListener('resize', manejarResizePantallaCompleta)
+)
+onUnmounted(() =>
+  window.removeEventListener('resize', manejarResizePantallaCompleta)
+)
+
+// Cada gráfico se recarga (se recrea desde cero) una vez por minuto
+// mientras esta pantalla está activa — reutiliza el mismo mecanismo del
+// :key que fuerza la recreación al volver de otra página (ver
+// generarInstanciaId más arriba), en vez de recargar el navegador entero:
+// así no se pierde el scroll ni lo que el usuario esté editando en el
+// modal. Se detiene si el usuario navega a otra página — de lo contrario,
+// gracias al <keep-alive>, el temporizador seguiría corriendo en segundo
+// plano sobre una pantalla distinta.
+const INTERVALO_RECARGA_MS = 30000
+let temporizadorRecarga: ReturnType<typeof setInterval> | null = null
+
+function iniciarRecargaAutomatica() {
+  detenerRecargaAutomatica()
+  temporizadorRecarga = setInterval(() => {
+    instanciaId.value = generarInstanciaId()
+  }, INTERVALO_RECARGA_MS)
+}
+
+function detenerRecargaAutomatica() {
+  if (temporizadorRecarga) {
+    clearInterval(temporizadorRecarga)
+    temporizadorRecarga = null
+  }
+}
+
+onMounted(iniciarRecargaAutomatica)
+onUnmounted(detenerRecargaAutomatica)
+
+// onActivated también se dispara justo después del primer montaje (no solo
+// al volver de otra página). Regenerar el id ahí forzaría a los 7 gráficos a
+// destruirse y recrearse dos veces seguidas en el primer render, lo cual
+// confunde a ApexCharts ("Element not found"). Por eso el id solo se
+// regenera a partir de la SEGUNDA activación en adelante — las siguientes,
+// que sí corresponden a "volver de otra página" de verdad.
+let primeraActivacion = true
+onActivated(() => {
+  if (!primeraActivacion) {
+    instanciaId.value = generarInstanciaId()
+  }
+  primeraActivacion = false
+  iniciarRecargaAutomatica()
+})
+onDeactivated(detenerRecargaAutomatica)
 
 function sum(valores: number[]): number {
   return valores.reduce((acumulado, valor) => acumulado + valor, 0)
@@ -448,55 +543,80 @@ const tarjetasEstadisticas = computed(() => [
   },
 ])
 
-// ---- Indicadores clave (donas) ----
+// ---- Indicadores clave (donas ApexCharts radialBar) ----
 const indicadoresClave = computed(() => [
-  {
-    titulo: 'Perfil apto',
-    colorVar: 'var(--orange)',
-    pct: pctPerfilApto.value,
-  },
+  { titulo: 'Perfil apto', colorVar: COLOR_ORANGE, pct: pctPerfilApto.value },
   {
     titulo: 'Cédulas revisadas',
-    colorVar: 'var(--purple-pastel)',
+    colorVar: COLOR_PURPLE_PASTEL,
     pct: pctCedulasRevisadas.value,
   },
   {
     titulo: 'Clientes ingresados',
-    colorVar: 'var(--teal)',
+    colorVar: COLOR_TEAL,
     pct: pctClientesIngresados.value,
   },
   {
     titulo: 'Tasa de aprobación',
-    colorVar: 'var(--blue)',
+    colorVar: COLOR_BLUE,
     pct: pctTasaAprobacion.value,
   },
 ])
 
-// ---- Helpers de coordenadas SVG (compartidos por área y tendencia) ----
-function calcularX(indice: number, totalPuntos: number, ancho = 640): number {
-  return totalPuntos <= 1 ? 0 : (indice * ancho) / (totalPuntos - 1)
+const ANIMACION_BASE = {
+  enabled: true,
+  easing: 'easeinout' as const,
+  speed: 500,
+  animateGradually: { enabled: true, delay: 80 },
+  dynamicAnimation: { enabled: true, speed: 350 },
 }
 
-function construirPuntos(
-  valores: number[],
-  y: (v: number) => number,
-  ancho = 640
-): string {
-  return valores
-    .map((v, i) => `${calcularX(i, valores.length, ancho)},${y(v)}`)
-    .join(' ')
-}
+// Los gráficos tipo 'area'/'line' animan su entrada con una máscara SVG que
+// crece de 0 a su ancho final. Esa máscara puede quedar atascada en 0 (el
+// gráfico se ve en blanco para siempre) cuando el componente se desmonta y
+// se vuelve a montar rápido — por ejemplo, al navegar a otra ruta y volver.
+// Para esos dos gráficos se desactivan las animaciones por completo, priorizando
+// que siempre se vean sobre el efecto de entrada.
+const SIN_ANIMACION = { enabled: false }
 
-function construirPathArea(
-  valores: number[],
-  y: (v: number) => number,
-  ancho: number,
-  alto: number
-): string {
-  const segmentos = valores
-    .map((v, i) => `L${calcularX(i, valores.length, ancho)},${y(v)}`)
-    .join(' ')
-  return `M0,${alto} ${segmentos} L${ancho},${alto} Z`
+// Options por color, creadas UNA sola vez y cacheadas: si se reconstruyera un
+// objeto `options` nuevo en cada render, vue3-apexcharts lo interpreta como un
+// cambio de configuración y redibuja el gráfico entero sin animar la
+// transición — por eso antes las donas no se veían animadas. Solo `series`
+// (el array `[pct]`) debe cambiar de referencia; `options` se queda fijo.
+const cacheOpcionesRadial = new Map<string, ApexOptions>()
+function opcionesRadial(color: string): ApexOptions {
+  const cacheada = cacheOpcionesRadial.get(color)
+  if (cacheada) return cacheada
+
+  const opciones: ApexOptions = {
+    chart: {
+      type: 'radialBar',
+      sparkline: { enabled: true },
+      animations: ANIMACION_BASE,
+    },
+    colors: [color],
+    plotOptions: {
+      radialBar: {
+        hollow: { size: '62%' },
+        track: { background: '#f1f2f6' },
+        dataLabels: {
+          name: { show: false },
+          value: {
+            show: true,
+            fontSize: '16px',
+            fontWeight: 700,
+            color: '#1e2333',
+            offsetY: 6,
+            formatter: (val: number) => `${val}%`,
+          },
+        },
+      },
+    },
+    stroke: { lineCap: 'round' },
+  }
+  cacheOpcionesRadial.set(color, opciones)
+  return opciones
 }
 
 // ---- Gráfico de área: serie diaria (aleatoria, siempre a beneficio) ----
@@ -547,29 +667,29 @@ const aprobadosSerieDiaria = computed(() =>
   serieDiariaValores.value.map((p) => p.aprobados)
 )
 
-const escalaSerieDiaria = computed(() => {
-  const maxValor = Math.max(
-    ...serieDiariaValores.value.flatMap((p) => [p.ingresados, p.aprobados])
-  )
-  return maxValor * 1.15 || 1
-})
-
-function ySerieDiaria(v: number): number {
-  return 210 * (1 - v / escalaSerieDiaria.value)
+const ejeCategoriasBase: ApexOptions['xaxis'] = {
+  labels: { style: { fontSize: '10.5px', colors: COLOR_TEXT_SOFT } },
+  axisBorder: { show: false },
+  axisTicks: { show: false },
 }
 
-const pathIngresadosDiaria = computed(() =>
-  construirPathArea(ingresadosSerieDiaria.value, ySerieDiaria, 640, 210)
-)
-const pathAprobadosDiaria = computed(() =>
-  construirPathArea(aprobadosSerieDiaria.value, ySerieDiaria, 640, 210)
-)
-const puntosIngresadosDiaria = computed(() =>
-  construirPuntos(ingresadosSerieDiaria.value, ySerieDiaria, 640)
-)
-const puntosAprobadosDiaria = computed(() =>
-  construirPuntos(aprobadosSerieDiaria.value, ySerieDiaria, 640)
-)
+const opcionesAreaDiaria = computed<ApexOptions>(() => ({
+  chart: { type: 'area', toolbar: { show: false }, animations: SIN_ANIMACION },
+  colors: [COLOR_TEAL, COLOR_BLUE],
+  dataLabels: { enabled: false },
+  stroke: { curve: 'smooth', width: 2.5 },
+  fill: { type: 'gradient', gradient: { opacityFrom: 0.5, opacityTo: 0.05 } },
+  xaxis: { ...ejeCategoriasBase, categories: etiquetasSerieDiaria.value },
+  yaxis: { labels: { show: false } },
+  grid: { show: false },
+  legend: { show: false },
+  tooltip: { theme: 'light' },
+}))
+
+const seriesAreaDiaria = computed(() => [
+  { name: 'Ingresados', data: ingresadosSerieDiaria.value },
+  { name: 'Aprobados', data: aprobadosSerieDiaria.value },
+])
 
 // ---- Barras: comparativo de asesores por mes (histórico aleatorio + mes vigente manual) ----
 const serieEquipoCompleta = computed(() => {
@@ -594,20 +714,43 @@ const serieEquipoCompleta = computed(() => {
   ]
 })
 
-const escalaEquipo = computed(() => {
-  const maxValor = Math.max(
-    ...serieEquipoCompleta.value.flatMap((m) => [
-      m.revisadas,
-      m.ingresadas,
-      m.aprobadas,
-    ])
-  )
-  return maxValor * 1.12 || 1
-})
+const opcionesBarras = computed<ApexOptions>(() => ({
+  chart: { type: 'bar', toolbar: { show: false }, animations: ANIMACION_BASE },
+  colors: [COLOR_PURPLE_PASTEL, COLOR_TEAL, COLOR_BLUE],
+  plotOptions: {
+    bar: {
+      columnWidth: '55%',
+      borderRadius: 4,
+      borderRadiusApplication: 'end',
+    },
+  },
+  dataLabels: { enabled: false },
+  stroke: { show: true, width: 2, colors: ['transparent'] },
+  xaxis: {
+    ...ejeCategoriasBase,
+    categories: serieEquipoCompleta.value.map((m) => m.mes),
+    labels: { style: { fontSize: '11px', colors: COLOR_TEXT_SOFT } },
+  },
+  yaxis: { labels: { show: false } },
+  grid: { show: false },
+  legend: { show: false },
+  tooltip: { theme: 'light' },
+}))
 
-function alturaBarra(valor: number): string {
-  return `${((valor / escalaEquipo.value) * 100).toFixed(1)}%`
-}
+const seriesBarras = computed(() => [
+  {
+    name: 'Revisadas',
+    data: serieEquipoCompleta.value.map((m) => m.revisadas),
+  },
+  {
+    name: 'Ingresadas',
+    data: serieEquipoCompleta.value.map((m) => m.ingresadas),
+  },
+  {
+    name: 'Aprobadas',
+    data: serieEquipoCompleta.value.map((m) => m.aprobadas),
+  },
+])
 
 // ---- Tendencia de monto aprobado (histórico aleatorio + mes vigente manual) ----
 const serieTendenciaCompleta = computed(() => {
@@ -625,42 +768,32 @@ const serieTendenciaCompleta = computed(() => {
   ]
 })
 
-const PAD_SUP_TENDENCIA = 20
-const PAD_INF_TENDENCIA = 10
-const ALTO_UTIL_TENDENCIA = 200 - PAD_SUP_TENDENCIA - PAD_INF_TENDENCIA
+const opcionesTendencia = computed<ApexOptions>(() => ({
+  chart: { type: 'area', toolbar: { show: false }, animations: SIN_ANIMACION },
+  colors: [COLOR_GOLD],
+  dataLabels: { enabled: false },
+  stroke: { curve: 'smooth', width: 2.5 },
+  markers: { size: 4, colors: [COLOR_GOLD], strokeWidth: 0 },
+  fill: { type: 'gradient', gradient: { opacityFrom: 0.35, opacityTo: 0.05 } },
+  xaxis: {
+    ...ejeCategoriasBase,
+    categories: serieTendenciaCompleta.value.map((p) => p.mes),
+  },
+  yaxis: { labels: { show: false } },
+  grid: { show: false },
+  legend: { show: false },
+  tooltip: {
+    theme: 'light',
+    y: { formatter: (val: number) => formatearMonto(val) },
+  },
+}))
 
-const minMontoTendencia = computed(() =>
-  Math.min(...serieTendenciaCompleta.value.map((p) => p.monto))
-)
-const maxMontoTendencia = computed(() =>
-  Math.max(...serieTendenciaCompleta.value.map((p) => p.monto))
-)
-
-function yTendencia(v: number): number {
-  const rango = maxMontoTendencia.value - minMontoTendencia.value
-  return rango === 0
-    ? PAD_SUP_TENDENCIA + ALTO_UTIL_TENDENCIA / 2
-    : PAD_SUP_TENDENCIA +
-        (1 - (v - minMontoTendencia.value) / rango) * ALTO_UTIL_TENDENCIA
-}
-
-const puntosCoordTendencia = computed(() =>
-  serieTendenciaCompleta.value.map((p, i) => ({
-    x: calcularX(i, serieTendenciaCompleta.value.length, 640),
-    y: yTendencia(p.monto),
-  }))
-)
-
-const pathTendencia = computed(() => {
-  const segmentos = puntosCoordTendencia.value
-    .map((p) => `L${p.x},${p.y}`)
-    .join(' ')
-  return `M0,200 ${segmentos} L640,200 Z`
-})
-
-const puntosTendencia = computed(() =>
-  puntosCoordTendencia.value.map((p) => `${p.x},${p.y}`).join(' ')
-)
+const seriesTendencia = computed(() => [
+  {
+    name: 'Monto aprobado',
+    data: serieTendenciaCompleta.value.map((p) => p.monto),
+  },
+])
 
 // ---- Calendario ----
 interface CeldaCalendario {
@@ -748,6 +881,39 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
   background: var(--bg);
   color: var(--text);
   padding: 26px 30px 40px;
+}
+
+/* Animación de entrada propia para los gráficos de área (Resumen diario y
+   Tendencia de monto aprobado). ApexCharts anima su propia entrada con una
+   máscara SVG que crece de 0 a su ancho final, pero esa máscara queda
+   atascada en 0 (el gráfico desaparece para siempre) cada vez que el
+   componente se recrea — al volver de otra página o en cada refresco
+   periódico de 30s. Por eso esos dos gráficos llevan animations:false y en
+   su lugar se recrean detrás de este fade/slide en CSS, que sí es 100%
+   confiable sin importar cuántas veces se repita. */
+.chart-fade-enter-active {
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.chart-fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* El navegador pinta un fondo negro (::backdrop) detrás del elemento en
+   pantalla completa por defecto; sin esto se ve negro alrededor/detrás
+   del contenido en vez del fondo del dashboard. */
+.dashboard-clientes-page:fullscreen,
+.dashboard-clientes-page:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--bg);
+}
+.dashboard-clientes-page::backdrop,
+.dashboard-clientes-page:-webkit-full-screen::backdrop {
+  /* ::backdrop no hereda custom properties del elemento, así que va el
+     valor literal (mismo que --bg) en vez de var(--bg). */
+  background: #eef1f7;
 }
 
 /* ---------- Stat cards ---------- */
@@ -862,48 +1028,33 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
   align-items: start;
 }
 
-.chart-wrap svg {
-  width: 100%;
-  height: 190px;
-  display: block;
-}
-.chart-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10.5px;
-  color: var(--text-soft);
-  margin-top: 6px;
-}
-
 .donut-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 14px;
 }
 .donut-card {
   background: #fafafd;
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 14px;
+  padding: 10px 10px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  min-width: 0;
+  overflow: hidden;
+}
+.donut-card > div[id^='apexcharts'] {
+  width: 100% !important;
+  max-width: 100%;
 }
 .donut-card .title {
   font-size: 12px;
   color: var(--text-soft);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-weight: 600;
-}
-.donut-card svg {
-  width: 82px;
-  height: 82px;
-}
-.donut-card .pct {
-  font-size: 17px;
-  font-weight: 700;
 }
 
 /* calendario */
@@ -1060,43 +1211,7 @@ table.advisors td:not(:first-child) {
   color: var(--purple-dark);
 }
 
-/* bar chart */
-.bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 18px;
-  height: 150px;
-  padding-top: 6px;
-}
-.bar-group {
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 4px;
-  height: 100%;
-}
-.bar-group .bar {
-  width: 9px;
-  border-radius: 4px 4px 0 0;
-}
-.bar-cats {
-  display: flex;
-  margin-top: 8px;
-}
-.bar-cats span {
-  flex: 1;
-  text-align: center;
-  font-size: 11px;
-  color: var(--text-soft);
-}
-
 /* trend line */
-.trend-wrap svg {
-  width: 100%;
-  height: 130px;
-  display: block;
-}
 
 /* destacado */
 .featured-card {
@@ -1206,7 +1321,7 @@ table.advisors td:not(:first-child) {
     gap: 12px;
   }
   .donut-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 10px;
   }
 }
@@ -1226,8 +1341,8 @@ table.advisors td:not(:first-child) {
   table.advisors {
     font-size: 12px;
   }
-  .bars {
-    height: 120px;
+  .donut-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 </style>

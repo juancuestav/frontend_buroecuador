@@ -123,13 +123,6 @@ export function calcularPorcentaje(
   return denominador ? Math.round((numerador / denominador) * 100) : 0
 }
 
-export const RADIO_DONUT = 15.5
-export const CIRCUNFERENCIA_DONUT = 2 * Math.PI * RADIO_DONUT
-
-export function calcularDashoffset(pct: number): number {
-  return CIRCUNFERENCIA_DONUT * (1 - pct / 100)
-}
-
 /** Cantidad de días del mes indicado (mesIndice 0=Enero..11=Diciembre). Maneja bisiestos. */
 export function diasEnMes(mesIndice: number, anio: number): number {
   return new Date(anio, mesIndice + 1, 0).getDate()
