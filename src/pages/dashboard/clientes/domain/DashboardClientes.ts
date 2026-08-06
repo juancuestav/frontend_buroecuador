@@ -128,6 +128,17 @@ export function diasEnMes(mesIndice: number, anio: number): number {
   return new Date(anio, mesIndice + 1, 0).getDate()
 }
 
+/** Mes/año/día de hoy, según el reloj del dispositivo — punto de partida
+ * del dataset de ejemplo para que el dashboard arranque siempre "al día". */
+export function obtenerPeriodoActual(): PeriodoDashboardClientes {
+  const hoy = new Date()
+  return {
+    mes: MESES_ES[hoy.getMonth()],
+    anio: hoy.getFullYear(),
+    diaActual: hoy.getDate(),
+  }
+}
+
 /**
  * Etiquetas cortas (3 letras) de los `cantidad` meses inmediatamente anteriores
  * a `mesIndice`, en orden cronológico (más antiguo primero), cruzando el límite
@@ -218,8 +229,14 @@ function seccionesVisiblesPorDefecto(): VisibilidadSecciones {
  * beneficio, para los gráficos que no se editan manualmente).
  */
 export function crearDatosEjemploDashboardClientes(): DashboardClientesData {
+  const periodo = obtenerPeriodoActual()
+  const mesIndiceActual = MESES_ES.indexOf(periodo.mes)
+  // El corte siempre cae en el último día del mes vigente (no un 31 fijo,
+  // que no existe en todos los meses).
+  const diaCorte = diasEnMes(mesIndiceActual, periodo.anio)
+
   return {
-    periodo: { mes: 'Julio', anio: 2026, diaActual: 28 },
+    periodo,
     totalClientesPool: 1250,
     perfilApto: 890,
     clientesIngresados: 670,
@@ -265,12 +282,12 @@ export function crearDatosEjemploDashboardClientes(): DashboardClientesData {
     ],
     eventosCalendario: [
       { dia: 9, tipo: 'reunion' },
-      { dia: 31, tipo: 'corte' },
+      { dia: diaCorte, tipo: 'corte' },
     ],
     novedades: [
       'Meta mensual de monto aprobado actualizada a $210,000.',
       'Se incorporaron 2 nuevos asesores este mes.',
-      'Corte de cédulas pendientes: 31 de julio.',
+      `Corte de cédulas pendientes: ${diaCorte} de ${periodo.mes.toLowerCase()}.`,
     ],
     serieDiariaRatios: generarSerieDiariaRatios(),
     serieEquipoHistoricaRatios: generarSerieEquipoHistoricaRatios(),

@@ -7,7 +7,7 @@
           Resumen mensual de gestión de clientes para asesores comerciales.
         </p>
       </div>
-      <div class="row items-center q-gutter-sm">
+      <div v-if="!estaEnPantallaCompleta" class="row items-center q-gutter-sm">
         <q-btn
           color="primary"
           outline
@@ -15,16 +15,8 @@
           no-caps
           @click="alternarPantallaCompleta"
         >
-          <q-icon
-            :name="
-              estaEnPantallaCompleta
-                ? 'bi-fullscreen-exit'
-                : 'bi-arrows-fullscreen'
-            "
-            size="xs"
-            class="q-mr-xs"
-          ></q-icon
-          >{{ estaEnPantallaCompleta ? '' : 'Pantalla completa' }}
+          <q-icon name="bi-arrows-fullscreen" size="xs" class="q-mr-xs"></q-icon
+          >Pantalla completa
         </q-btn>
         <q-btn color="primary" unelevated no-caps @click="modalAbierto = true">
           <q-icon name="bi-pencil-square" size="xs" class="q-mr-xs"></q-icon>
@@ -63,16 +55,18 @@
             >
           </span>
         </div>
-        <transition name="chart-fade">
-          <VueApexCharts
-            :key="`area-diaria-${instanciaId}`"
-            type="area"
-            width="100%"
-            height="220"
-            :options="opcionesAreaDiaria"
-            :series="seriesAreaDiaria"
-          />
-        </transition>
+        <div class="area-chart-wrap">
+          <transition name="chart-fade">
+            <VueApexCharts
+              :key="`area-diaria-${instanciaId}`"
+              type="area"
+              width="100%"
+              height="100%"
+              :options="opcionesAreaDiaria"
+              :series="seriesAreaDiaria"
+            />
+          </transition>
+        </div>
       </div>
 
       <div class="panel" v-if="datos.visibilidad.indicadoresClave">
@@ -91,7 +85,7 @@
               :key="`radial-${indicador.titulo}-${instanciaId}`"
               type="radialBar"
               width="100%"
-              height="120"
+              :height="alturaRadial"
               :options="opcionesRadial(indicador.colorVar)"
               :series="[indicador.pct]"
             />
@@ -107,7 +101,7 @@
           >
           <span class="cal-nav">›</span>
         </div>
-        <div class="panel-title" style="margin-bottom: 8px">
+        <div class="panel-title" style="margin-bottom: 10px">
           <span class="legend" style="margin-left: 0">
             <span
               ><span class="dot-sm" style="background: var(--blue)"></span
@@ -119,34 +113,57 @@
             >
           </span>
         </div>
-        <table class="cal">
-          <thead>
-            <tr>
-              <th>D</th>
-              <th>L</th>
-              <th>M</th>
-              <th>M</th>
-              <th>J</th>
-              <th>V</th>
-              <th>S</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(semana, i) in matrizCalendario" :key="i">
-              <td
-                v-for="(celda, j) in semana"
-                :key="j"
-                :class="{
-                  'cal-today': celda.esHoy,
-                  'cal-event': celda.evento === 'reunion',
-                  'cal-cutoff': celda.evento === 'corte',
-                }"
-              >
-                <span v-if="celda.dia">{{ celda.dia }}</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="cal-grid">
+          <div class="cal-weekdays">
+            <span
+              v-for="(letra, j) in ['D', 'L', 'M', 'M', 'J', 'V', 'S']"
+              :key="j"
+              class="cal-weekday"
+              :class="{ 'cal-weekend': j === 0 || j === 6 }"
+              >{{ letra }}</span
+            >
+          </div>
+          <div class="cal-days">
+            <div
+              v-for="(celda, k) in celdasCalendario"
+              :key="k"
+              class="cal-day-cell"
+              :class="{ 'cal-weekend': k % 7 === 0 || k % 7 === 6 }"
+            >
+              <template v-if="celda.dia">
+                <span
+                  class="cal-day-num"
+                  :class="{
+                    'cal-day-today': celda.esHoy,
+                    'cal-day-today-reunion':
+                      celda.esHoy && celda.evento === 'reunion',
+                    'cal-day-today-corte':
+                      celda.esHoy && celda.evento === 'corte',
+                  }"
+                  >{{ celda.dia }}</span
+                >
+                <span
+                  v-if="celda.evento && !celda.esHoy"
+                  class="cal-day-dot"
+                  :class="`dot-${celda.evento}`"
+                ></span>
+              </template>
+            </div>
+          </div>
+        </div>
+        <div class="cal-events" v-if="eventosDelMesCalendario.length">
+          <div class="cal-events-title">Eventos del mes</div>
+          <div
+            class="cal-event-row"
+            :class="`tipo-${evento.tipo}`"
+            v-for="evento in eventosDelMesCalendario"
+            :key="evento.dia"
+          >
+            <span class="cal-event-dot" :class="`dot-${evento.tipo}`"></span>
+            <span class="cal-event-label">{{ evento.etiqueta }}</span>
+            <span class="cal-event-day">{{ evento.diaTexto }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -161,46 +178,64 @@
           </h3>
         </div>
 
-        <div class="table-scroll">
-          <table class="advisors">
-            <thead>
-              <tr>
-                <th>Asesor</th>
-                <th>Cédulas revisadas</th>
-                <th>Cédulas ingresadas</th>
-                <th>Monto aprobado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(asesor, i) in datos.asesores" :key="asesor.id">
-                <td>
-                  <div class="advisor-name">
-                    <span
-                      class="advisor-avatar"
-                      :style="estiloAvatar(asesor, i)"
-                      >{{ obtenerIniciales(asesor.nombre) }}</span
-                    >
-                    <span class="advisor-name-text">{{ asesor.nombre }}</span>
-                  </div>
-                </td>
-                <td>{{ agruparMiles(asesor.cedulasRevisadas) }}</td>
-                <td>{{ agruparMiles(asesor.cedulasIngresadas) }}</td>
-                <td>{{ formatearMonto(asesor.montoAprobado) }}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr class="total-row">
-                <td>Total</td>
-                <td>{{ agruparMiles(sumaAsesoresRevisadas) }}</td>
-                <td>{{ agruparMiles(sumaAsesoresIngresadas) }}</td>
-                <td>{{ formatearMonto(sumaAsesoresMonto) }}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-        <div class="table-foot">
-          Última actualización manual: {{ ultimaActualizacionTexto }} · usa el
-          botón "Editar datos" para modificarlos.
+        <transition-group tag="div" name="advisor-row" class="advisors-list">
+          <div
+            v-for="(asesor, i) in datos.asesores"
+            :key="`${asesor.id}-${instanciaId}`"
+            class="advisor-row"
+            :style="{ transitionDelay: `${i * 60}ms` }"
+          >
+            <div class="advisor-row-identity">
+              <span class="advisor-avatar" :style="estiloAvatar(asesor, i)">{{
+                obtenerIniciales(asesor.nombre)
+              }}</span>
+              <span class="advisor-row-name">{{ asesor.nombre }}</span>
+            </div>
+            <div class="advisor-row-stats">
+              <div class="advisor-stat">
+                <span class="advisor-stat-value">{{
+                  agruparMiles(asesor.cedulasRevisadas)
+                }}</span>
+                <span class="advisor-stat-label">Revisadas</span>
+              </div>
+              <div class="advisor-stat">
+                <span class="advisor-stat-value">{{
+                  agruparMiles(asesor.cedulasIngresadas)
+                }}</span>
+                <span class="advisor-stat-label">Ingresadas</span>
+              </div>
+              <div class="advisor-stat advisor-stat-monto">
+                <span class="advisor-stat-value">{{
+                  formatearMonto(asesor.montoAprobado)
+                }}</span>
+                <span class="advisor-stat-label">Monto</span>
+              </div>
+            </div>
+          </div>
+        </transition-group>
+
+        <div class="advisors-total">
+          <span class="advisors-total-label">Total</span>
+          <div class="advisor-row-stats">
+            <div class="advisor-stat">
+              <span class="advisor-stat-value">{{
+                agruparMiles(sumaAsesoresRevisadas)
+              }}</span>
+              <span class="advisor-stat-label">Revisadas</span>
+            </div>
+            <div class="advisor-stat">
+              <span class="advisor-stat-value">{{
+                agruparMiles(sumaAsesoresIngresadas)
+              }}</span>
+              <span class="advisor-stat-label">Ingresadas</span>
+            </div>
+            <div class="advisor-stat advisor-stat-monto">
+              <span class="advisor-stat-value">{{
+                formatearMonto(sumaAsesoresMonto)
+              }}</span>
+              <span class="advisor-stat-label">Monto</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -230,7 +265,7 @@
           :key="`barras-${instanciaId}`"
           type="bar"
           width="100%"
-          height="220"
+          :height="alturaBarras"
           :options="opcionesBarras"
           :series="seriesBarras"
         />
@@ -246,7 +281,7 @@
             :key="`tendencia-${instanciaId}`"
             type="area"
             width="100%"
-            height="190"
+            :height="alturaTendencia"
             :options="opcionesTendencia"
             :series="seriesTendencia"
           />
@@ -258,22 +293,38 @@
           <span class="bar"></span>
           <h3>Asesor destacado</h3>
         </div>
-        <div class="featured-card" v-if="asesorDestacado">
-          <div class="featured-avatar">
-            {{ obtenerIniciales(asesorDestacado.nombre) }}
-          </div>
-          <div class="featured-info">
-            <h4>{{ asesorDestacado.nombre }}</h4>
-            <div class="role">
-              {{ agruparMiles(asesorDestacado.cedulasIngresadas) }} clientes
-              ingresados este mes
+        <transition name="advisor-row">
+          <div
+            v-if="asesorDestacado"
+            :key="`${asesorDestacado.id}-${instanciaId}`"
+            class="advisor-row featured-row"
+          >
+            <div class="advisor-row-identity">
+              <span
+                class="advisor-avatar featured-avatar-lg"
+                :style="estiloAvatar(asesorDestacado, indiceAsesorDestacado)"
+                >{{ obtenerIniciales(asesorDestacado.nombre) }}</span
+              >
+              <div class="featured-row-info">
+                <span class="advisor-row-name">{{
+                  asesorDestacado.nombre
+                }}</span>
+                <span class="badge-top">🏆 Mejor tasa de conversión</span>
+              </div>
             </div>
-            <span class="badge-top">🏆 Mejor tasa de conversión</span>
+            <div class="advisor-row-stats">
+              <div class="advisor-stat">
+                <span class="advisor-stat-value">{{
+                  agruparMiles(asesorDestacado.cedulasIngresadas)
+                }}</span>
+                <span class="advisor-stat-label">Ingresados</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div v-else class="text-caption text-grey-7">
-          Agrega asesores en "Detalle de asesores" para ver el destacado.
-        </div>
+          <div key="sin-destacado" v-else class="text-caption text-grey-7">
+            Agrega asesores en "Detalle de asesores" para ver el destacado.
+          </div>
+        </transition>
       </div>
 
       <div class="panel p-updates" v-if="datos.visibilidad.novedades">
@@ -281,12 +332,19 @@
           <span class="bar"></span>
           <h3>Novedades</h3>
         </div>
-        <ul class="updates-list">
-          <li v-for="(nota, i) in datos.novedades" :key="i">
-            <span class="n">{{ i + 1 }}</span>
-            <span class="update-text">{{ nota }}</span>
-          </li>
-        </ul>
+        <transition-group tag="div" name="advisor-row" class="advisors-list">
+          <div
+            v-for="(nota, i) in datos.novedades"
+            :key="`${i}-${instanciaId}`"
+            class="advisor-row update-row"
+            :style="{ transitionDelay: `${i * 60}ms` }"
+          >
+            <div class="advisor-row-identity">
+              <span class="advisor-avatar update-avatar">{{ i + 1 }}</span>
+              <span class="advisor-row-name">{{ nota }}</span>
+            </div>
+          </div>
+        </transition-group>
       </div>
     </div>
 
@@ -319,6 +377,7 @@ import {
   crearDatosEjemploDashboardClientes,
   DashboardClientesData,
   MESES_ES,
+  obtenerPeriodoActual,
   PALETA_AVATARES,
   TipoEventoCalendario,
   agruparMiles,
@@ -351,14 +410,34 @@ function generarInstanciaId(): string {
 }
 const instanciaId = ref(generarInstanciaId())
 
-const datos = reactive<DashboardClientesData>(
-  crearDatosEjemploDashboardClientes()
-)
+// Persistencia: como esta página todavía no tiene backend, "guardar" deja
+// los datos en localStorage (como JSON) para que una recarga de la página no
+// vuelva a mostrar el dataset de ejemplo.
+const CLAVE_ALMACENAMIENTO_DATOS = 'dashboard-clientes:datos'
+
+function cargarDatosGuardados(): DashboardClientesData | null {
+  try {
+    const guardado = localStorage.getItem(CLAVE_ALMACENAMIENTO_DATOS)
+    return guardado ? (JSON.parse(guardado) as DashboardClientesData) : null
+  } catch {
+    return null
+  }
+}
+
+// El período ya no es editable (siempre es "hoy"): se sobreescribe al cargar
+// y al guardar sin importar lo que traiga el dataset de ejemplo o lo
+// persistido en localStorage, para que nunca quede una fecha vieja.
+const datos = reactive<DashboardClientesData>({
+  ...(cargarDatosGuardados() ?? crearDatosEjemploDashboardClientes()),
+  periodo: obtenerPeriodoActual(),
+})
 
 const modalAbierto = ref(false)
 
 function onGuardarDatos(nuevosDatos: DashboardClientesData) {
-  Object.assign(datos, nuevosDatos)
+  Object.assign(datos, nuevosDatos, { periodo: obtenerPeriodoActual() })
+  localStorage.setItem(CLAVE_ALMACENAMIENTO_DATOS, JSON.stringify(datos))
+  $q.notify({ type: 'positive', message: 'Datos guardados.' })
 }
 
 // Pantalla completa: solo del contenido del dashboard (no del navegador
@@ -367,6 +446,18 @@ function onGuardarDatos(nuevosDatos: DashboardClientesData) {
 const $q = useQuasar()
 const paginaRef = ref<{ $el: HTMLElement } | null>(null)
 const estaEnPantallaCompleta = computed(() => $q.fullscreen.isActive)
+
+// Los gráficos tienen alto fijo (vue3-apexcharts no se ajusta solo al
+// contenedor). En pantalla completa se reduce ese alto junto con los
+// paddings/gaps del CSS de modo compacto de arriba — así el contenido
+// natural ya es más bajo de entrada y el zoom de ajuste-a-pantalla (ver
+// ajustarZoomPantallaCompleta) necesita achicar mucho menos para que todo
+// quepa sin scroll, dejando el texto más grande y legible.
+const alturaRadial = computed(() => (estaEnPantallaCompleta.value ? 92 : 120))
+const alturaBarras = computed(() => (estaEnPantallaCompleta.value ? 170 : 220))
+const alturaTendencia = computed(() =>
+  estaEnPantallaCompleta.value ? 150 : 190
+)
 
 function alternarPantallaCompleta() {
   const el = paginaRef.value?.$el as HTMLElement | undefined
@@ -411,7 +502,12 @@ watch(
   () => $q.fullscreen.isActive,
   (activo) => {
     if (activo) {
+      // nextTick espera el DOM de Vue, pero el resize interno de ApexCharts
+      // (disparado por el alto reactivo de los gráficos) puede tardar un
+      // poco más — un segundo ajuste 80ms después cubre ese caso sin que
+      // se note un salto visual.
       nextTick(ajustarZoomPantallaCompleta)
+      setTimeout(ajustarZoomPantallaCompleta, 80)
     } else {
       quitarZoomPantallaCompleta()
     }
@@ -802,29 +898,48 @@ interface CeldaCalendario {
   evento?: TipoEventoCalendario
 }
 
-const matrizCalendario = computed<CeldaCalendario[][]>(() => {
+// Array plano (no por semanas): el grid CSS de 7 columnas envuelve cada
+// fila automáticamente, así que no hace falta agrupar las celdas a mano.
+const celdasCalendario = computed<CeldaCalendario[]>(() => {
   const primerDia = new Date(datos.periodo.anio, mesIndice.value, 1).getDay()
   const totalDias = diasEnMes(mesIndice.value, datos.periodo.anio)
-  const celdas: (number | null)[] = [
+  const dias: (number | null)[] = [
     ...Array(primerDia).fill(null),
     ...Array.from({ length: totalDias }, (_, i) => i + 1),
   ]
-  while (celdas.length % 7 !== 0) celdas.push(null)
+  while (dias.length % 7 !== 0) dias.push(null)
 
-  const semanas: CeldaCalendario[][] = []
-  for (let i = 0; i < celdas.length; i += 7) {
-    semanas.push(
-      celdas.slice(i, i + 7).map((dia) => ({
-        dia,
-        esHoy: dia === datos.periodo.diaActual,
-        evento: dia
-          ? datos.eventosCalendario.find((e) => e.dia === dia)?.tipo
-          : undefined,
-      }))
-    )
-  }
-  return semanas
+  return dias.map((dia) => ({
+    dia,
+    esHoy: dia === datos.periodo.diaActual,
+    evento: dia
+      ? datos.eventosCalendario.find((e) => e.dia === dia)?.tipo
+      : undefined,
+  }))
 })
+
+const ETIQUETAS_EVENTO_CALENDARIO: Record<TipoEventoCalendario, string> = {
+  reunion: 'Reunión de equipo',
+  corte: 'Corte de cédulas',
+}
+
+interface EventoCalendarioResumen {
+  dia: number
+  tipo: TipoEventoCalendario
+  etiqueta: string
+  diaTexto: string
+}
+
+const eventosDelMesCalendario = computed<EventoCalendarioResumen[]>(() =>
+  [...datos.eventosCalendario]
+    .sort((a, b) => a.dia - b.dia)
+    .map((evento) => ({
+      dia: evento.dia,
+      tipo: evento.tipo,
+      etiqueta: ETIQUETAS_EVENTO_CALENDARIO[evento.tipo],
+      diaTexto: `${evento.dia} de ${mesCorto.value.toLowerCase()}`,
+    }))
+)
 
 // ---- Asesor destacado (mejor tasa ingresadas/revisadas, entre los asesores actuales) ----
 const asesorDestacado = computed<AsesorDashboardClientes | null>(() => {
@@ -842,11 +957,11 @@ const asesorDestacado = computed<AsesorDashboardClientes | null>(() => {
   return mejor
 })
 
-const ultimaActualizacionTexto = computed(
-  () =>
-    `${datos.periodo.diaActual} de ${datos.periodo.mes.toLowerCase()} de ${
-      datos.periodo.anio
-    }`
+// Índice del destacado dentro de `datos.asesores`, para que su avatar use el
+// mismo color que muestra en "Detalle de asesores" (estiloAvatar deriva el
+// color del índice cuando el asesor no trae `colorAvatar` propio).
+const indiceAsesorDestacado = computed(() =>
+  datos.asesores.findIndex((a) => a.id === asesorDestacado.value?.id)
 )
 
 function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
@@ -914,6 +1029,55 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
   /* ::backdrop no hereda custom properties del elemento, así que va el
      valor literal (mismo que --bg) en vez de var(--bg). */
   background: #eef1f7;
+}
+
+/* Modo compacto en pantalla completa: reduce paddings/separaciones (no el
+   texto, que se deja grande a propósito) para que TODO quepa sin scroll
+   vertical con la menor reducción posible del zoom de ajuste-a-pantalla
+   (ver ajustarZoomPantallaCompleta en el script) — así el contenido no se
+   ve chico en una pantalla grande. */
+.dashboard-clientes-page:fullscreen,
+.dashboard-clientes-page:-webkit-full-screen {
+  padding: 14px 18px 16px;
+}
+.dashboard-clientes-page:fullscreen .header-row,
+.dashboard-clientes-page:-webkit-full-screen .header-row {
+  margin-bottom: 10px;
+}
+.dashboard-clientes-page:fullscreen .stats-row,
+.dashboard-clientes-page:-webkit-full-screen .stats-row {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.dashboard-clientes-page:fullscreen .stat-card,
+.dashboard-clientes-page:-webkit-full-screen .stat-card {
+  padding: 12px 14px 16px;
+  min-height: 88px;
+}
+.dashboard-clientes-page:fullscreen .row-1,
+.dashboard-clientes-page:-webkit-full-screen .row-1 {
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.dashboard-clientes-page:fullscreen .row-2,
+.dashboard-clientes-page:-webkit-full-screen .row-2 {
+  gap: 12px;
+}
+.dashboard-clientes-page:fullscreen .panel,
+.dashboard-clientes-page:-webkit-full-screen .panel {
+  padding: 12px 14px;
+}
+.dashboard-clientes-page:fullscreen .panel-title,
+.dashboard-clientes-page:-webkit-full-screen .panel-title {
+  margin-bottom: 8px;
+}
+.dashboard-clientes-page:fullscreen .advisor-row,
+.dashboard-clientes-page:-webkit-full-screen .advisor-row {
+  padding: 8px 14px;
+}
+.dashboard-clientes-page:fullscreen .advisors-list,
+.dashboard-clientes-page:-webkit-full-screen .advisors-list {
+  gap: 6px;
 }
 
 /* ---------- Stat cards ---------- */
@@ -1019,13 +1183,31 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
   margin-right: 5px;
 }
 
-/* Row 1 */
+/* Row 1 — los 3 cards (área, donas, calendario) deben verse siempre a la
+   misma altura sin importar el ancho de pantalla. En vez de fijar un alto en
+   píxeles (frágil: el ancho de cada columna cambia con el viewport y eso
+   reflowea textos/leyendas de forma distinta en cada card), se usa el
+   stretch por defecto de CSS Grid: la fila toma el alto del card más alto
+   ("Indicadores clave", con contenido intrínseco fijo) y los otros dos se
+   estiran para igualarlo — válido en cualquier resolución. */
 .row-1 {
   display: grid;
   grid-template-columns: 2fr 1.25fr 1.2fr;
   gap: 18px;
   margin-bottom: 18px;
-  align-items: start;
+  align-items: stretch;
+}
+.row-1 > .panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* El gráfico de área ocupa todo el espacio que el stretch de arriba le deje
+   sobre "Indicadores clave" (height:100% en vez de un alto fijo). */
+.area-chart-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .donut-grid {
@@ -1057,7 +1239,9 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
   font-weight: 600;
 }
 
-/* calendario */
+/* calendario — número normal + punto de color debajo para los días con
+   evento (en vez de "pintar" todo el círculo del día, que competía visualmente
+   con "hoy" y se veía más anticuado); "hoy" es el único círculo relleno. */
 .cal-head {
   display: flex;
   align-items: center;
@@ -1071,48 +1255,144 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
   text-transform: uppercase;
 }
 .cal-nav {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f2f8;
   color: var(--text-soft);
   font-size: 13px;
   cursor: default;
 }
-table.cal {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
+
+/* Grilla envuelta en una tarjeta propia, mismo lenguaje visual que
+   .donut-card/.advisor-row (fondo suave + borde), en vez de flotar sola
+   sobre el fondo blanco del panel. Construida con CSS Grid puro (sin
+   <table>): un <table> trae semántica y estilos por defecto de hoja de
+   cálculo (líneas de encabezado, celdas pegadas) que es justo lo que se
+   quería evitar — con divs se controla cada espaciado a propósito. */
+.cal-grid {
+  background: #fafafd;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 10px 12px;
 }
-table.cal th {
-  color: var(--text-soft);
-  font-weight: 600;
-  padding: 4px 0;
-  font-size: 11px;
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 10px;
 }
-table.cal td {
+.cal-weekday {
   text-align: center;
-  padding: 6px 0;
-  color: var(--text);
+  color: var(--text-soft);
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
-table.cal td span {
+.cal-weekday.cal-weekend {
+  color: #c3c8d6;
+}
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 10px;
+}
+.cal-day-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-height: 20px;
+}
+.cal-day-num {
   display: inline-flex;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  color: var(--text);
+  font-weight: 500;
 }
-.cal-today span {
-  background: var(--purple);
-  color: #fff;
+.cal-weekend .cal-day-num {
+  color: #9aa0b1;
+}
+.cal-day-today {
+  background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+  color: #fff !important;
   font-weight: 700;
+  box-shadow: 0 3px 8px rgba(124, 58, 237, 0.35);
 }
-.cal-event span {
+.cal-day-today-reunion {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3),
+    0 3px 8px rgba(124, 58, 237, 0.35);
+}
+.cal-day-today-corte {
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.3),
+    0 3px 8px rgba(124, 58, 237, 0.35);
+}
+.cal-day-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.cal-day-dot.dot-reunion {
   background: var(--blue);
-  color: #fff;
-  font-weight: 700;
 }
-.cal-cutoff span {
+.cal-day-dot.dot-corte {
   background: var(--gold);
-  color: #fff;
+}
+
+/* Resumen de los eventos del mes debajo de la grilla, como chips con fondo
+   tenue del color del evento — reutiliza los mismos colores de la leyenda de
+   arriba para que sea inmediato asociar cada punto. */
+.cal-events {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cal-events-title {
+  font-size: 10.5px;
   font-weight: 700;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+.cal-event-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+.cal-event-row.tipo-reunion {
+  background: rgba(37, 99, 235, 0.07);
+}
+.cal-event-row.tipo-corte {
+  background: rgba(217, 119, 6, 0.08);
+}
+.cal-event-row .cal-event-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.cal-event-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.cal-event-day {
+  font-size: 11.5px;
+  color: var(--text-soft);
+  flex-shrink: 0;
 }
 
 /* Row 2 */
@@ -1152,33 +1432,36 @@ table.cal td span {
   gap: 8px;
   align-items: center;
 }
-table.advisors {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
+/* ---------- Detalle de asesores: lista vertical (no grid, no tabla) ----------
+   Sin scroll: es un dashboard de pantalla grande sin interacción, así que
+   ningún asesor puede quedar escondido — la lista simplemente crece hacia
+   abajo, una fila por asesor, todas siempre visibles. */
+.advisors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-table.advisors th {
-  text-align: left;
-  font-size: 11.5px;
-  color: var(--text-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  padding: 8px 6px;
-  border-bottom: 2px solid var(--border);
+.advisor-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #fafafd;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-table.advisors td {
-  padding: 11px 6px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
+.advisor-row:hover {
+  border-color: var(--purple);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
 }
-table.advisors td:not(:first-child) {
-  white-space: nowrap;
-}
-.advisor-name {
+.advisor-row-identity {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 .advisor-avatar {
   width: 32px;
@@ -1192,63 +1475,114 @@ table.advisors td:not(:first-child) {
   justify-content: center;
   flex-shrink: 0;
 }
-.advisor-name-text {
+.advisor-row-name {
+  font-size: 12.5px;
+  font-weight: 700;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.table-foot {
-  margin-top: 12px;
-  font-size: 11px;
-  color: var(--text-soft);
+.advisor-row-stats {
+  display: flex;
+  gap: 28px;
+  flex-shrink: 0;
 }
-.total-row td {
+.advisor-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.advisor-stat-value {
+  font-size: 13px;
   font-weight: 700;
-  background: #f6f4ff;
-  border-top: 2px solid var(--purple);
-  border-bottom: none !important;
+  color: var(--text);
+  white-space: nowrap;
+}
+.advisor-stat-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.advisor-stat-monto .advisor-stat-value {
   color: var(--purple-dark);
 }
 
-/* trend line */
-
-/* destacado */
-.featured-card {
+.advisors-total {
+  margin-top: 6px;
   display: flex;
-  gap: 12px;
   align-items: center;
+  gap: 18px;
+  background: #f6f4ff;
+  border: 1px solid #e4defc;
+  border-radius: 12px;
+  padding: 10px 16px;
 }
-.featured-avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, var(--teal), var(--blue));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
+.advisors-total-label {
+  font-size: 11.5px;
   font-weight: 700;
-  font-size: 16px;
+  color: var(--purple-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
 }
-.featured-info {
+.advisors-total .advisor-row-stats {
+  gap: 32px;
+}
+.advisors-total .advisor-stat-value {
+  color: var(--purple-dark);
+}
+
+/* Entrada fluida de izquierda a derecha, en cascada (ver transitionDelay en
+   el template). Al salir, position:absolute evita que las demás filas
+   "salten" bruscamente — algo que no era posible con filas de tabla. */
+.advisor-row-enter-active {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.advisor-row-enter-from {
+  opacity: 0;
+  transform: translateX(-26px);
+}
+.advisor-row-leave-active {
+  transition: opacity 0.2s ease;
+  position: absolute;
+}
+.advisor-row-leave-to {
+  opacity: 0;
+}
+.advisor-row-move {
+  transition: transform 0.4s ease;
+}
+
+/* destacado — misma tarjeta-fila que "Detalle de asesores" (.advisor-row),
+   con el avatar un poco más grande para mantener el protagonismo que tenía
+   el diseño anterior. */
+.featured-row {
+  align-items: center;
+}
+.featured-avatar-lg {
+  width: 44px;
+  height: 44px;
+  font-size: 14px;
+}
+.featured-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   min-width: 0;
 }
-.featured-info h4 {
-  margin: 0 0 3px;
+.featured-row-info .advisor-row-name {
+  white-space: normal;
   font-size: 13.5px;
-  overflow-wrap: break-word;
-}
-.featured-info .role {
-  font-size: 11.5px;
-  color: var(--text-soft);
-  margin-bottom: 6px;
 }
 .badge-top {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  width: fit-content;
   background: #ecfdf5;
   color: #047857;
   font-size: 11px;
@@ -1257,42 +1591,19 @@ table.advisors td:not(:first-child) {
   border-radius: 20px;
 }
 
-/* novedades */
-.updates-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: 12.5px;
+/* novedades — mismas filas que "Detalle de asesores" (.advisor-row), pero
+   con el texto libre y sin truncar (una novedad puede ocupar varias
+   líneas), y el número identificador en vez de un avatar con iniciales. */
+.update-row {
+  align-items: flex-start;
 }
-.updates-list li {
-  padding: 9px 0;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  gap: 8px;
+.update-row .advisor-row-name {
+  white-space: normal;
+  font-weight: 500;
+  line-height: 1.4;
 }
-.updates-list li:last-child {
-  border-bottom: none;
-}
-.updates-list .n {
-  width: 19px;
-  height: 19px;
-  border-radius: 50%;
+.update-avatar {
   background: var(--indigo);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.updates-list .update-text {
-  min-width: 0;
-}
-
-.table-scroll {
-  overflow-x: auto;
 }
 
 @media (max-width: 1180px) {
@@ -1301,6 +1612,15 @@ table.advisors td:not(:first-child) {
   }
   .row-1 {
     grid-template-columns: 1fr;
+  }
+  /* Con una sola columna cada card ocupa su propia fila del grid, así que
+     ya no hay un hermano más alto contra el cual estirarse (align-items:
+     stretch deja de tener efecto) — el gráfico de área necesita un alto
+     explícito propio en vez de depender del 100% que resolvía bien en el
+     layout de 3 columnas de escritorio. */
+  .area-chart-wrap {
+    flex: none;
+    height: 260px;
   }
   .row-2 {
     grid-template-columns: 1fr;
@@ -1338,8 +1658,12 @@ table.advisors td:not(:first-child) {
   .panel {
     padding: 14px;
   }
-  table.advisors {
-    font-size: 12px;
+  .advisor-row {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  .advisor-row-stats {
+    gap: 16px;
   }
   .donut-grid {
     grid-template-columns: minmax(0, 1fr);

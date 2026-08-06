@@ -11,95 +11,46 @@
       </q-card-section>
 
       <q-card-section class="scroll editar-dashboard-body">
-        <!-- Período -->
-        <div class="text-subtitle2 text-bold q-mb-sm">Período</div>
-        <div class="row q-col-gutter-sm q-mb-md">
-          <div class="col-12 col-sm-4">
-            <q-select
-              v-model="borrador.periodo.mes"
-              :options="MESES_ES"
-              label="Mes"
-              dense
-              outlined
-            />
-          </div>
-          <div class="col-6 col-sm-4">
-            <q-select
-              v-model.number="borrador.periodo.anio"
-              :options="aniosDisponibles"
-              label="Año"
-              dense
-              outlined
-            />
-          </div>
-          <div class="col-6 col-sm-4">
-            <q-select
-              v-model.number="borrador.periodo.diaActual"
-              :options="diasDisponibles"
-              label="Día"
-              dense
-              outlined
-            />
-          </div>
-        </div>
-
         <!-- Indicadores manuales -->
         <div class="text-subtitle2 text-bold q-mb-sm">
           Indicadores principales
         </div>
         <div class="row q-col-gutter-sm q-mb-md">
           <div class="col-6 col-sm-4">
-            <q-input
-              v-model.number="borrador.totalClientesPool"
-              type="number"
+            <input-numero-formateado
+              v-model="borrador.totalClientesPool"
               :label="`Clientes ${borrador.periodo.mes}`"
-              dense
-              outlined
             />
           </div>
           <div class="col-6 col-sm-4">
-            <q-input
-              v-model.number="borrador.perfilApto"
-              type="number"
+            <input-numero-formateado
+              v-model="borrador.perfilApto"
               label="Perfil apto"
-              dense
-              outlined
             />
           </div>
           <div class="col-6 col-sm-4">
-            <q-input
-              v-model.number="borrador.clientesIngresados"
-              type="number"
+            <input-numero-formateado
+              v-model="borrador.clientesIngresados"
               label="Clientes ingresados"
-              dense
-              outlined
             />
           </div>
           <div class="col-6 col-sm-4">
-            <q-input
-              v-model.number="borrador.clientesAprobados"
-              type="number"
+            <input-numero-formateado
+              v-model="borrador.clientesAprobados"
               label="Clientes aprobados"
-              dense
-              outlined
             />
           </div>
           <div class="col-6 col-sm-4">
-            <q-input
-              v-model.number="borrador.montoAprobadoTotal"
-              type="number"
+            <input-numero-formateado
+              v-model="borrador.montoAprobadoTotal"
+              :decimales="2"
               label="Monto aprobado ($)"
-              dense
-              outlined
             />
           </div>
           <div class="col-6 col-sm-4">
-            <q-input
-              v-model.number="borrador.cedulasAsignadas"
-              type="number"
+            <input-numero-formateado
+              v-model="borrador.cedulasAsignadas"
               label="Cédulas asignadas (meta)"
-              dense
-              outlined
               hint="Denominador de la dona 'Cédulas revisadas'"
             />
           </div>
@@ -132,24 +83,9 @@
           class="asesor-row q-mb-xs"
         >
           <q-input v-model="asesor.nombre" dense outlined placeholder="Nombre" />
-          <q-input
-            v-model.number="asesor.cedulasRevisadas"
-            type="number"
-            dense
-            outlined
-          />
-          <q-input
-            v-model.number="asesor.cedulasIngresadas"
-            type="number"
-            dense
-            outlined
-          />
-          <q-input
-            v-model.number="asesor.montoAprobado"
-            type="number"
-            dense
-            outlined
-          />
+          <input-numero-formateado v-model="asesor.cedulasRevisadas" />
+          <input-numero-formateado v-model="asesor.cedulasIngresadas" />
+          <input-numero-formateado v-model="asesor.montoAprobado" :decimales="2" />
           <q-btn
             icon="bi-trash3"
             flat
@@ -244,14 +180,13 @@
 
 <script setup lang="ts">
 import { computed, reactive, toRaw, watch } from 'vue'
+import InputNumeroFormateado from 'pages/dashboard/clientes/components/InputNumeroFormateado.vue'
 import {
   AsesorDashboardClientes,
   crearAsesorVacio,
   crearDatosEjemploDashboardClientes,
   DashboardClientesData,
-  diasEnMes,
   formatearMonto,
-  MESES_ES,
   VisibilidadSecciones,
 } from 'pages/dashboard/clientes/domain/DashboardClientes'
 
@@ -278,23 +213,6 @@ watch(
   },
   { immediate: true },
 )
-
-const anioBase = new Date().getFullYear()
-const aniosDisponibles = Array.from({ length: 8 }, (_, i) => anioBase - 2 + i)
-
-const diasDisponibles = computed(() => {
-  const totalDias = diasEnMes(
-    MESES_ES.indexOf(borrador.periodo.mes),
-    borrador.periodo.anio,
-  )
-  return Array.from({ length: totalDias }, (_, i) => i + 1)
-})
-
-watch(diasDisponibles, (dias) => {
-  if (borrador.periodo.diaActual > dias.length) {
-    borrador.periodo.diaActual = dias.length
-  }
-})
 
 function sum(valores: number[]): number {
   return valores.reduce((acumulado, valor) => acumulado + (Number(valor) || 0), 0)
