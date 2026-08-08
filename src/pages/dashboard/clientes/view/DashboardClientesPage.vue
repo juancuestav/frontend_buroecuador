@@ -24,26 +24,6 @@
       </div>
     </div>
 
-    <!-- STAT CARDS -->
-    <div class="stats-row" v-if="datos.visibilidad.estadisticas">
-      <div
-        v-for="tarjeta in tarjetasEstadisticas"
-        :key="tarjeta.etiqueta"
-        class="stat-card"
-        :class="tarjeta.color"
-      >
-        <div class="num">
-          <numero-animado
-            :key="`stat-${tarjeta.etiqueta}-${instanciaId}`"
-            :valor="tarjeta.numero"
-            :formatear="tarjeta.formatear"
-          />
-        </div>
-        <div class="label">{{ tarjeta.etiqueta }}</div>
-        <div class="sub">{{ tarjeta.sub }}</div>
-      </div>
-    </div>
-
     <!-- ROW 1 -->
     <div class="row-1">
       <div class="panel" v-if="datos.visibilidad.resumenDiario">
@@ -368,6 +348,26 @@
             </div>
           </div>
         </transition-group>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stats-row" v-if="datos.visibilidad.estadisticas">
+      <div
+        v-for="tarjeta in tarjetasEstadisticas"
+        :key="tarjeta.etiqueta"
+        class="stat-card"
+        :class="tarjeta.color"
+      >
+        <div class="num">
+          <numero-animado
+            :key="`stat-${tarjeta.etiqueta}-${instanciaId}`"
+            :valor="tarjeta.numero"
+            :formatear="tarjeta.formatear"
+          />
+        </div>
+        <div class="label">{{ tarjeta.etiqueta }}</div>
+        <div class="sub">{{ tarjeta.sub }}</div>
       </div>
     </div>
 
@@ -1079,7 +1079,7 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
 .dashboard-clientes-page:fullscreen .stats-row,
 .dashboard-clientes-page:-webkit-full-screen .stats-row {
   gap: 10px;
-  margin-bottom: 12px;
+  margin-top: 12px;
 }
 .dashboard-clientes-page:fullscreen .stat-card,
 .dashboard-clientes-page:-webkit-full-screen .stat-card {
@@ -1117,7 +1117,7 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 18px;
-  margin-bottom: 22px;
+  margin-top: 22px;
 }
 .stat-card {
   position: relative;
