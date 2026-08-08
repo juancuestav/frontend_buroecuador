@@ -32,7 +32,13 @@
         class="stat-card"
         :class="tarjeta.color"
       >
-        <div class="num">{{ tarjeta.numero }}</div>
+        <div class="num">
+          <numero-animado
+            :key="`stat-${tarjeta.etiqueta}-${instanciaId}`"
+            :valor="tarjeta.numero"
+            :formatear="tarjeta.formatear"
+          />
+        </div>
         <div class="label">{{ tarjeta.etiqueta }}</div>
         <div class="sub">{{ tarjeta.sub }}</div>
       </div>
@@ -193,21 +199,27 @@
             </div>
             <div class="advisor-row-stats">
               <div class="advisor-stat">
-                <span class="advisor-stat-value">{{
-                  agruparMiles(asesor.cedulasRevisadas)
-                }}</span>
+                <span class="advisor-stat-value"
+                  ><numero-animado
+                    :valor="asesor.cedulasRevisadas"
+                    :formatear="agruparMiles"
+                /></span>
                 <span class="advisor-stat-label">Revisadas</span>
               </div>
               <div class="advisor-stat">
-                <span class="advisor-stat-value">{{
-                  agruparMiles(asesor.cedulasIngresadas)
-                }}</span>
+                <span class="advisor-stat-value"
+                  ><numero-animado
+                    :valor="asesor.cedulasIngresadas"
+                    :formatear="agruparMiles"
+                /></span>
                 <span class="advisor-stat-label">Ingresadas</span>
               </div>
               <div class="advisor-stat advisor-stat-monto">
-                <span class="advisor-stat-value">{{
-                  formatearMonto(asesor.montoAprobado)
-                }}</span>
+                <span class="advisor-stat-value"
+                  ><numero-animado
+                    :valor="asesor.montoAprobado"
+                    :formatear="formatearMonto"
+                /></span>
                 <span class="advisor-stat-label">Monto</span>
               </div>
             </div>
@@ -218,21 +230,30 @@
           <span class="advisors-total-label">Total</span>
           <div class="advisor-row-stats">
             <div class="advisor-stat">
-              <span class="advisor-stat-value">{{
-                agruparMiles(sumaAsesoresRevisadas)
-              }}</span>
+              <span class="advisor-stat-value"
+                ><numero-animado
+                  :key="`total-revisadas-${instanciaId}`"
+                  :valor="sumaAsesoresRevisadas"
+                  :formatear="agruparMiles"
+              /></span>
               <span class="advisor-stat-label">Revisadas</span>
             </div>
             <div class="advisor-stat">
-              <span class="advisor-stat-value">{{
-                agruparMiles(sumaAsesoresIngresadas)
-              }}</span>
+              <span class="advisor-stat-value"
+                ><numero-animado
+                  :key="`total-ingresadas-${instanciaId}`"
+                  :valor="sumaAsesoresIngresadas"
+                  :formatear="agruparMiles"
+              /></span>
               <span class="advisor-stat-label">Ingresadas</span>
             </div>
             <div class="advisor-stat advisor-stat-monto">
-              <span class="advisor-stat-value">{{
-                formatearMonto(sumaAsesoresMonto)
-              }}</span>
+              <span class="advisor-stat-value"
+                ><numero-animado
+                  :key="`total-monto-${instanciaId}`"
+                  :valor="sumaAsesoresMonto"
+                  :formatear="formatearMonto"
+              /></span>
               <span class="advisor-stat-label">Monto</span>
             </div>
           </div>
@@ -314,9 +335,11 @@
             </div>
             <div class="advisor-row-stats">
               <div class="advisor-stat">
-                <span class="advisor-stat-value">{{
-                  agruparMiles(asesorDestacado.cedulasIngresadas)
-                }}</span>
+                <span class="advisor-stat-value"
+                  ><numero-animado
+                    :valor="asesorDestacado.cedulasIngresadas"
+                    :formatear="agruparMiles"
+                /></span>
                 <span class="advisor-stat-label">Ingresados</span>
               </div>
             </div>
@@ -372,6 +395,7 @@ import { ApexOptions } from 'apexcharts'
 import { useQuasar } from 'quasar'
 import VueApexCharts from 'vue3-apexcharts'
 import EditarDashboardClientesModal from 'pages/dashboard/clientes/components/EditarDashboardClientesModal.vue'
+import NumeroAnimado from 'pages/dashboard/clientes/components/NumeroAnimado.vue'
 import {
   AsesorDashboardClientes,
   crearDatosEjemploDashboardClientes,
@@ -606,35 +630,43 @@ const mesIndice = computed(() => MESES_ES.indexOf(datos.periodo.mes))
 const mesCorto = computed(() => datos.periodo.mes.slice(0, 3))
 
 // ---- Stat cards ----
+// `numero` queda como valor crudo (no ya formateado a texto) para que
+// <numero-animado> pueda contar desde 0 hasta él y recién ahí aplicarle
+// `formatear` en cada frame.
 const tarjetasEstadisticas = computed(() => [
   {
     color: 'c-purple',
     etiqueta: `Clientes ${datos.periodo.mes}`,
-    numero: agruparMiles(datos.totalClientesPool),
+    numero: datos.totalClientesPool,
+    formatear: agruparMiles,
     sub: `${datos.periodo.mes} ${datos.periodo.anio}`,
   },
   {
     color: 'c-orange',
     etiqueta: 'Perfil apto',
-    numero: agruparMiles(datos.perfilApto),
+    numero: datos.perfilApto,
+    formatear: agruparMiles,
     sub: `${pctPerfilApto.value}% del total`,
   },
   {
     color: 'c-teal',
     etiqueta: 'Clientes ingresados',
-    numero: agruparMiles(datos.clientesIngresados),
+    numero: datos.clientesIngresados,
+    formatear: agruparMiles,
     sub: `${pctClientesIngresados.value}% de perfil apto`,
   },
   {
     color: 'c-blue',
     etiqueta: 'Clientes aprobados',
-    numero: agruparMiles(datos.clientesAprobados),
+    numero: datos.clientesAprobados,
+    formatear: agruparMiles,
     sub: `${pctTasaAprobacion.value}% de ingresados`,
   },
   {
     color: 'c-gold',
     etiqueta: 'Monto aprobado',
-    numero: formatearMonto(datos.montoAprobadoTotal),
+    numero: datos.montoAprobadoTotal,
+    formatear: formatearMonto,
     sub: `Acumulado ${datos.periodo.mes.toLowerCase()}`,
   },
 ])
