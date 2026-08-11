@@ -694,9 +694,9 @@ const indicadoresClave = computed(() => [
 const ANIMACION_BASE = {
   enabled: true,
   easing: 'easeinout' as const,
-  speed: 500,
+  speed: 5000,
   animateGradually: { enabled: true, delay: 80 },
-  dynamicAnimation: { enabled: true, speed: 350 },
+  dynamicAnimation: { enabled: true, speed: 5000 },
 }
 
 // Los gráficos tipo 'area'/'line' animan su entrada con una máscara SVG que
@@ -1039,7 +1039,7 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
    su lugar se recrean detrás de este fade/slide en CSS, que sí es 100%
    confiable sin importar cuántas veces se repita. */
 .chart-fade-enter-active {
-  transition: opacity 0.45s ease, transform 0.45s ease;
+  transition: opacity 5s ease, transform 5s ease;
 }
 .chart-fade-enter-from {
   opacity: 0;
@@ -1531,6 +1531,16 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
   font-weight: 700;
   color: var(--text);
   white-space: nowrap;
+  /* Mientras el número cuenta hacia arriba va cambiando de cantidad de
+     dígitos (de "0" a "198"), y eso por sí solo achica/agranda esta caja —
+     como es un flex item, eso corre tanto la etiqueta de abajo como los
+     demás .advisor-stat de la fila. Reservar el ancho de antemano evita el
+     "salto" visual mientras dura la animación. tabular-nums además evita
+     que el ancho tiemble dígito a dígito (algunas fuentes no dan el mismo
+     ancho a cada número). */
+  min-width: 3.4em;
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
 }
 .advisor-stat-label {
   font-size: 9px;
@@ -1541,6 +1551,7 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
 }
 .advisor-stat-monto .advisor-stat-value {
   color: var(--purple-dark);
+  min-width: 5.2em;
 }
 
 .advisors-total {
