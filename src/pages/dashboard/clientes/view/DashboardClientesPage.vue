@@ -42,16 +42,14 @@
           </span>
         </div>
         <div class="area-chart-wrap">
-          <transition name="chart-fade">
-            <VueApexCharts
-              :key="`area-diaria-${instanciaId}`"
-              type="area"
-              width="100%"
-              height="100%"
-              :options="opcionesAreaDiaria"
-              :series="seriesAreaDiaria"
-            />
-          </transition>
+          <VueApexCharts
+            ref="chartAreaDiariaRef"
+            type="area"
+            width="100%"
+            height="100%"
+            :options="opcionesAreaDiaria"
+            :series="seriesAreaDiaria"
+          />
         </div>
       </div>
 
@@ -277,16 +275,14 @@
           <span class="bar"></span>
           <h3>Tendencia de monto aprobado</h3>
         </div>
-        <transition name="chart-fade">
-          <VueApexCharts
-            :key="`tendencia-${instanciaId}`"
-            type="area"
-            width="100%"
-            :height="alturaTendencia"
-            :options="opcionesTendencia"
-            :series="seriesTendencia"
-          />
-        </transition>
+        <VueApexCharts
+          ref="chartTendenciaRef"
+          type="area"
+          width="100%"
+          :height="alturaTendencia"
+          :options="opcionesTendencia"
+          :series="seriesTendencia"
+        />
       </div>
 
       <div class="panel p-featured" v-if="datos.visibilidad.asesorDestacado">
@@ -394,6 +390,7 @@ import {
 import { ApexOptions } from 'apexcharts'
 import { useQuasar } from 'quasar'
 import VueApexCharts from 'vue3-apexcharts'
+import type { VueApexChartsComponentMethods } from 'vue3-apexcharts'
 import EditarDashboardClientesModal from 'pages/dashboard/clientes/components/EditarDashboardClientesModal.vue'
 import NumeroAnimado from 'pages/dashboard/clientes/components/NumeroAnimado.vue'
 import {
@@ -433,6 +430,41 @@ function generarInstanciaId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 const instanciaId = ref(generarInstanciaId())
+
+// Los dos gráficos de área ("Resumen diario" y "Tendencia de monto
+// aprobado") son la excepción al patrón de arriba: el componente Vue en sí
+// NUNCA se recrea vía :key — recrearlo (desmontarlo y volverlo a montar) es
+// justo lo que deja su máscara SVG de dibujo atascada en 0 para siempre (ver
+// más abajo, junto a `opcionesAreaDiaria`/`opcionesTendencia`).
+//
+// En cambio, para "redibujarlos" de izquierda a derecha en cada refresco se
+// destruye y reinicializa solo la instancia INTERNA de ApexCharts
+// (chart.destroy()+chart.init(), expuestos por vue3-apexcharts) dejando el
+// componente Vue y su nodo del DOM intactos. Probado (updateSeries con datos
+// vacíos y luego reales) que NO sirve: ApexCharts interpola directamente al
+// valor final en vez de volver a dibujar la máscara de entrada. destroy()+
+// init() sí fuerza una animación de entrada genuina en cada llamada, y al no
+// pasar por el ciclo de montaje de Vue no dispara el bug de la máscara
+// atascada — verificado con varios ciclos de reactivación seguidos.
+const chartAreaDiariaRef = ref<VueApexChartsComponentMethods | null>(null)
+const chartTendenciaRef = ref<VueApexChartsComponentMethods | null>(null)
+
+async function redibujarAreaChart(
+  chartRef: typeof chartAreaDiariaRef | typeof chartTendenciaRef
+) {
+  const chart = chartRef.value
+  if (!chart) return
+  chart.destroy()
+  await nextTick()
+  await chart.init()
+}
+
+async function redibujarAreasConAnimacion() {
+  await Promise.all([
+    redibujarAreaChart(chartAreaDiariaRef),
+    redibujarAreaChart(chartTendenciaRef),
+  ])
+}
 
 // Persistencia: como esta página todavía no tiene backend, "guardar" deja
 // los datos en localStorage (como JSON) para que una recarga de la página no
@@ -556,13 +588,14 @@ onUnmounted(() =>
 // modal. Se detiene si el usuario navega a otra página — de lo contrario,
 // gracias al <keep-alive>, el temporizador seguiría corriendo en segundo
 // plano sobre una pantalla distinta.
-const INTERVALO_RECARGA_MS = 30000
+const INTERVALO_RECARGA_MS = 60000
 let temporizadorRecarga: ReturnType<typeof setInterval> | null = null
 
 function iniciarRecargaAutomatica() {
   detenerRecargaAutomatica()
   temporizadorRecarga = setInterval(() => {
     instanciaId.value = generarInstanciaId()
+    void redibujarAreasConAnimacion()
   }, INTERVALO_RECARGA_MS)
 }
 
@@ -586,6 +619,7 @@ let primeraActivacion = true
 onActivated(() => {
   if (!primeraActivacion) {
     instanciaId.value = generarInstanciaId()
+    void redibujarAreasConAnimacion()
   }
   primeraActivacion = false
   iniciarRecargaAutomatica()
@@ -694,18 +728,10 @@ const indicadoresClave = computed(() => [
 const ANIMACION_BASE = {
   enabled: true,
   easing: 'easeinout' as const,
-  speed: 5000,
+  speed: 30000,
   animateGradually: { enabled: true, delay: 80 },
-  dynamicAnimation: { enabled: true, speed: 5000 },
+  dynamicAnimation: { enabled: true, speed: 30000 },
 }
-
-// Los gráficos tipo 'area'/'line' animan su entrada con una máscara SVG que
-// crece de 0 a su ancho final. Esa máscara puede quedar atascada en 0 (el
-// gráfico se ve en blanco para siempre) cuando el componente se desmonta y
-// se vuelve a montar rápido — por ejemplo, al navegar a otra ruta y volver.
-// Para esos dos gráficos se desactivan las animaciones por completo, priorizando
-// que siempre se vean sobre el efecto de entrada.
-const SIN_ANIMACION = { enabled: false }
 
 // Options por color, creadas UNA sola vez y cacheadas: si se reconstruyera un
 // objeto `options` nuevo en cada render, vue3-apexcharts lo interpreta como un
@@ -802,7 +828,7 @@ const ejeCategoriasBase: ApexOptions['xaxis'] = {
 }
 
 const opcionesAreaDiaria = computed<ApexOptions>(() => ({
-  chart: { type: 'area', toolbar: { show: false }, animations: SIN_ANIMACION },
+  chart: { type: 'area', toolbar: { show: false }, animations: ANIMACION_BASE },
   colors: [COLOR_TEAL, COLOR_BLUE],
   dataLabels: { enabled: false },
   stroke: { curve: 'smooth', width: 2.5 },
@@ -897,7 +923,7 @@ const serieTendenciaCompleta = computed(() => {
 })
 
 const opcionesTendencia = computed<ApexOptions>(() => ({
-  chart: { type: 'area', toolbar: { show: false }, animations: SIN_ANIMACION },
+  chart: { type: 'area', toolbar: { show: false }, animations: ANIMACION_BASE },
   colors: [COLOR_GOLD],
   dataLabels: { enabled: false },
   stroke: { curve: 'smooth', width: 2.5 },
@@ -1028,22 +1054,6 @@ function estiloAvatar(asesor: AsesorDashboardClientes, indice: number) {
   background: var(--bg);
   color: var(--text);
   padding: 26px 30px 40px;
-}
-
-/* Animación de entrada propia para los gráficos de área (Resumen diario y
-   Tendencia de monto aprobado). ApexCharts anima su propia entrada con una
-   máscara SVG que crece de 0 a su ancho final, pero esa máscara queda
-   atascada en 0 (el gráfico desaparece para siempre) cada vez que el
-   componente se recrea — al volver de otra página o en cada refresco
-   periódico de 30s. Por eso esos dos gráficos llevan animations:false y en
-   su lugar se recrean detrás de este fade/slide en CSS, que sí es 100%
-   confiable sin importar cuántas veces se repita. */
-.chart-fade-enter-active {
-  transition: opacity 5s ease, transform 5s ease;
-}
-.chart-fade-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
 }
 
 /* El navegador pinta un fondo negro (::backdrop) detrás del elemento en

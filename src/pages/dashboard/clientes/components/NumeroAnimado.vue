@@ -14,7 +14,7 @@ const props = withDefaults(
     formatear?: (valor: number) => string
     duracionMs?: number
   }>(),
-  { duracionMs: 5000 }
+  { duracionMs: 30000 }
 )
 
 const valorMostrado = ref(0)
