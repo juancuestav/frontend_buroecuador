@@ -440,8 +440,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
+import { useRoute } from 'vue-router'
 import { ApiN8N } from '../api/ApiN8N'
 import { useNotificaciones } from 'shared/notificaciones'
 
@@ -456,6 +457,7 @@ interface ReporteGenerado {
 }
 
 const $q = useQuasar()
+const route = useRoute()
 const { notificarCorrecto, notificarError, notificarAdvertencia } =
   useNotificaciones()
 
@@ -463,6 +465,7 @@ const { notificarCorrecto, notificarError, notificarAdvertencia } =
 const tipoIdentificacion = ref<'cedula' | 'ruc'>('cedula')
 const identificacion = ref('')
 const tipoReporte = ref('normal')
+const ws = ref('')
 const reporteEquifax = ref<File | null>(null)
 const informacionPersonal = ref<File | null>(null)
 const cargandoEnvio = ref(false)
@@ -586,6 +589,39 @@ watch(informacionPersonal, (nuevo) => {
   }
 })
 
+onMounted(() => {
+  const {
+    identificacion: identificacionQuery,
+    tipo: tipoQuery,
+    ws: wsQuery,
+  } = route.query
+
+  let esRuc = typeof tipoQuery === 'string' && tipoQuery.trim() === 'empresa'
+
+  if (typeof identificacionQuery === 'string' && identificacionQuery.trim()) {
+    let identificacionValor = identificacionQuery.trim()
+
+    if (identificacionValor.length === 13) {
+      esRuc = true
+    } else if (esRuc && identificacionValor.length === 10) {
+      identificacionValor += '001'
+    }
+
+    tipoIdentificacion.value = esRuc ? 'ruc' : 'cedula'
+    identificacion.value = identificacionValor
+  }
+
+  if (esRuc) {
+    tipoReporte.value = 'empresa'
+  } else if (typeof tipoQuery === 'string' && tipoQuery.trim()) {
+    tipoReporte.value = tipoQuery.trim()
+  }
+
+  if (typeof wsQuery === 'string') {
+    ws.value = wsQuery
+  }
+})
+
 // --- MÉTODOS ---
 
 function limpiarEquifax() {
@@ -634,6 +670,7 @@ async function enviarReporte() {
 
   formData.append('tipoReporte', tipoReporte.value)
   formData.append('identificacion', identificacion.value.trim())
+  formData.append('ws', ws.value)
 
   cargandoEnvio.value = true
   animacionIA.value = true
