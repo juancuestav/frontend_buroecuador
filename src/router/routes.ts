@@ -318,9 +318,7 @@ const routes: RouteRecordRaw[] = [
         path: '/register',
         name: 'register',
         component: () =>
-          import(
-            'pages/sistema/authentication/register/view/RegisterModo2Page.vue'
-          ),
+          import('pages/sistema/authentication/register/view/RegisterPage.vue'),
       },
       {
         path: '/register-pay/:servicio_id?',
