@@ -105,11 +105,20 @@ export const useAuthenticationStore = defineStore('authentication', () => {
   }
 
   async function getUser() {
+    // Si no hay token guardado, la petición está condenada a un 401.
+    // Evitamos el round-trip innecesario al backend (p.ej. en páginas
+    // públicas como /register) y resolvemos "no autenticado" localmente.
+    const token = await obtenerToken()
+    if (!token) {
+      setUser(null)
+      return
+    }
+
     try {
       const userApi = axiosRepo.getEndpoint(endpoints.api_user)
       const response: AxiosResponse = await axiosRepo.get(
         userApi,
-        await getHeaderToken()
+        headerAutorizacion(token)
       )
 
       setUser(response.data)
@@ -131,14 +140,14 @@ export const useAuthenticationStore = defineStore('authentication', () => {
     }
   }
 
-  async function getHeaderToken() {
-    let token = ''
+  async function obtenerToken(): Promise<string> {
     if (Platform.is.android || Platform.is.ios || Platform.is.capacitor) {
-      token = (await authenticatePreferences.getToken()) ?? ''
-    } else {
-      token = (await authenticateLocalStorage.getToken()) ?? ''
+      return (await authenticatePreferences.getToken()) ?? ''
     }
+    return (await authenticateLocalStorage.getToken()) ?? ''
+  }
 
+  function headerAutorizacion(token: string) {
     return {
       headers: {
         'Content-type': 'application/json',
@@ -261,7 +270,6 @@ export const useAuthenticationStore = defineStore('authentication', () => {
     correoVerificado,
     planPagado,
     token,
-    // getHeaderToken,
     extraerRol,
     esCliente,
     esEmpleado,

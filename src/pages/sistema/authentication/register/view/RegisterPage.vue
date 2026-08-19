@@ -1,5 +1,5 @@
 <template>
-  <q-page class="glass-page-v2 flex flex-center q-pa-md">
+  <q-page class="glass-page-v2 flex flex-center q-px-md q-py-xs">
     <div class="glass-dots">
       <div class="glass-orb glass-orb--1"></div>
       <div class="glass-orb glass-orb--2"></div>
@@ -69,7 +69,7 @@
       <div class="col-12 col-md-6 flex flex-center">
         <div class="register-form-wrapper">
           <!-- Encabezado móvil -->
-          <div v-if="$q.screen.xs" class="text-center q-mb-md">
+          <!-- <div v-if="$q.screen.xs" class="text-center q-mb-md">
             <q-avatar size="56px" class="q-mb-sm">
               <img :src="!$q.dark.isActive ? logoClaro : logoOscuro" />
             </q-avatar>
@@ -85,13 +85,15 @@
                   : 'Rápido y seguro'
               }}
             </p>
-          </div>
+          </div> -->
 
           <q-form @submit.prevent>
             <!-- Capa exterior: acciones (más sólida, contiene a la otra capa) -->
             <div class="glass-layer glass-layer--actions">
               <!-- Capa interior: campos del formulario (más clara, anidada debajo) -->
-              <div class="glass-layer glass-layer--inputs q-pa-lg q-mb-md">
+              <div
+                class="glass-layer glass-layer--inputs q-px-md q-py-xs q-mb-md"
+              >
                 <div class="text-center q-mb-md">
                   <h2 class="text-h6 text-weight-medium text-primary q-mb-xs">
                     {{
@@ -223,7 +225,6 @@
                       :error="!!v$.tipo_cliente.$errors.length"
                       transition-show="flip-up"
                       transition-hide="flip-down"
-                      options-dense
                       class="glass-input"
                       hide-bottom-space
                       dense
@@ -251,7 +252,6 @@
                       label="Provincia (Opcional)"
                       transition-show="jump-up"
                       transition-hide="jump-down"
-                      options-dense
                       dense
                       outlined
                       use-input
@@ -271,7 +271,7 @@
                       map-options
                     >
                       <template v-slot:prepend>
-                        <q-icon name="location_on" color="orange" size="18px" />
+                        <q-icon name="location_on" color="accent" size="18px" />
                       </template>
                       <template v-slot:no-option>
                         <q-item>
@@ -291,7 +291,6 @@
                       label="Cantón (Opcional)"
                       transition-show="jump-up"
                       transition-hide="jump-down"
-                      options-dense
                       dense
                       outlined
                       use-input
@@ -305,7 +304,7 @@
                       map-options
                     >
                       <template v-slot:prepend>
-                        <q-icon name="place" color="orange" size="18px" />
+                        <q-icon name="place" color="accent" size="18px" />
                       </template>
                       <template v-slot:no-option>
                         <q-item>
@@ -326,7 +325,6 @@
                       :error="!!v$.tipo_identificacion.$errors.length"
                       transition-show="flip-up"
                       transition-hide="flip-down"
-                      options-dense
                       dense
                       outlined
                       class="glass-input"
@@ -337,7 +335,7 @@
                       map-options
                     >
                       <template v-slot:prepend>
-                        <q-icon name="badge" color="deep-orange" size="18px" />
+                        <q-icon name="badge" color="accent" size="18px" />
                       </template>
                       <template v-slot:error>
                         <div
@@ -365,11 +363,7 @@
                       dense
                     >
                       <template v-slot:prepend>
-                        <q-icon
-                          name="credit_card"
-                          color="deep-orange"
-                          size="18px"
-                        />
+                        <q-icon name="credit_card" color="accent" size="18px" />
                       </template>
                       <template v-slot:error>
                         <div
@@ -395,7 +389,7 @@
                       :type="isPwd ? 'password' : 'text'"
                     >
                       <template v-slot:prepend>
-                        <q-icon name="lock" color="red" size="18px" />
+                        <q-icon name="lock" color="accent" size="18px" />
                       </template>
                       <template v-slot:append>
                         <q-icon
@@ -429,7 +423,11 @@
                       :type="isPwd ? 'password' : 'text'"
                     >
                       <template v-slot:prepend>
-                        <q-icon name="lock_outline" color="red" size="18px" />
+                        <q-icon
+                          name="lock_outline"
+                          color="accent"
+                          size="18px"
+                        />
                       </template>
                       <template v-slot:append>
                         <q-icon

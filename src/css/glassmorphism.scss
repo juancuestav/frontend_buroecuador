@@ -509,3 +509,39 @@
     animation: none !important;
   }
 }
+
+// Rendimiento en celulares: animar "border-radius" (el morph de los
+// blobs) obliga a repintar continuamente 3 capas grandes con
+// filter: blur(65px) — en la mayoría de laptops/PC la GPU lo
+// disimula, pero en celulares reales compite por CPU/GPU justo
+// cuando se abre un q-select y se nota como demora/lag. Se apagan
+// las animaciones decorativas y se reduce el blur en pantallas
+// angostas; el fondo se queda estático pero se ve igual de bien.
+@media (max-width: 1023px) {
+  .glass-orb,
+  .glass-orb--1,
+  .glass-orb--2,
+  .glass-orb--3 {
+    animation: none !important;
+  }
+
+  .glass-orb {
+    filter: blur(34px);
+  }
+
+  .glass-dots {
+    animation: none !important;
+  }
+
+  .glass-layer--actions,
+  .glass-chip,
+  .glass-btn-outline {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .glass-panel {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+}

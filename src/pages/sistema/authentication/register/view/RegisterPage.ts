@@ -150,7 +150,6 @@ export default defineComponent({
       )
 
       servicio = response.data.modelo
-      console.log(servicio)
     }
 
     const enableLoginButton = computed(
@@ -198,7 +197,12 @@ export default defineComponent({
     }
 
     cargarConfiguracion()
-    obtenerServicio()
+    // Solo existe un servicio que consultar cuando se llega desde el
+    // flujo de compra (/register-pay/:servicio_id); en el registro
+    // normal servicioId es undefined y no debe golpear el backend.
+    if (servicioId) {
+      obtenerServicio()
+    }
 
     return {
       logoClaro: computed(

@@ -34,7 +34,7 @@
 
         <!-- Formulario -->
         <div class="col-12 col-md-5">
-          <q-form class="login-card" @submit.prevent="login">
+          <q-form class="login-card q-mt-xl" @submit.prevent="login">
             <!-- Capa exterior: acciones (más sólida, contiene a la otra capa) -->
             <div class="glass-layer glass-layer--actions">
               <!-- Capa interior: campos del formulario (más clara, anidada debajo) -->
