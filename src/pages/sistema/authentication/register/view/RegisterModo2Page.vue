@@ -181,6 +181,8 @@
                       :error="!!v$.celular.$errors.length"
                       class="glass-input"
                       hide-bottom-space
+                      type="tel"
+                      mask="##########"
                       outlined
                       dense
                     >
@@ -248,7 +250,7 @@
                       input-debounce="0"
                       @filter="filtrarProvincias"
                       :option-value="(v) => v.id"
-                      :option-label="(v) => v.descripcion"
+                      :option-label="(v) => v.nombre"
                       emit-value
                       map-options
                     >
@@ -282,7 +284,7 @@
                       input-debounce="0"
                       @filter="filtrarCantones"
                       :option-value="(v) => v.id"
-                      :option-label="(v) => v.descripcion"
+                      :option-label="(v) => v.nombre"
                       emit-value
                       map-options
                     >
@@ -341,6 +343,8 @@
                       :error="!!v$.identificacion.$errors.length"
                       class="glass-input"
                       hide-bottom-space
+                      :type="identificacionInputType"
+                      :mask="identificacionMask"
                       outlined
                       dense
                     >

@@ -1,5 +1,5 @@
 // Dependencias
-import { computed, defineComponent, reactive, ref } from 'vue'
+import { computed, defineComponent, reactive, ref, watch } from 'vue'
 import { gestionarNotificacionError } from 'shared/utils'
 import { useNotificaciones } from 'shared/notificaciones'
 import loginJson from 'src/assets/lottie/login_work.json' // trabajos ecuador
@@ -98,7 +98,7 @@ export default defineComponent({
         await obtenerListados({
           cantones: {
             controller: new CantonController(),
-            params: { provincia_id: idProvincia },
+            params: { provincia: idProvincia },
           },
         })
       })
@@ -162,6 +162,32 @@ export default defineComponent({
         usuario.password === usuario.password_confirmation
     )
 
+    // Cédula = 10 dígitos, RUC = 13 dígitos, Pasaporte = sin límite ni máscara
+    const tipoIdentificacionSeleccionado = computed(() =>
+      listadosAuxiliares.tiposIdentificaciones?.find(
+        (tipo: any) => tipo.id === usuario.tipo_identificacion
+      )
+    )
+
+    const identificacionMask = computed(() => {
+      const descripcion =
+        tipoIdentificacionSeleccionado.value?.descripcion?.toUpperCase()
+      if (descripcion === 'CEDULA') return '##########'
+      if (descripcion === 'RUC') return '#############'
+      return undefined
+    })
+
+    const identificacionInputType = computed(() =>
+      identificacionMask.value ? 'tel' : 'text'
+    )
+
+    watch(
+      () => usuario.tipo_identificacion,
+      () => {
+        usuario.identificacion = ''
+      }
+    )
+
     /*******
      * Init
      *******/
@@ -190,6 +216,8 @@ export default defineComponent({
       tiposIdentificaciones,
       // computed
       enableLoginButton,
+      identificacionMask,
+      identificacionInputType,
       // functions
       registrar,
       provincias,

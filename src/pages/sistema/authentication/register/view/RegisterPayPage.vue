@@ -135,6 +135,8 @@
                 label="Celular"
                 placeholder="Ingrese su celular"
                 :error="!!v$.celular.$errors.length"
+                type="tel"
+                mask="##########"
                 outlined
                 dense
               >
@@ -286,6 +288,8 @@
                 label="Identificación"
                 placeholder="Ingrese su identificación"
                 :error="!!v$.identificacion.$errors.length"
+                :type="identificacionInputType"
+                :mask="identificacionMask"
                 outlined
                 dense
               >
