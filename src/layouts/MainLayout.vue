@@ -1,8 +1,19 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lHh Lpr lFf" class="glass-page-v2">
+    <!-- Fondo decorativo (igual que Login/Register), fijo al viewport
+    para que el header y el drawer siempre tengan color de sobra que
+    desenfocar sin importar cuánto scroll tenga la página. style
+    inline porque .glass-dots ya trae su propio position:absolute y
+    ganaría por orden de cascada a la clase utilitaria fixed-full. -->
+    <div class="glass-dots" style="position: fixed; inset: 0; z-index: 0">
+      <div class="glass-orb glass-orb--1"></div>
+      <div class="glass-orb glass-orb--2"></div>
+      <div class="glass-orb glass-orb--3"></div>
+    </div>
+
     <!-- Navbar -->
     <q-header
-      class="bg-body-background text-dark"
+      class="glass-layer glass-layer--actions no-border-radius text-dark"
       :class="{ 'q-px-lg': !$q.screen.xs }"
     >
       <transition name="slide-fade" mode="out-in">
@@ -35,7 +46,7 @@
           <q-list
             dense
             bordered
-            class="lista-busqueda bg-solid custom-shadow text-color"
+            class="lista-busqueda glass-panel glass-panel--solid text-color"
             style="width: 90%; margin: 0 auto"
           >
             <div
@@ -142,7 +153,7 @@
             </q-avatar>
             <q-menu>
               <div
-                class="bg-desenfoque-2 no-wrap q-pa-mdd"
+                class="glass-panel glass-panel--solid no-wrap q-pa-md"
                 style="width: 300px"
               >
                 <div class="column items-center q-gutter-y-md bg-body q-pa-md">
@@ -236,14 +247,17 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      class="bg-drawer my-font border-right"
-      :class="{ 'bg-solid': $q.screen.xs }"
+      class="glass-layer no-border-radius my-font"
+      :class="{
+        'glass-panel glass-panel--solid': $q.screen.xs,
+        'glass-layer--actions': !$q.screen.xs,
+      }"
     >
       <!-- Drawer Header -->
       <div
-        class="absolute-top row items-center justify-center q-px-md q-py-md border-bottomold q-mx-msd"
+        class="absolute-top row items-center justify-center q-px-md q-py-md q-mx-sm"
       >
-        <div class="bg-white row items-center rounded-card q-px-lg q-py-sm">
+        <div class="glass-chip">
           <q-avatar rounded size="38px" class="q-mr-sm">
             <img :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''" />
           </q-avatar>
@@ -280,7 +294,7 @@
     </q-drawer>
 
     <!-- Router -->
-    <q-page-container class="my-font">
+    <q-page-container class="my-font relative-position" style="z-index: 1">
       <simple-chat></simple-chat>
 
       <router-view v-slot="{ Component }">

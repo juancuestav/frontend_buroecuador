@@ -51,14 +51,14 @@
       animated
       transition-prev="scale"
       transition-next="scale"
-      class="borde q-mt-lg"
+      class="q-mt-lg bg-transparent"
       keep-alive
     >
       <!-- Formulario -->
       <q-tab-panel
         name="formulario"
         :class="{ 'q-pa-none': full }"
-        class="z-index-10-menos"
+        class="glass-panel z-index-10-menos"
       >
         <slot name="formulario" />
         <div :class="{ 'q-pa-md': full }">
@@ -78,7 +78,9 @@
         </div>
       </q-tab-panel>
 
-      <!-- Listado -->
+      <!-- Listado: essential-table(-pagination) ya se renderiza dentro
+      de su propio q-card, que ahora es de vidrio globalmente; no se
+      envuelve en otro glass-panel para no anidar dos cards. -->
       <q-tab-panel name="listado">
         <essential-table-pagination
           v-if="paginate"

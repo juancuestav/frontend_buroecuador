@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="bg-solid borde rounded-card q-pa-md text-center cursor-pointer q-card-hover q-card-press"
-  >
+  <q-card class="q-pa-md text-center cursor-pointer q-card-hover q-card-press">
     <img
       :src="accesoDirecto.imagen ?? ''"
       width="100px"
@@ -33,7 +31,7 @@
     >
       <q-icon name="bi-trash" size="xs" class="q-mr-xs"></q-icon>Eliminar
     </q-btn>
-  </div>
+  </q-card>
 </template>
 
 <script lang="ts" setup>
