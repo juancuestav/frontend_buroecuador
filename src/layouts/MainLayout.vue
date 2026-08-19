@@ -13,7 +13,7 @@
 
     <!-- Navbar -->
     <q-header
-      class="glass-layer glass-layer--actions no-border-radius text-dark"
+      class="glass-layder glass-ldayer--actions no-border-radius text-dark bg-transparent"
       :class="{ 'q-px-lg': !$q.screen.xs }"
     >
       <transition name="slide-fade" mode="out-in">
@@ -76,7 +76,7 @@
         </div>
       </transition>
 
-      <q-toolbar class="row justify-between border-bottom q-py-md">
+      <q-toolbar class="row justify-between q-py-md">
         <span>
           <q-btn
             color="primary"
@@ -247,17 +247,17 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      class="glass-layer no-border-radius my-font"
+      class="glass-laydder no-border-radius my-font"
       :class="{
         'glass-panel glass-panel--solid': $q.screen.xs,
-        'glass-layer--actions': !$q.screen.xs,
+        'glass-layer--actionds': !$q.screen.xs,
       }"
     >
       <!-- Drawer Header -->
       <div
         class="absolute-top row items-center justify-center q-px-md q-py-md q-mx-sm"
       >
-        <div class="glass-chip">
+        <div class="glass-chip text-bold">
           <q-avatar rounded size="38px" class="q-mr-sm">
             <img :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''" />
           </q-avatar>

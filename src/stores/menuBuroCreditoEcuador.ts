@@ -15,7 +15,7 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: true, //store.can('acceder.tablero'),
   },
   {
-    title: 'Tablero',
+    title: 'Gestión N',
     icon: 'bi-layers-fill',
     link: '/',
     can: store.can('acceder.tablero'),
