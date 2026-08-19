@@ -186,30 +186,6 @@
             </q-input>
           </div>
 
-          <!-- Tipo de cliente -->
-          <div class="col-12 col-md-3">
-            <label class="q-mb-sm block">Tipo cliente</label>
-            <q-select
-              v-model="usuario.tipo_cliente"
-              :options="tiposClientes"
-              :error="!!v$.tipo_cliente.$errors.length"
-              transition-show="flip-up"
-              transition-hide="flip-down"
-              options-dense
-              dense
-              outlined
-            >
-              <template v-slot:error>
-                <div
-                  v-for="error of v$.tipo_identificacion.$errors"
-                  :key="error.$uid"
-                >
-                  <div class="error-msg">{{ error.$message }}</div>
-                </div>
-              </template>
-            </q-select>
-          </div>
-
           <!-- Tipo de identificacion -->
           <div class="col-12 col-md-3 q-mb-md">
             <label class="q-mb-sm block">Tipo de identificación</label>
@@ -335,6 +311,30 @@
             >
               <template v-slot:error>
                 <div v-for="error of v$.rol.$errors" :key="error.$uid">
+                  <div class="error-msg">{{ error.$message }}</div>
+                </div>
+              </template>
+            </q-select>
+          </div>
+
+          <!-- Tipo de cliente -->
+          <div v-if="mostrarTipoCliente" class="col-12 col-md-3">
+            <label class="q-mb-sm block">Tipo cliente</label>
+            <q-select
+              v-model="usuario.tipo_cliente"
+              :options="tiposClientes"
+              :error="!!v$.tipo_cliente.$errors.length"
+              transition-show="flip-up"
+              transition-hide="flip-down"
+              options-dense
+              dense
+              outlined
+            >
+              <template v-slot:error>
+                <div
+                  v-for="error of v$.tipo_cliente.$errors"
+                  :key="error.$uid"
+                >
                   <div class="error-msg">{{ error.$message }}</div>
                 </div>
               </template>

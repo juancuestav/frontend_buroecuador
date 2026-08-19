@@ -1,8 +1,8 @@
 // Dependencias
 import { configuracionColumnasUsuarios } from '../domain/configuracionColumnasUsuarios'
-import { required } from '@vuelidate/validators'
+import { required, requiredIf } from '@vuelidate/validators'
 import useVuelidate from '@vuelidate/core'
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 
 // Componentes
 import TabLayout from 'shared/contenedor/modules/simple/view/TabLayout.vue'
@@ -20,6 +20,8 @@ import { tiposClientes } from 'config/utils'
 import { CustomActionPrompt } from 'components/tables/domain/CustomActionPrompt'
 import { useNotificaciones } from 'shared/notificaciones'
 import { Rol } from 'pages/sistema/roles/domain/Rol'
+
+const ROL_ID_EMPRESA = 2
 
 export default defineComponent({
   components: { TabLayout },
@@ -48,7 +50,7 @@ export default defineComponent({
       identificacion: { required },
       tipo_identificacion: { required },
       rol: { required },
-      tipo_cliente: { required },
+      tipo_cliente: { requiredIf: requiredIf(() => usuario.rol.includes(ROL_ID_EMPRESA)) },
     }
 
     const v$ = useVuelidate(reglas, usuario)
@@ -72,6 +74,12 @@ export default defineComponent({
         (rol: Rol) => rol.name === 'EMPRESA'
       )?.id
       return usuario.rol.includes(idEmpresa)
+    })
+    const mostrarTipoCliente = computed(() =>
+      usuario.rol.includes(ROL_ID_EMPRESA)
+    )
+    watch(mostrarTipoCliente, (visible) => {
+      if (!visible) usuario.tipo_cliente = null
     })
 
     /*************
@@ -128,6 +136,7 @@ export default defineComponent({
       tiposClientes,
       ampliarLimiteConsultas,
       mostrarLimiteConsultas,
+      mostrarTipoCliente,
     }
   },
 })
