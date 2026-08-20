@@ -4,31 +4,35 @@
 
     <div
       v-if="puedeCrear"
-      class="row bg-solid rounded-card q-pt-xs q-pb-lg q-mb-md"
+      class="row q-pt-xs q-pb-lg q-mb-md glass-layer glass-layer--actions"
     >
-      <div class="col-12 q-mb-md">
-        <SelectorUsuario
-          :mixin="mixin"
-          :propietario="4"
-          :disable="false"
-          @selected="seleccionarUsuario"
-        ></SelectorUsuario>
+      <div class="col-12 row q-pa-md q-mb-md glass-layer glass-layer--inputs">
+        <div class="col-12 q-mb-md">
+          <SelectorUsuario
+            :mixin="mixin"
+            :propietario="4"
+            :disable="false"
+            @selected="seleccionarUsuario"
+          ></SelectorUsuario>
+        </div>
+
+        <div class="col-12 q-mb-md">
+          <label class="q-mb-sm block">Ingrese la puntuación</label>
+          <q-input
+            v-model="userProfile.puntuacion"
+            placeholder="Ingrese puntuación"
+            :disable="!userProfile.user"
+            outlined
+            dense
+          >
+            <template #prepend
+              ><q-icon name="bi-person-check"></q-icon
+            ></template>
+          </q-input>
+        </div>
       </div>
 
-      <div class="col-12 q-mb-md">
-        <label class="q-mb-sm block">Ingrese la puntuación</label>
-        <q-input
-          v-model="userProfile.puntuacion"
-          placeholder="Ingrese puntuación"
-          :disable="!userProfile.user"
-          outlined
-          dense
-        >
-          <template #prepend><q-icon name="bi-person-check"></q-icon></template>
-        </q-input>
-      </div>
-
-      <div class="col-12 row justify-end">
+      <div class="col-12 row justify-end q-px-md">
         <button-submits
           :accion="accion"
           @cancelar="reestablecer()"

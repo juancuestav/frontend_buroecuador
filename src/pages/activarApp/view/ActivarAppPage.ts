@@ -1,26 +1,43 @@
 // Dependencias
 import { AxiosHttpRepository } from 'shared/http/infraestructure/AxiosHttpRepository'
 import { useConfiguracionGeneralStore } from 'stores/configuracion_general'
+import { useAuthenticationStore } from 'stores/authentication'
 import { defineComponent, ref } from 'vue'
 import { endpoints } from 'config/api'
 
 import CalloutComponent from 'components/CalloutComponent.vue'
+import PlanetScoreAnimation from 'pages/puntuacionCliente/PlanetScoreAnimation.vue'
 import { tiposServicios } from 'config/utils'
+import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
+import { UserProfile } from 'pages/userProfile/domain/UserProfile'
+import { UserProfileController } from 'pages/userProfile/infraestructure/UserProfileController'
 
 export default defineComponent({
-  components: { CalloutComponent },
+  components: { CalloutComponent, PlanetScoreAnimation },
   setup() {
     /********
      * Store
      ********/
     const configuracionGeneralStore = useConfiguracionGeneralStore()
+    const authenticationStore = useAuthenticationStore()
+
+    /********
+     * Mixin
+     ********/
+    const mixin = new ContenedorSimpleMixin(
+      UserProfile,
+      new UserProfileController()
+    )
+    const { entidad: userProfile } = mixin.useReferencias()
+    const { consultar } = mixin.useComportamiento()
 
     /************
      * Variables
      ************/
-    let fechaProximaFacturacion
-    let pagado
+    const fechaProximaFacturacion = ref()
+    const pagado = ref(false)
     const tipoServicio = ref()
+    const usuario = authenticationStore.user
 
     const planesClientes = ref()
     const planesEmpresas = ref()
@@ -51,8 +68,8 @@ export default defineComponent({
       )
       planesClientes.value = response.data.planesClientes
       planesEmpresas.value = response.data.planesEmpresas
-      fechaProximaFacturacion = response.data.fecha_proximo_pago
-      pagado = response.data.pagado
+      fechaProximaFacturacion.value = response.data.fecha_proximo_pago
+      pagado.value = response.data.pagado
     }
 
     /*******
@@ -60,11 +77,18 @@ export default defineComponent({
      *******/
     obtenerData()
 
+    if (usuario?.user_profile_id) {
+      userProfile.id = usuario.user_profile_id
+      consultar(userProfile)
+    }
+
     return {
       fechaProximaFacturacion,
       planesClientes,
       planesEmpresas,
       pagado,
+      usuario,
+      userProfile,
       abrirWhatsapp,
       tipoServicio,
       tiposServicios,

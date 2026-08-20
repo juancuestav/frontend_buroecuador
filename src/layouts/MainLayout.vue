@@ -13,8 +13,12 @@
 
     <!-- Navbar -->
     <q-header
-      class="glass-layder glass-ldayer--actions no-border-radius text-dark bg-transparent"
-      :class="{ 'q-px-lg': !$q.screen.xs }"
+      class="no-border-radius text-dark"
+      :class="
+        $q.screen.xs
+          ? 'glass-layer glass-layer--actions'
+          : 'bg-transparent q-px-lg'
+      "
     >
       <transition name="slide-fade" mode="out-in">
         <div v-if="mostrarBuscar" class="q-pa-xs">

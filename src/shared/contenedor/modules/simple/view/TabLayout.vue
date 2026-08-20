@@ -51,31 +51,30 @@
       animated
       transition-prev="scale"
       transition-next="scale"
-      class="q-mt-lg bg-transparent"
+      class="q-mt-lg glass-layer glass-layer--actions"
       keep-alive
     >
       <!-- Formulario -->
-      <q-tab-panel
-        name="formulario"
-        :class="{ 'q-pa-none': full }"
-        class="glass-panel z-index-10-menos"
-      >
-        <slot name="formulario" />
-        <div :class="{ 'q-pa-md': full }">
-          <div class="row justify-end q-col-gutter-x-xs q-pt-xl">
-            <button-submits
-              v-if="mostrarButtonSubmits"
-              :accion="accion"
-              :permitirGuardar="puedeCrear"
-              :disabled="storeCargando.cargando"
-              :labelGuardar="labelGuardar"
-              @cancelar="reestablecer()"
-              @editar="editar(entidad, resetFormularioOnUpdate)"
-              @eliminar="eliminar(entidad, cbEliminar)"
-              @guardar="guardar(entidad)"
-            />
-          </div>
+      <!-- :class="{ 'q-pa-none': full }" -->
+      <q-tab-panel name="formulario" class="z-index-10-menos q-pa-none">
+        <div class="glass-layer glass-layer--inputs q-pa-md">
+          <slot name="formulario" />
         </div>
+        <!-- <div :class="{ 'q-pa-md': full }"> -->
+        <div class="row justify-end q-col-gutter-x-xs q-pa-md">
+          <button-submits
+            v-if="mostrarButtonSubmits"
+            :accion="accion"
+            :permitirGuardar="puedeCrear"
+            :disabled="storeCargando.cargando"
+            :labelGuardar="labelGuardar"
+            @cancelar="reestablecer()"
+            @editar="editar(entidad, resetFormularioOnUpdate)"
+            @eliminar="eliminar(entidad, cbEliminar)"
+            @guardar="guardar(entidad)"
+          />
+        </div>
+        <!-- </div> -->
       </q-tab-panel>
 
       <!-- Listado: essential-table(-pagination) ya se renderiza dentro

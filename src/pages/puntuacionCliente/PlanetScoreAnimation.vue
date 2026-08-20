@@ -1,5 +1,8 @@
 <template>
-  <div class="planet-container q-mx-auto bg-body-backgrodund">
+  <div
+    class="planet-container q-mx-auto bg-body-backgrodund"
+    :style="dotColorVarStyle"
+  >
     <div
       class="planet"
       :class="{ animating: isAnimating }"
@@ -18,20 +21,20 @@
       v-for="(object, index) in orbitingObjects"
       :key="index"
       class="orbiting-object"
-      :style="{ ...object, ...backgroundStyle }"
+      :style="object"
       :class="{ animating: isAnimating }"
     ></div>
     <div class="score-number rounded-card q-pa-xs">{{ animatedScore }}</div>
     <div class="score-label" :style="labelStyle">{{ scoreLabel }}</div>
   </div>
-  <small class="block text-center"
+  <small v-if="!waiting" class="block text-center"
     >Puntaje calculado el {{ fechaActualizacion }}</small
   >
   <small class="block text-center">Provisto por Buró de Crédito Ecuador</small>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
   score: {
@@ -42,6 +45,17 @@ const props = defineProps({
   fechaActualizacion: {
     type: String,
     required: true,
+  },
+  // Cuando es true, ignora `score` y en su lugar corre un relleno en
+  // bucle (0 → arriba → 0 → ...) con `waitingLabel` como etiqueta, para
+  // representar "calculando" mientras aún no hay un puntaje real.
+  waiting: {
+    type: Boolean,
+    default: false,
+  },
+  waitingLabel: {
+    type: String,
+    default: 'En espera de activación. Calculando...',
   },
 })
 
@@ -86,12 +100,18 @@ const labelStyle = computed(() => {
   return { color }
 })
 
-const backgroundStyle = computed(() => {
+// Variable CSS en el contenedor: un solo cambio de color por frame (no 100),
+// heredado por los puntos orbitantes vía `background-color: var(--dot-color)`.
+const dotColorVarStyle = computed(() => {
   const { color } = getColorAndLabel(animatedScore.value)
-  return { 'background-color': color }
+  return { '--dot-color': color }
 })
 
-const scoreLabel = computed(() => getColorAndLabel(animatedScore.value).label)
+const scoreLabel = computed(() =>
+  props.waiting
+    ? props.waitingLabel
+    : getColorAndLabel(animatedScore.value).label
+)
 
 const surfaceFeatures = ref(
   Array.from({ length: 7 }, () => ({
@@ -108,13 +128,26 @@ const orbitingObjects = ref(
     animationDelay: `${i * 0.2}s`,
     top: `${50 + Math.random() * 20 - 10}%`, // Posición aleatoria en el eje vertical
     left: `${50 + Math.random() * 20 - 10}%`, // Posición aleatoria en el eje horizontal
-    backgroundColor: '#ffffff', // Color blanco semitransparente
     width: '4px', // Ancho del punto
     height: '4px', // Alto del punto
   }))
 )
 
+let rafId = null
+let loopTimeoutId = null
+
+const stopAnimationLoops = () => {
+  if (rafId !== null) cancelAnimationFrame(rafId)
+  if (loopTimeoutId !== null) clearTimeout(loopTimeoutId)
+  rafId = null
+  loopTimeoutId = null
+}
+
+// Empieza rápido y desacelera suave hacia el final (deceleración cúbica).
+const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
+
 const animateScore = () => {
+  stopAnimationLoops()
   isAnimating.value = true
   const duration = props.score <= 500 ? 3000 : 6000 // 2 seconds
   const start = animatedScore.value
@@ -124,21 +157,74 @@ const animateScore = () => {
   const animate = (currentTime) => {
     const elapsedTime = currentTime - startTime
     const progress = Math.min(elapsedTime / duration, 1)
-    animatedScore.value = Math.round(start + (end - start) * progress)
+    const eased = easeOutCubic(progress)
+    animatedScore.value = Math.round(start + (end - start) * eased)
 
     if (progress < 1) {
-      requestAnimationFrame(animate)
+      rafId = requestAnimationFrame(animate)
     } else {
       isAnimating.value = false
     }
   }
 
-  requestAnimationFrame(animate)
+  rafId = requestAnimationFrame(animate)
 }
 
-watch(() => props.score, animateScore)
+// Mientras se espera la activación no hay un puntaje real: se anima un
+// relleno de 0 a un valor alto y se reinicia en bucle, como indicador de
+// "calculando", hasta que `waiting` pase a false.
+const WAITING_TARGET = 950
+const WAITING_FILL_DURATION = 2200
+const WAITING_PAUSE_AT_FULL = 400
 
-onMounted(animateScore)
+const runWaitingLoop = () => {
+  isAnimating.value = true
+  const start = animatedScore.value
+  const startTime = performance.now()
+
+  const step = (currentTime) => {
+    const elapsedTime = currentTime - startTime
+    const progress = Math.min(elapsedTime / WAITING_FILL_DURATION, 1)
+    const eased = easeOutCubic(progress)
+    animatedScore.value = Math.round(
+      start + (WAITING_TARGET - start) * eased
+    )
+
+    if (progress < 1) {
+      rafId = requestAnimationFrame(step)
+    } else {
+      loopTimeoutId = setTimeout(() => {
+        animatedScore.value = 0
+        if (props.waiting) runWaitingLoop()
+      }, WAITING_PAUSE_AT_FULL)
+    }
+  }
+
+  rafId = requestAnimationFrame(step)
+}
+
+watch(
+  () => props.waiting,
+  (waiting) => {
+    stopAnimationLoops()
+    if (waiting) runWaitingLoop()
+    else animateScore()
+  }
+)
+
+onBeforeUnmount(stopAnimationLoops)
+
+watch(
+  () => props.score,
+  () => {
+    if (!props.waiting) animateScore()
+  }
+)
+
+onMounted(() => {
+  if (props.waiting) runWaitingLoop()
+  else animateScore()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -228,9 +314,9 @@ onMounted(animateScore)
   position: absolute;
   border-radius: 50%;
   z-index: 1;
-  /* animation: orbit 10s linear infinite; */
+  background-color: var(--dot-color, #fff);
   animation: orbit 10s linear infinite;
-  transition: all 0.5s ease;
+  transition: background-color 0.5s ease;
 }
 
 .orbiting-object.animating {

@@ -35,6 +35,24 @@
       class="q-mb-md"
     ></CalloutComponent>
 
+    <planet-score-animation
+      class="q-mx-auto"
+      :score="
+        parseInt(userProfile.puntuacion ? userProfile.puntuacion + '' : '0')
+      "
+      :fecha-actualizacion="userProfile.updated_at ?? ''"
+      :waiting="!pagado"
+    ></planet-score-animation>
+
+    <div class="text-center q-mb-lg">
+      <div class="q-mt-sm">
+        <div><strong>Cédula:</strong> {{ usuario?.identificacion }}</div>
+        <div>
+          <strong>Nombre:</strong> {{ usuario?.name }} {{ usuario?.apellidos }}
+        </div>
+      </div>
+    </div>
+
     <div class="row justify-center q-mb-sm">
       <q-btn color="positive" no-caps unelevated @click="abrirWhatsapp()">
         <q-icon name="bi-whatsapp" size="xs" class="q-mr-sm"></q-icon>
@@ -42,7 +60,7 @@
       >
     </div>
 
-    <div class="row q-gutter-sm q-mb-sm justify-center">
+    <div class="row q-gutter-sm q-mb-lg justify-center">
       <q-btn
         unelevated
         no-caps
@@ -67,9 +85,10 @@
       animated
       transition-prev="scale"
       transition-next="scale"
+      class="glass-layer glass-layer--actions"
     >
       <q-tab-panel :name="tiposServicios.PLAN">
-        <div class="row q-gutter-xs">
+        <div class="row q-col-gutter-md">
           <div class="col-12 q-mb-md">
             <div class="text-h5 text-bold q-mb-md">Planes para clientes</div>
             <CalloutComponent
@@ -78,13 +97,12 @@
             ></CalloutComponent>
           </div>
 
-          <q-card
+          <div
             v-for="plan in planesClientes"
             :key="plan.id"
-            square
-            class="col-12 col-md-3 text-center q-pa-xs rounded-card"
+            class="col-12 col-md-3"
           >
-            <q-card-section>
+            <q-card-section class="text-center glass-layer glass-layer--inputs">
               <!--<q-img :src="plan.imagen" alt="" class="full-width" />-->
               <div class="text-center text-bold text-h6 q-mb-md">
                 {{ plan.nombre }}
@@ -92,7 +110,7 @@
               <div class="bg-desenfoque rounded-card text-dark q-py-sm q-mb-md">
                 <div v-html="plan.descripcion"></div>
               </div>
-              <div class="text-center text-h5">
+              <div class="text-center text-h5 text-bold">
                 $
                 {{ parseFloat(plan.precio_unitario) + parseFloat(plan.iva) }}
               </div>
@@ -121,12 +139,12 @@
                 >TU COMPRA ES SEGURA
               </div>
             </q-card-section>
-          </q-card>
+          </div>
         </div>
       </q-tab-panel>
 
       <q-tab-panel :name="tiposServicios.SOLUCIONES_EMPRESAS">
-        <div class="row q-gutter-xs">
+        <div class="row q-col-gutter-md">
           <div class="col-12 q-mb-md">
             <div class="text-h5 text-bold q-mb-md">Planes para empresas</div>
             <CalloutComponent
@@ -135,13 +153,12 @@
             ></CalloutComponent>
           </div>
 
-          <q-card
+          <div
             v-for="plan in planesEmpresas"
             :key="plan.id"
-            square
-            class="col-12 col-md-3 text-center q-pa-xs rounded-card"
+            class="col-12 col-md-3"
           >
-            <q-card-section>
+            <q-card-section class="text-center glass-layer glass-layer--inputs">
               <!--<q-img :src="plan.imagen" alt="" class="full-width" />-->
               <div class="text-center text-bold text-h6 q-mb-md">
                 {{ plan.nombre }}
@@ -149,7 +166,7 @@
               <div class="bg-desenfoque rounded-card text-dark q-py-sm q-mb-md">
                 <div v-html="plan.descripcion"></div>
               </div>
-              <div class="text-center text-h5">
+              <div class="text-center text-h5 text-bold">
                 $
                 {{ parseFloat(plan.precio_unitario) + parseFloat(plan.iva) }}
               </div>
@@ -180,7 +197,7 @@
                 <small> *Buró de crédito muestra información preliminar.</small>
               </div>
             </q-card-section>
-          </q-card>
+          </div>
         </div>
       </q-tab-panel>
     </q-tab-panels>
