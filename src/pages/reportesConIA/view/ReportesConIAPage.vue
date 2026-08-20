@@ -466,6 +466,7 @@ const tipoIdentificacion = ref<'cedula' | 'ruc'>('cedula')
 const identificacion = ref('')
 const tipoReporte = ref('normal')
 const ws = ref('')
+const compraId = ref('')
 const reporteEquifax = ref<File | null>(null)
 const informacionPersonal = ref<File | null>(null)
 const cargandoEnvio = ref(false)
@@ -594,6 +595,7 @@ onMounted(() => {
     identificacion: identificacionQuery,
     tipo: tipoQuery,
     ws: wsQuery,
+    compra_id: compraIdQuery,
   } = route.query
 
   let esRuc = typeof tipoQuery === 'string' && tipoQuery.trim() === 'empresa'
@@ -619,6 +621,10 @@ onMounted(() => {
 
   if (typeof wsQuery === 'string') {
     ws.value = wsQuery
+  }
+
+  if (typeof compraIdQuery === 'string') {
+    compraId.value = compraIdQuery
   }
 })
 
@@ -671,6 +677,10 @@ async function enviarReporte() {
   formData.append('tipoReporte', tipoReporte.value)
   formData.append('identificacion', identificacion.value.trim())
   formData.append('ws', ws.value)
+
+  if (compraId.value) {
+    formData.append('compra_id', compraId.value)
+  }
 
   cargandoEnvio.value = true
   animacionIA.value = true
