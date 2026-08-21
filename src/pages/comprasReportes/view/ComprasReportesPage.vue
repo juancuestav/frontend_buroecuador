@@ -55,6 +55,7 @@
               type="date"
               outlined
               dense
+              clearable
               @update:model-value="aplicarFiltros"
             />
           </div>
@@ -65,6 +66,7 @@
               type="date"
               outlined
               dense
+              clearable
               @update:model-value="aplicarFiltros"
             />
           </div>
@@ -78,6 +80,7 @@
               multiple
               emit-value
               map-options
+              clearable
               outlined
               dense
               @update:model-value="aplicarFiltros"
@@ -125,6 +128,18 @@
               <template #prepend><q-icon name="bi-search" /></template>
             </q-input>
           </div>
+          <div v-if="hayFiltrosActivos" class="col-12 col-md-auto">
+            <q-btn
+              flat
+              dense
+              no-caps
+              no-wrap
+              color="primary"
+              icon="bi-eraser"
+              label="Limpiar filtros"
+              @click="limpiarFiltros"
+            />
+          </div>
         </div>
 
         <!-- Tabla: mismo patrón que el resto del panel administrativo -->
@@ -153,7 +168,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { date } from 'quasar'
 import MultiplePageLayout from 'src/shared/contenedor/modules/simple/view/MultiplePageLayout.vue'
 import EssentialTablePagination from 'components/tables/view/EssentialTablePagination.vue'
@@ -209,6 +224,26 @@ const tipoIdentificacionOptions = [
   { label: 'Cédula', value: 'cedula' },
   { label: 'RUC', value: 'ruc' },
 ]
+
+const hayFiltrosActivos = computed(
+  () =>
+    !!filtros.fecha_desde ||
+    !!filtros.fecha_hasta ||
+    !!filtros.estado?.length ||
+    !!filtros.tipo_reporte ||
+    !!filtros.tipo_identificacion ||
+    !!busqueda.value
+)
+
+function limpiarFiltros() {
+  filtros.fecha_desde = null
+  filtros.fecha_hasta = null
+  filtros.estado = []
+  filtros.tipo_reporte = null
+  filtros.tipo_identificacion = null
+  busqueda.value = ''
+  aplicarFiltros()
+}
 
 // Filtros activos, sin las claves de paginación (se usan tanto para el
 // listado como para el resumen, y se sincronizan hacia `mixin.filtros.fields`
