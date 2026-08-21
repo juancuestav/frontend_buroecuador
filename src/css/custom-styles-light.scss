@@ -30,8 +30,13 @@ $text-color: $primary; //#51547a;
     // background: linear-gradient(to bottom right, #a9abbe, #e2e4ec);
   }
 
+  // Sólido a propósito (sin alpha): sobre un fondo con blobs, una tabla
+  // grande con columnas/encabezado sticky obligaba a recomponer la
+  // transparencia en cada celda en cada frame — medido con Playwright,
+  // ~8fps en /usuarios (100 filas) solo por este alpha combinado con el
+  // fondo animado. Ver también glassmorphism.scss.
   .bg-body-table {
-    background-color: rgba($grey-1, 0.8);
+    background-color: $grey-1;
   }
 
   .bg-body-table-dark-color {

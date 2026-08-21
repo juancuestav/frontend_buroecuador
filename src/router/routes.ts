@@ -210,6 +210,13 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: '/compras-reportes',
+        name: 'compras_reportes',
+        component: () =>
+          import('pages/comprasReportes/view/ComprasReportesPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: 'dashboard-clientes',
         name: 'dashboard_clientes',
         component: () =>

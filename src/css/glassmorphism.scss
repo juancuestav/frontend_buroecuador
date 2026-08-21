@@ -234,6 +234,19 @@
   box-shadow: 0 20px 50px -18px rgba(20, 40, 100, 0.3);
 }
 
+// Variante de .glass-layer--actions sin backdrop-filter, para contenedores
+// que envuelven una tabla grande (TabLayout.vue). El blur detrás igual
+// queda oculto por el fondo opaco de la tabla (.bg-body-table), pero
+// recalcularlo en cada repintado de columnas/encabezado sticky es carísimo
+// — medido con Playwright: ~25fps deslizando /usuarios (100 filas) con
+// este blur activo en 10px, 60fps limpio sin él. Mismo fondo/sombra que
+// .glass-layer--actions, sin el costo.
+.glass-layer--tabla {
+  background: rgba(255, 255, 255, 0.001);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 20px 50px -18px rgba(20, 40, 100, 0.3);
+}
+
 // Capa encima - Formulario
 .glass-layer--inputs {
   background: rgba(255, 255, 255, 0.5);
@@ -340,6 +353,11 @@
   }
 
   .glass-layer--actions {
+    background: rgba(15, 23, 42, 0.72);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  .glass-layer--tabla {
     background: rgba(15, 23, 42, 0.72);
     border-color: rgba(255, 255, 255, 0.14);
   }
@@ -523,39 +541,39 @@
   }
 }
 
-// Rendimiento en celulares: animar "border-radius" (el morph de los
-// blobs) obliga a repintar continuamente 3 capas grandes con
-// filter: blur(65px) — en la mayoría de laptops/PC la GPU lo
-// disimula, pero en celulares reales compite por CPU/GPU justo
-// cuando se abre un q-select y se nota como demora/lag. Se apagan
-// las animaciones decorativas y se reduce el blur en pantallas
-// angostas; el fondo se queda estático pero se ve igual de bien.
-@media (max-width: 1023px) {
-  .glass-orb,
-  .glass-orb--1,
-  .glass-orb--2,
-  .glass-orb--3 {
-    animation: none !important;
-  }
+// Rendimiento general: animar "border-radius" (el morph de los blobs)
+// obliga a repintar continuamente 3 capas grandes con filter: blur(65px).
+// Se asumía que en laptops/PC la GPU lo disimulaba, pero medido con
+// Playwright sobre una vista con tabla grande (100 filas): la página
+// queda en ~9fps EN REPOSO (sin ni siquiera hacer scroll) solo por esta
+// animación corriendo de fondo, antes de sumarle cualquier otro costo de
+// la tabla. Se apagan las animaciones decorativas y se reduce el blur en
+// todas las pantallas (no solo angostas); el fondo se queda estático pero
+// se ve igual de bien.
+.glass-orb,
+.glass-orb--1,
+.glass-orb--2,
+.glass-orb--3 {
+  animation: none !important;
+}
 
-  .glass-orb {
-    filter: blur(34px);
-  }
+.glass-orb {
+  filter: blur(34px);
+}
 
-  .glass-dots {
-    animation: none !important;
-  }
+.glass-dots {
+  animation: none !important;
+}
 
-  .glass-layer--actions,
-  .glass-chip,
-  .glass-btn-outline {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
+.glass-layer--actions,
+.glass-chip,
+.glass-btn-outline {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 
-  .glass-panel,
-  .q-card {
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  }
+.glass-panel,
+.q-card {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }

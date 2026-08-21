@@ -66,4 +66,5 @@ export const endpoints = {
   crear_permiso: new Endpoint('crear-permiso'),
   permisos_roles_usuario: new Endpoint('permisos_roles_usuario'),
   user_profiles: new Endpoint('user-profiles'),
+  compras: new Endpoint('compras'),
 }

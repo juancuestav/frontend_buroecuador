@@ -12,6 +12,9 @@ export interface ColumnConfig<T> {
   min?:number
   max?:number
   align?: align
+  // Clases CSS por celda de esta columna, según el QTable nativo de Quasar
+  // (prop `classes` de cada columna, no existe un equivalente a nivel de fila).
+  classes?: string | ((row: any) => string)
   sortable?: boolean
   visible?: boolean
   print?: boolean

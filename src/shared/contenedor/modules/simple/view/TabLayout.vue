@@ -51,7 +51,7 @@
       animated
       transition-prev="scale"
       transition-next="scale"
-      class="q-mt-lg glass-layer glass-layer--actions"
+      class="q-mt-lg glass-layer glass-layer--tabla"
       keep-alive
     >
       <!-- Formulario -->

@@ -16,7 +16,6 @@
       animated
       transition-prev="slide-right"
       transition-next="slide-left"
-      keep-alive
       class="bg-transparent"
     >
       <!-- Formulario -->

@@ -33,6 +33,12 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: store.can('acceder.reportes_con_ia'),
   },
   {
+    title: 'Compras de Reportes',
+    icon: 'bi-bar-chart-line-fill',
+    link: 'compras-reportes',
+    can: store.can('acceder.compras_reportes'),
+  },
+  {
     title: 'Dashboard Precalifica',
     icon: 'bi-pie-chart',
     link: 'dashboard-precalifica',
