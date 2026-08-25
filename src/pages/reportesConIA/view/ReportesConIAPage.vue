@@ -2,9 +2,7 @@
   <q-page class="ia-page" padding>
     <!-- Animación IA al enviar -->
     <q-dialog v-model="animacionIA" persistent>
-      <q-card
-        class="ia-processing-cardd bg-grey-4 rounded-card no-border text-center q-pa-xl"
-      >
+      <q-card class="bg-grey-4 rounded-card no-border text-center q-pa-xl">
         <div class="ia-orb q-mx-auto q-mb-lg">
           <q-spinner-rings color="primary" size="80px" />
           <div class="ia-orb-inner">
@@ -31,7 +29,7 @@
     <div class="row q-col-gutter-md">
       <!-- Panel formulario -->
       <div class="col-12 col-md-3 col-lg-3">
-        <q-card class="ia-form-card" flat bordered>
+        <q-card class="ia-fordm-card glass-layer glass-layer--actions">
           <q-card-section class="q-pb-sm">
             <div class="row items-center q-gutter-sm">
               <q-avatar
@@ -53,7 +51,7 @@
 
           <q-separator color="grey-4" />
 
-          <q-card-section>
+          <q-card-section class="glass-layer glass-layer--inputs">
             <q-form @submit.prevent="enviarReporte">
               <div class="row q-col-gutter-sm">
                 <div class="col-12">
@@ -274,7 +272,7 @@
 
       <!-- Panel resultados -->
       <div class="col-12 col-md-9 col-lg-9">
-        <q-card class="ia-results-card" flat bordered>
+        <q-card class="glass-layer glass-layer--actions">
           <q-card-section class="q-pb-sm">
             <div class="row items-center q-gutter-sm">
               <q-avatar
@@ -296,7 +294,7 @@
 
           <q-separator color="grey-4" />
 
-          <q-card-section>
+          <q-card-section class="glass-layer glass-layer--inputs">
             <div class="row q-col-gutter-sm items-end">
               <div class="col-12 col-md-3">
                 <div class="q-mb-xs">Buscar por</div>

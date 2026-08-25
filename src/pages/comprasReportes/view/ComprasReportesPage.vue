@@ -46,115 +46,119 @@
           </div>
         </div>
 
-        <!-- Filtros -->
-        <div class="row q-col-gutter-sm q-mb-md items-end">
-          <div class="col-6 col-md-2">
-            <label class="q-mb-sm block">Desde</label>
-            <q-input
-              v-model="filtros.fecha_desde"
-              type="date"
-              outlined
-              dense
-              clearable
-              @update:model-value="aplicarFiltros"
-            />
+        <div class="q-pa-md glass-layer glass-layer--actions">
+          <!-- Filtros -->
+          <div class="row q-col-gutter-sm q-mb-md items-end">
+            <div class="col-6 col-md-2">
+              <label class="q-mb-sm block">Desde</label>
+              <q-input
+                v-model="filtros.fecha_desde"
+                type="date"
+                outlined
+                dense
+                clearable
+                @update:model-value="aplicarFiltros"
+              />
+            </div>
+            <div class="col-6 col-md-2">
+              <label class="q-mb-sm block">Hasta</label>
+              <q-input
+                v-model="filtros.fecha_hasta"
+                type="date"
+                outlined
+                dense
+                clearable
+                @update:model-value="aplicarFiltros"
+              />
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="q-mb-sm block">Estado</label>
+              <q-select
+                v-model="filtros.estado"
+                :options="estadoOptions"
+                option-value="value"
+                option-label="label"
+                multiple
+                emit-value
+                map-options
+                clearable
+                outlined
+                dense
+                @update:model-value="aplicarFiltros"
+              />
+            </div>
+            <div class="col-6 col-md-2">
+              <label class="q-mb-sm block">Tipo de reporte</label>
+              <q-select
+                v-model="filtros.tipo_reporte"
+                :options="tipoReporteOptions"
+                option-value="value"
+                option-label="label"
+                emit-value
+                map-options
+                clearable
+                outlined
+                dense
+                @update:model-value="aplicarFiltros"
+              />
+            </div>
+            <div class="col-6 col-md-2">
+              <label class="q-mb-sm block">Identificación</label>
+              <q-select
+                v-model="filtros.tipo_identificacion"
+                :options="tipoIdentificacionOptions"
+                option-value="value"
+                option-label="label"
+                emit-value
+                map-options
+                clearable
+                outlined
+                dense
+                @update:model-value="aplicarFiltros"
+              />
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="q-mb-sm block"
+                >Buscar cliente o identificación</label
+              >
+              <q-input
+                v-model="busqueda"
+                outlined
+                dense
+                clearable
+                @update:model-value="onInputChange"
+              >
+                <template #prepend><q-icon name="bi-search" /></template>
+              </q-input>
+            </div>
+            <div v-if="hayFiltrosActivos" class="col-12 col-md-auto">
+              <q-btn
+                flat
+                dense
+                no-caps
+                no-wrap
+                color="primary"
+                icon="bi-eraser"
+                label="Limpiar filtros"
+                @click="limpiarFiltros"
+              />
+            </div>
           </div>
-          <div class="col-6 col-md-2">
-            <label class="q-mb-sm block">Hasta</label>
-            <q-input
-              v-model="filtros.fecha_hasta"
-              type="date"
-              outlined
-              dense
-              clearable
-              @update:model-value="aplicarFiltros"
-            />
-          </div>
-          <div class="col-12 col-md-3">
-            <label class="q-mb-sm block">Estado</label>
-            <q-select
-              v-model="filtros.estado"
-              :options="estadoOptions"
-              option-value="value"
-              option-label="label"
-              multiple
-              emit-value
-              map-options
-              clearable
-              outlined
-              dense
-              @update:model-value="aplicarFiltros"
-            />
-          </div>
-          <div class="col-6 col-md-2">
-            <label class="q-mb-sm block">Tipo de reporte</label>
-            <q-select
-              v-model="filtros.tipo_reporte"
-              :options="tipoReporteOptions"
-              option-value="value"
-              option-label="label"
-              emit-value
-              map-options
-              clearable
-              outlined
-              dense
-              @update:model-value="aplicarFiltros"
-            />
-          </div>
-          <div class="col-6 col-md-2">
-            <label class="q-mb-sm block">Identificación</label>
-            <q-select
-              v-model="filtros.tipo_identificacion"
-              :options="tipoIdentificacionOptions"
-              option-value="value"
-              option-label="label"
-              emit-value
-              map-options
-              clearable
-              outlined
-              dense
-              @update:model-value="aplicarFiltros"
-            />
-          </div>
-          <div class="col-12 col-md-3">
-            <label class="q-mb-sm block">Buscar cliente o identificación</label>
-            <q-input
-              v-model="busqueda"
-              outlined
-              dense
-              clearable
-              @update:model-value="onInputChange"
-            >
-              <template #prepend><q-icon name="bi-search" /></template>
-            </q-input>
-          </div>
-          <div v-if="hayFiltrosActivos" class="col-12 col-md-auto">
-            <q-btn
-              flat
-              dense
-              no-caps
-              no-wrap
-              color="primary"
-              icon="bi-eraser"
-              label="Limpiar filtros"
-              @click="limpiarFiltros"
-            />
-          </div>
-        </div>
 
-        <!-- Tabla: mismo patrón que el resto del panel administrativo -->
-        <essential-table-pagination
-          :mixin="mixin"
-          :datos="listado"
-          :configuracion-columnas="(configuracionColumnasCompras as any)"
-          :permitir-consultar="true"
-          :permitir-editar="false"
-          :permitir-eliminar="false"
-          :permitir-buscar="false"
-          :alto-fijo="false"
-          :mostrar-header="false"
-          @consultar="onConsultar"
-        ></essential-table-pagination>
+          <!-- Tabla: mismo patrón que el resto del panel administrativo -->
+          <essential-table-pagination
+            :mixin="mixin"
+            :datos="listado"
+            :configuracion-columnas="(configuracionColumnasCompras as any)"
+            :permitir-consultar="true"
+            :permitir-editar="false"
+            :permitir-eliminar="false"
+            :permitir-buscar="false"
+            :alto-fijo="false"
+            :mostrar-header="false"
+            @consultar="onConsultar"
+          ></essential-table-pagination>
+        </div>
       </q-page>
     </template>
 
@@ -184,8 +188,12 @@ const mixin = new ContenedorSimpleMixin(
   CompraReporte,
   new CompraReporteController()
 )
-const { listado, tabsPage, pagination, filtros: filtrosMixin } =
-  mixin.useReferencias()
+const {
+  listado,
+  tabsPage,
+  pagination,
+  filtros: filtrosMixin,
+} = mixin.useReferencias()
 const { listar } = mixin.useComportamiento()
 
 const axios = AxiosHttpRepository.getInstance()
