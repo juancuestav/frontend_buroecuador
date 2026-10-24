@@ -577,3 +577,56 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
+
+// Desktop: solo tres partículas desenfocadas (los orbes), más grandes
+// y alargadas. Se ocultan los puntos "bokeh" de .glass-dots para no
+// sumar más manchas al fondo.
+@media (min-width: 1024px) {
+  .glass-dots,
+  .body--dark .glass-dots {
+    background-image: none;
+  }
+
+  .glass-orb {
+    filter: blur(48px);
+
+    &--1 {
+      width: 1000px;
+      height: 360px;
+      top: -80px;
+      left: -220px;
+      transform: rotate(-18deg);
+      background: radial-gradient(
+        ellipse at center,
+        rgba(0, 91, 255, 0.65),
+        transparent 70%
+      );
+    }
+
+    &--2 {
+      width: 1100px;
+      height: 380px;
+      bottom: -120px;
+      right: -260px;
+      transform: rotate(-14deg);
+      background: radial-gradient(
+        ellipse at center,
+        rgba(14, 116, 199, 0.55),
+        transparent 70%
+      );
+    }
+
+    &--3 {
+      width: 900px;
+      height: 320px;
+      top: 34%;
+      left: 28%;
+      transform: rotate(-22deg);
+      background: radial-gradient(
+        ellipse at center,
+        rgba(30, 58, 138, 0.5),
+        transparent 70%
+      );
+    }
+  }
+}

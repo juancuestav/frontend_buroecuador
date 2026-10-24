@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf" class="glass-page-v2">
+  <q-layout view="lHh Lpr lFf" class="glass-page-v2" @scroll="onScroll">
     <!-- Fondo decorativo (igual que Login/Register), fijo al viewport
     para que el header y el drawer siempre tengan color de sobra que
     desenfocar sin importar cuánto scroll tenga la página. style
@@ -17,7 +17,7 @@
       :class="
         $q.screen.xs
           ? 'glass-layer glass-layer--actions'
-          : 'bg-transparent q-px-lg'
+          : ['q-px-lg header-desktop', haceScroll && 'header-desktop--blur']
       "
     >
       <transition name="slide-fade" mode="out-in">
@@ -325,6 +325,24 @@
   top: 50px;
   z-index: 10;
 }
+
+// Navbar transparente que se desenfoca al hacer scroll
+.header-desktop {
+  background: transparent;
+  transition: background-color 0.25s ease, backdrop-filter 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.header-desktop--blur {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px -16px rgba(20, 40, 100, 0.35);
+}
+
+:global(.body--dark) .header-desktop--blur {
+  background: rgba(15, 23, 42, 0.55);
+}
 </style>
 
 <script lang="ts">
@@ -378,6 +396,11 @@ export default defineComponent({
     const refListadoBusqueda = ref()
     const posicionResultados = ref(-1)
     const resultadosBusqueda = ref<MenuOption[]>([])
+    const haceScroll = ref(false)
+
+    const onScroll = ({ position }: { position: number }) => {
+      haceScroll.value = position > 10
+    }
 
     const $q = useQuasar()
     $q.dark.set(Boolean(modoOscuro.value))
@@ -522,6 +545,8 @@ export default defineComponent({
     updateStatusBarColor()
 
     return {
+      haceScroll,
+      onScroll,
       imagenPerfil: `https://ui-avatars.com/api/?name=${authenticationStore.user?.name.substr(
         0,
         1
