@@ -99,80 +99,6 @@
                   />
                 </div>
 
-                <div class="col-12">
-                  <div class="q-mb-xs row items-center">
-                    <span>Reporte Equifax</span>
-                    <q-badge color="red-8" label="requerido" class="q-ml-xs" />
-                    <q-badge
-                      v-if="equifaxListo"
-                      color="positive"
-                      class="q-ml-xs file-ready-badge"
-                    >
-                      <q-icon name="check_circle" size="12px" class="q-mr-xs" />
-                      Listo
-                    </q-badge>
-                  </div>
-                  <div
-                    :class="[
-                      'file-field-wrapper',
-                      cargandoEquifax && 'file-field--loading',
-                      equifaxListo && 'file-field--ready',
-                    ]"
-                  >
-                    <q-file
-                      v-model="reporteEquifax"
-                      accept=".pdf"
-                      label="Seleccionar PDF"
-                      outlined
-                      dense
-                      counter
-                      hide-upload
-                      :disable="cargandoEquifax"
-                    >
-                      <template #prepend>
-                        <q-icon
-                          :name="
-                            equifaxListo ? 'picture_as_pdf' : 'picture_as_pdf'
-                          "
-                          :color="equifaxListo ? 'positive' : 'red-4'"
-                        />
-                      </template>
-                      <template #append>
-                        <transition name="fade-scale">
-                          <q-spinner-dots
-                            v-if="cargandoEquifax"
-                            color="primary"
-                            size="18px"
-                          />
-                          <div
-                            v-else-if="equifaxListo"
-                            class="row items-center no-wrap q-gutter-xs"
-                          >
-                            <q-icon
-                              name="check_circle"
-                              color="positive"
-                              size="20px"
-                              class="file-check-icon"
-                            />
-                            <q-btn
-                              flat
-                              round
-                              dense
-                              icon="close"
-                              color="negative"
-                              size="xs"
-                              class="file-remove-btn"
-                              @click.stop="limpiarEquifax"
-                            >
-                              <q-tooltip>Quitar archivo</q-tooltip>
-                            </q-btn>
-                          </div>
-                        </transition>
-                      </template>
-                    </q-file>
-                  </div>
-                </div>
-
                 <div v-if="tipoIdentificacion === 'cedula'" class="col-12">
                   <div class="q-mb-xs row items-center">
                     <span>Información personal</span>
@@ -465,14 +391,11 @@ const identificacion = ref('')
 const tipoReporte = ref('normal')
 const ws = ref('')
 const compraId = ref('')
-const reporteEquifax = ref<File | null>(null)
 const informacionPersonal = ref<File | null>(null)
 const cargandoEnvio = ref(false)
 const animacionIA = ref(false)
 
 // Estados de carga de archivos
-const cargandoEquifax = ref(false)
-const equifaxListo = ref(false)
 const cargandoInfoPersonal = ref(false)
 const infoPersonalLista = ref(false)
 
@@ -560,20 +483,6 @@ watch(tipoIdentificacion, (value) => {
   }
 })
 
-watch(reporteEquifax, (nuevo) => {
-  if (nuevo) {
-    equifaxListo.value = false
-    cargandoEquifax.value = true
-    setTimeout(() => {
-      cargandoEquifax.value = false
-      equifaxListo.value = true
-    }, 800)
-  } else {
-    cargandoEquifax.value = false
-    equifaxListo.value = false
-  }
-})
-
 watch(informacionPersonal, (nuevo) => {
   if (nuevo) {
     infoPersonalLista.value = false
@@ -628,21 +537,12 @@ onMounted(() => {
 
 // --- MÉTODOS ---
 
-function limpiarEquifax() {
-  reporteEquifax.value = null
-  // Los watchers se encargan de resetear cargandoEquifax y equifaxListo
-}
-
 function limpiarInfoPersonal() {
   informacionPersonal.value = null
   // Los watchers se encargan de resetear cargandoInfoPersonal e infoPersonalLista
 }
 
 function validarFormulario() {
-  if (!reporteEquifax.value) {
-    notificarAdvertencia('Debe seleccionar el archivo PDF obligatorio.')
-    return false
-  }
   if (!identificacion.value.trim()) {
     notificarAdvertencia(`Falta llenar: ${identificacionLabel.value}.`)
     return false
@@ -658,12 +558,6 @@ async function enviarReporte() {
   if (!validarFormulario()) return
 
   const formData = new FormData()
-  formData.append(
-    'reporteEquifax',
-    reporteEquifax.value as File,
-    reporteEquifax.value!.name
-  )
-
   if (informacionPersonal.value) {
     formData.append(
       'informacionPersonal',
@@ -687,9 +581,15 @@ async function enviarReporte() {
     await ApiN8N.post('/generar-reporte', formData)
     animacionIA.value = false
     notificarCorrecto('El reporte se ha generado exitosamente.')
-    reporteEquifax.value = null
+
+    // Buscar automáticamente el reporte recién generado
+    criterioBuscarPor.value = 'identificacion'
+    criterioBusqueda.value = identificacion.value.trim()
+
     informacionPersonal.value = null
     identificacion.value = ''
+
+    buscarReportes()
   } catch (error: any) {
     console.error(error)
     animacionIA.value = false
