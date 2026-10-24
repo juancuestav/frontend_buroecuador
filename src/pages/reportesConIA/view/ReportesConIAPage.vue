@@ -1,28 +1,119 @@
 <template>
   <q-page class="ia-page" padding>
     <!-- Animación IA al enviar -->
-    <q-dialog v-model="animacionIA" persistent>
-      <q-card class="bg-grey-4 rounded-card no-border text-center q-pa-xl">
-        <div class="ia-orb q-mx-auto q-mb-lg">
-          <q-spinner-rings color="primary" size="80px" />
-          <div class="ia-orb-inner">
-            <q-icon name="bi-robot" color="primary" size="28px" />
+    <q-dialog
+      v-model="animacionIA"
+      persistent
+      transition-show="scale"
+      transition-hide="fade"
+    >
+      <q-card class="ia-loader-card glass-layer glass-layer--actions q-pa-lg">
+        <!-- Orbe animado -->
+        <div
+          :class="['ia-loader-orb q-mx-auto', generacionCompleta && 'is-done']"
+        >
+          <div class="ia-loader-ring ia-loader-ring--1"></div>
+          <div class="ia-loader-ring ia-loader-ring--2"></div>
+          <div class="ia-loader-core">
+            <transition name="fade-scale" mode="out-in">
+              <q-icon
+                v-if="generacionCompleta"
+                key="ok"
+                name="check"
+                color="white"
+                size="34px"
+              />
+              <q-icon
+                v-else
+                key="ia"
+                name="bi-robot"
+                color="white"
+                size="30px"
+              />
+            </transition>
           </div>
         </div>
-        <div class="text-h6 text-primary q-mb-xs" style="letter-spacing: 2px">
-          PROCESANDO
+
+        <!-- Título y mensaje dinámico -->
+        <div class="text-center q-mt-md">
+          <div class="text-subtitle1 text-bold text-primary">
+            {{
+              generacionCompleta
+                ? '¡Reporte listo!'
+                : 'Generando reporte con IA'
+            }}
+          </div>
+          <div class="ia-loader-message text-body2 text-blue-grey-8">
+            <transition name="msg-slide" mode="out-in">
+              <span :key="mensajeActual">{{ mensajeActual }}</span>
+            </transition>
+          </div>
         </div>
-        <div class="text-body2 text-blue-grey-14 q-mb-md">
-          Generando reporte...
+
+        <!-- Progreso -->
+        <div class="q-mt-md">
+          <div class="row items-center justify-between q-mb-xs">
+            <span class="text-caption text-blue-grey-6">
+              {{ Math.round(progresoIA) }}%
+            </span>
+            <span class="text-caption text-blue-grey-6">
+              <q-icon name="schedule" size="14px" class="q-mr-xs" />
+              {{ tiempoTranscurrido }}
+            </span>
+          </div>
+          <q-linear-progress
+            :value="progresoIA / 100"
+            :color="generacionCompleta ? 'positive' : 'primary'"
+            size="8px"
+            rounded
+            stripe
+            animation-speed="400"
+            class="ia-loader-progress"
+          />
         </div>
-        <q-linear-progress
-          indeterminate
-          color="positive"
-          class="rounded-borders"
-        />
-        <div class="text-caption text-blue-grey-14 q-mt-sm">
-          Por favor espere...
-        </div>
+
+        <!-- Pasos -->
+        <q-list dense class="q-mt-md ia-loader-steps">
+          <q-item
+            v-for="(paso, index) in pasosIA"
+            :key="paso.label"
+            :class="[
+              'ia-loader-step',
+              index < pasoActual && 'is-done',
+              index === pasoActual && 'is-active',
+            ]"
+          >
+            <q-item-section avatar class="ia-loader-step__icon">
+              <q-icon
+                v-if="index < pasoActual"
+                name="check_circle"
+                color="positive"
+                size="20px"
+              />
+              <q-spinner-dots
+                v-else-if="index === pasoActual"
+                color="primary"
+                size="20px"
+              />
+              <q-icon v-else :name="paso.icon" color="blue-grey-4" size="20px" />
+            </q-item-section>
+            <q-item-section>{{ paso.label }}</q-item-section>
+          </q-item>
+        </q-list>
+
+        <!-- Aviso de demora -->
+        <transition name="fade-scale">
+          <div
+            v-if="demoraLarga && !generacionCompleta"
+            class="ia-loader-hint row no-wrap items-center q-mt-md q-pa-sm"
+          >
+            <q-icon name="info" color="primary" size="18px" class="q-mr-sm" />
+            <span class="text-caption text-blue-grey-8">
+              Está tardando un poco más de lo habitual. Seguimos trabajando,
+              no cierre ni recargue la página.
+            </span>
+          </div>
+        </transition>
       </q-card>
     </q-dialog>
 
@@ -364,7 +455,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
 import { ApiN8N } from '../api/ApiN8N'
@@ -394,6 +485,64 @@ const compraId = ref('')
 const informacionPersonal = ref<File | null>(null)
 const cargandoEnvio = ref(false)
 const animacionIA = ref(false)
+
+// Estados de la animación de generación
+const pasosIA = [
+  { label: 'Validando datos', icon: 'fact_check' },
+  { label: 'Consultando información crediticia', icon: 'travel_explore' },
+  { label: 'Analizando historial con IA', icon: 'psychology' },
+  { label: 'Calculando indicadores de riesgo', icon: 'insights' },
+  { label: 'Redactando y generando el PDF', icon: 'picture_as_pdf' },
+]
+
+// Mensajes que rotan por paso para que se vea actividad continua
+const mensajesPorPaso = [
+  ['Verificando la identificación...', 'Preparando la solicitud...'],
+  [
+    'Buscando registros del cliente...',
+    'Revisando operaciones vigentes y vencidas...',
+    'Recopilando datos de las entidades...',
+  ],
+  [
+    'La IA está leyendo el historial de pagos...',
+    'Detectando patrones de comportamiento...',
+    'Comparando con perfiles similares...',
+  ],
+  [
+    'Calculando el score crediticio...',
+    'Evaluando nivel de endeudamiento...',
+    'Ponderando alertas y riesgos...',
+  ],
+  [
+    'Redactando conclusiones y recomendaciones...',
+    'Dando formato al documento...',
+    'Últimos retoques al PDF...',
+  ],
+]
+
+const DURACION_PASO_MS = 9000
+const ROTACION_MENSAJE_MS = 3200
+
+const pasoActual = ref(0)
+const indiceMensaje = ref(0)
+const progresoIA = ref(0)
+const segundosTranscurridos = ref(0)
+const generacionCompleta = ref(false)
+let temporizadoresIA: ReturnType<typeof setInterval>[] = []
+
+const mensajeActual = computed(() => {
+  if (generacionCompleta.value) return 'Mostrando el reporte generado...'
+  const mensajes = mensajesPorPaso[pasoActual.value]
+  return mensajes[indiceMensaje.value % mensajes.length]
+})
+
+const tiempoTranscurrido = computed(() => {
+  const min = Math.floor(segundosTranscurridos.value / 60)
+  const seg = segundosTranscurridos.value % 60
+  return `${min}:${seg.toString().padStart(2, '0')}`
+})
+
+const demoraLarga = computed(() => segundosTranscurridos.value >= 60)
 
 // Estados de carga de archivos
 const cargandoInfoPersonal = ref(false)
@@ -537,6 +686,50 @@ onMounted(() => {
 
 // --- MÉTODOS ---
 
+function detenerAnimacionIA() {
+  temporizadoresIA.forEach(clearInterval)
+  temporizadoresIA = []
+}
+
+function iniciarAnimacionIA() {
+  detenerAnimacionIA()
+  pasoActual.value = 0
+  indiceMensaje.value = 0
+  progresoIA.value = 0
+  segundosTranscurridos.value = 0
+  generacionCompleta.value = false
+  animacionIA.value = true
+
+  temporizadoresIA.push(
+    setInterval(() => segundosTranscurridos.value++, 1000),
+    setInterval(() => indiceMensaje.value++, ROTACION_MENSAJE_MS),
+    setInterval(() => {
+      // El último paso se queda activo hasta que responda el servidor
+      if (pasoActual.value < pasosIA.length - 1) {
+        pasoActual.value++
+        indiceMensaje.value = 0
+      }
+    }, DURACION_PASO_MS),
+    // Avance asintótico: se acerca a 95% sin llegar nunca a completarse
+    setInterval(() => {
+      progresoIA.value += (95 - progresoIA.value) * 0.03
+    }, 400)
+  )
+}
+
+async function finalizarAnimacionIA(exito: boolean) {
+  detenerAnimacionIA()
+  if (exito) {
+    pasoActual.value = pasosIA.length
+    progresoIA.value = 100
+    generacionCompleta.value = true
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+  }
+  animacionIA.value = false
+}
+
+onBeforeUnmount(detenerAnimacionIA)
+
 function limpiarInfoPersonal() {
   informacionPersonal.value = null
   // Los watchers se encargan de resetear cargandoInfoPersonal e infoPersonalLista
@@ -575,11 +768,11 @@ async function enviarReporte() {
   }
 
   cargandoEnvio.value = true
-  animacionIA.value = true
+  iniciarAnimacionIA()
 
   try {
     await ApiN8N.post('/generar-reporte', formData)
-    animacionIA.value = false
+    await finalizarAnimacionIA(true)
     notificarCorrecto('El reporte se ha generado exitosamente.')
 
     // Buscar automáticamente el reporte recién generado
@@ -592,7 +785,7 @@ async function enviarReporte() {
     buscarReportes()
   } catch (error: any) {
     console.error(error)
-    animacionIA.value = false
+    await finalizarAnimacionIA(false)
     notificarError('Error al enviar el reporte a n8n.')
   } finally {
     cargandoEnvio.value = false
@@ -768,32 +961,126 @@ async function enviarWebhookN8n(fila: ReporteGenerado) {
   opacity: 0.7;
 }
 
-/* Orb spinner IA */
-.ia-orb {
+/* === Loader generación IA === */
+.ia-loader-card {
+  width: 420px;
+  max-width: 92vw;
+  border-radius: 20px;
+}
+
+.ia-loader-orb {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
+}
+.ia-loader-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid transparent;
+}
+.ia-loader-ring--1 {
+  border-top-color: var(--q-primary);
+  border-right-color: var(--q-primary);
+  animation: ia-spin 1.4s linear infinite;
+}
+.ia-loader-ring--2 {
+  inset: 10px;
+  border-bottom-color: var(--q-positive);
+  border-left-color: var(--q-positive);
+  animation: ia-spin 2s linear infinite reverse;
+}
+.ia-loader-core {
+  position: absolute;
+  inset: 22px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, var(--q-primary), #0e74c7);
+  box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.5);
+  animation: ia-core-pulse 1.8s ease-out infinite;
+  transition: background 0.4s ease;
 }
-.ia-orb-inner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: ia-pulse 2s ease-in-out infinite;
+.ia-loader-orb.is-done .ia-loader-ring {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-@keyframes ia-pulse {
-  0%,
+.ia-loader-orb.is-done .ia-loader-core {
+  background: var(--q-positive);
+  animation: ia-core-done 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ia-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ia-core-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(25, 118, 210, 0);
+  }
   100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 0 0 rgba(25, 118, 210, 0);
   }
-  50% {
-    opacity: 0.6;
-    transform: translate(-50%, -50%) scale(0.85);
+}
+@keyframes ia-core-done {
+  0% {
+    transform: scale(0.7);
   }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ia-loader-message {
+  min-height: 24px;
+  margin-top: 4px;
+}
+
+.ia-loader-progress {
+  transition: all 0.4s ease;
+}
+
+.ia-loader-step {
+  border-radius: 8px;
+  min-height: 34px;
+  color: #90a4ae;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.ia-loader-step__icon {
+  min-width: 32px;
+}
+.ia-loader-step.is-active {
+  color: var(--q-primary);
+  font-weight: 600;
+  background: rgba(25, 118, 210, 0.08);
+}
+.ia-loader-step.is-done {
+  color: #455a64;
+}
+
+.ia-loader-hint {
+  border-radius: 10px;
+  background: rgba(25, 118, 210, 0.08);
+}
+
+/* Transición de mensajes dinámicos */
+.msg-slide-enter-active,
+.msg-slide-leave-active {
+  transition: all 0.3s ease;
+}
+.msg-slide-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.msg-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 
 /* === Animación campos de archivo === */
