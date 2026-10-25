@@ -312,7 +312,7 @@
                   </div>
                   <q-input
                     v-model="codigoVerificacion"
-                    :type="mostrarCodigo ? 'text' : 'password'"
+                    type="password"
                     autocomplete="one-time-code"
                     maxlength="20"
                     outlined
@@ -320,14 +320,6 @@
                   >
                     <template #prepend>
                       <q-icon name="bi-shield-lock" size="18px" />
-                    </template>
-                    <template #append>
-                      <q-icon
-                        :name="mostrarCodigo ? 'visibility_off' : 'visibility'"
-                        class="cursor-pointer"
-                        size="18px"
-                        @click="mostrarCodigo = !mostrarCodigo"
-                      />
                     </template>
                   </q-input>
                 </div>
@@ -342,8 +334,7 @@
                     :disable="cargandoEnvio"
                     rounded
                   >
-                    <q-icon name="bi-robot" class="q-mr-sm" />
-                    Generar Reporte con IA
+                    Generar Reporte
                   </q-btn>
                 </div>
               </div>
@@ -740,7 +731,6 @@ const informacionPersonal = ref<File | null>(null)
 const categoria = ref<string | null>(null)
 const motivo = ref('')
 const codigoVerificacion = ref('')
-const mostrarCodigo = ref(false)
 // Se muestra si el backend lo exige aunque la configuración cargada diga lo contrario
 const forzarCampoCodigo = ref(false)
 const cargandoEnvio = ref(false)
