@@ -1093,13 +1093,35 @@ async function enviarReporte() {
 
   cargandoEnvio.value = true
   iniciarAnimacionIA()
+  const enviadoEn = Date.now()
 
   try {
-    await axios.post(
+    const response: any = await axios.post(
       axios.getEndpoint(endpoints.reportes_multibanco_generar),
       formData,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     )
+
+    // La generación continúa en segundo plano: se espera su resultado
+    const resultado = await esperarGeneracion(response.data.generacion_id)
+
+    if (resultado.estado === 'error') {
+      await finalizarAnimacionIA(false)
+      notificarError(resultado.mensaje || 'No se pudo generar el reporte.')
+      return
+    }
+
+    if (resultado.estado !== 'completado') {
+      await finalizarAnimacionIA(false)
+      notificarAdvertencia(
+        'No se recibió confirmación del reporte. Búscalo en unos minutos antes de volver a generarlo.'
+      )
+      Object.assign(filtros, filtrosVacios(), {
+        identificacion: identificacion.value.trim(),
+      })
+      return
+    }
+
     await finalizarAnimacionIA(true)
     notificarCorrecto('El reporte se ha generado exitosamente.')
 
@@ -1120,6 +1142,16 @@ async function enviarReporte() {
     console.error(error)
     await finalizarAnimacionIA(false)
 
+    if (esConexionInterrumpida(error)) {
+      const identificacionEnviada = identificacion.value.trim()
+      notificarAdvertencia(
+        'La conexión se interrumpió, pero el reporte puede seguir generándose. Te avisaremos cuando aparezca; no lo vuelvas a generar mientras tanto.'
+      )
+      clearTimeout(temporizadorVerificacion)
+      verificarReporteGenerado(identificacionEnviada, enviadoEn)
+      return
+    }
+
     if (error?.response?.data?.errors?.codigo_verificacion) {
       forzarCampoCodigo.value = true
     }
@@ -1127,6 +1159,127 @@ async function enviarReporte() {
   } finally {
     cargandoEnvio.value = false
   }
+}
+
+// Mapeo seguro asegurando que tomamos la ruta del archivo del JSON
+function mapearReporte(item: any): ReporteGenerado {
+  return {
+    id: item.id,
+    nombre: item.nombre_cliente || '',
+    identificacion: item.identificacion,
+    fecha_generado: item.fecha_generado,
+    tipoReporte: item.tipo_reporte?.toUpperCase() || '',
+    enviado_wa: item.enviado_wa ? 'Sí' : 'No',
+    telefono_cliente: item.telefono_cliente || '',
+    fecha_envio_wa: item.fecha_envio_wa
+      ? new Date(item.fecha_envio_wa).toLocaleDateString()
+      : 'No enviado',
+    fecha: item.fecha_generado
+      ? new Date(item.fecha_generado).toLocaleDateString()
+      : '',
+    ruta_archivo: item.ruta_archivo || '', // Asignación de la ruta para el PDF
+  } as ReporteGenerado
+}
+
+/**
+ * El hosting puede cortar la conexión antes de que n8n termine (reportes que
+ * tardan varios minutos), pero el servidor sigue generando el reporte. Se
+ * reconoce porque no llega respuesta de Laravel o llega un error de pasarela.
+ */
+function esConexionInterrumpida(error: any): boolean {
+  const estado = error?.response?.status
+  if (!error?.response) return true
+  if ([502, 503, 504, 524].includes(estado)) return true
+  // Página de error HTML del servidor web en lugar del JSON de Laravel
+  return typeof error.response.data === 'string'
+}
+
+const INTERVALO_VERIFICACION_MS = 20 * 1000
+const MAX_VERIFICACIONES = 18 // ~6 minutos
+let temporizadorVerificacion: ReturnType<typeof setTimeout> | undefined
+
+/**
+ * Consulta periódicamente si apareció un reporte de esa identificación
+ * generado después del envío, y lo muestra en la tabla.
+ */
+function verificarReporteGenerado(
+  identificacionConsultada: string,
+  enviadoEn: number,
+  intento = 1
+) {
+  temporizadorVerificacion = setTimeout(async () => {
+    try {
+      const response: any = await axios.get(
+        axios.getEndpoint(endpoints.reportes_multibanco_buscar),
+        { params: { identificacion: identificacionConsultada } }
+      )
+      const resultados = response.data.resultados || []
+      // Margen de un minuto por diferencias de reloj entre servidores
+      const nuevo = resultados.find(
+        (item: any) =>
+          item.fecha_generado &&
+          new Date(item.fecha_generado).getTime() >= enviadoEn - 60 * 1000
+      )
+
+      if (nuevo) {
+        Object.assign(filtros, filtrosVacios(), {
+          identificacion: identificacionConsultada,
+        })
+        reportesGenerados.value = resultados.map(mapearReporte)
+        consultarConteoPropio()
+        notificarCorrecto(
+          `El reporte de ${identificacionConsultada} se generó correctamente.`
+        )
+        return
+      }
+    } catch (error) {
+      console.error('Error al verificar el reporte:', error)
+    }
+
+    if (intento < MAX_VERIFICACIONES) {
+      verificarReporteGenerado(identificacionConsultada, enviadoEn, intento + 1)
+    } else {
+      notificarAdvertencia(
+        `No se encontró el reporte de ${identificacionConsultada}. Búscalo más tarde antes de volver a generarlo.`
+      )
+    }
+  }, INTERVALO_VERIFICACION_MS)
+}
+
+onBeforeUnmount(() => clearTimeout(temporizadorVerificacion))
+
+const INTERVALO_ESTADO_MS = 4000
+// Algo más que la espera del backend (15 min), que es quien decide expirar
+const LIMITE_ESPERA_MS = 16 * 60 * 1000
+let generacionCancelada = false
+onBeforeUnmount(() => (generacionCancelada = true))
+
+const pausa = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+/**
+ * Consulta el estado de la generación hasta que termine. Los fallos
+ * puntuales de red (p. ej. el celular cambió de red) no la interrumpen.
+ */
+async function esperarGeneracion(
+  generacionId: string
+): Promise<{ estado: string; mensaje?: string | null }> {
+  const ruta =
+    axios.getEndpoint(endpoints.reportes_multibanco_generaciones) +
+    `/${generacionId}`
+  const limite = Date.now() + LIMITE_ESPERA_MS
+
+  while (!generacionCancelada && Date.now() < limite) {
+    await pausa(INTERVALO_ESTADO_MS)
+    try {
+      const response: any = await axios.get(ruta)
+      if (response.data.estado !== 'en_proceso') return response.data
+    } catch (error: any) {
+      // 401/403/404 no se van a resolver reintentando
+      if ([401, 403, 404].includes(error?.response?.status)) throw error
+    }
+  }
+
+  return { estado: 'sin_respuesta' }
 }
 
 function limpiarFiltros() {
@@ -1164,24 +1317,8 @@ async function buscarReportes() {
       { params: parametros }
     )
 
-    // Mapeo seguro asegurando que tomamos la ruta del archivo del JSON
     reportesGenerados.value = (response.data.resultados || []).map(
-      (item: any) => ({
-        id: item.id,
-        nombre: item.nombre_cliente || '',
-        identificacion: item.identificacion,
-        fecha_generado: item.fecha_generado,
-        tipoReporte: item.tipo_reporte?.toUpperCase() || '',
-        enviado_wa: item.enviado_wa ? 'Sí' : 'No',
-        telefono_cliente: item.telefono_cliente || '',
-        fecha_envio_wa: item.fecha_envio_wa
-          ? new Date(item.fecha_envio_wa).toLocaleDateString()
-          : 'No enviado',
-        fecha: item.fecha_generado
-          ? new Date(item.fecha_generado).toLocaleDateString()
-          : '',
-        ruta_archivo: item.ruta_archivo || '', // Asignación de la ruta para el PDF
-      })
+      mapearReporte
     )
 
     notificarCorrecto(

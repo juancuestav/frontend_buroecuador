@@ -75,5 +75,8 @@ export const endpoints = {
     'reportes-multibanco/conteo-diario'
   ),
   reportes_multibanco_enviar_wa: new Endpoint('reportes-multibanco/enviar-wa'),
+  reportes_multibanco_generaciones: new Endpoint(
+    'reportes-multibanco/generaciones'
+  ),
   reportes_multibanco: new Endpoint('reportes-multibanco'),
 }
