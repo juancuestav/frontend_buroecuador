@@ -347,24 +347,26 @@
       <div class="col-12 col-md-9 col-lg-9">
         <q-card class="glass-layer glass-layer--actions">
           <q-card-section class="q-pb-sm">
-            <div class="row items-center q-gutter-sm">
-              <q-avatar
-                color="positive"
-                text-color="white"
-                icon="manage_search"
-                size="36px"
-              />
-              <div class="col">
-                <div class="text-subtitle1 text-bold text-positive">
-                  Reportes generados
-                </div>
-                <div class="text-caption text-blue-grey-4">
-                  Busca por identificación, celular, nombre o fecha
+            <div class="ia-header">
+              <div class="ia-header__titulo">
+                <q-avatar
+                  color="positive"
+                  text-color="white"
+                  icon="manage_search"
+                  size="36px"
+                />
+                <div class="ia-header__texto">
+                  <div class="text-subtitle1 text-bold text-positive">
+                    Reportes generados
+                  </div>
+                  <div class="text-caption text-blue-grey-4">
+                    Busca por identificación, celular, nombre o fecha
+                  </div>
                 </div>
               </div>
 
               <!-- Contador de reportes del asesor -->
-              <div class="row items-center no-wrap q-gutter-sm">
+              <div class="ia-header__acciones">
                 <div class="ia-contador row items-center no-wrap">
                   <q-icon
                     name="bi-file-earmark-check"
@@ -1389,8 +1391,41 @@ const logoOscuro = computed(
   opacity: 0.7;
 }
 
+/* === Encabezado de reportes generados === */
+.ia-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.ia-header__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.ia-header__texto {
+  min-width: 0;
+}
+.ia-header__acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* En móvil el contador baja a su propia línea y ocupa todo el ancho */
+@media (max-width: 599px) {
+  .ia-header__acciones {
+    width: 100%;
+  }
+  .ia-header__acciones .ia-contador {
+    flex: 1;
+  }
+}
+
 /* === Contador de reportes === */
 .ia-contador {
+  gap: 2px;
   padding: 6px 12px;
   border-radius: 10px;
   background: rgba(33, 186, 69, 0.1);
