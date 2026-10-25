@@ -7,7 +7,7 @@
       transition-show="scale"
       transition-hide="fade"
     >
-      <q-card class="ia-loader-card glass-layer glass-layer--actions q-pa-lg">
+      <q-card class="ia-loader-card glass-layer glass-layer--input q-pa-lg">
         <!-- Orbe animado -->
         <div
           :class="['ia-loader-orb q-mx-auto', generacionCompleta && 'is-done']"
@@ -23,13 +23,16 @@
                 color="white"
                 size="34px"
               />
-              <q-icon
+              <!-- <q-icon
                 v-else
                 key="ia"
                 name="bi-robot"
                 color="white"
                 size="30px"
-              />
+              /> -->
+              <q-avatar v-else rounded-circle size="38px">
+                <img :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''" />
+              </q-avatar>
             </transition>
           </div>
         </div>
@@ -37,11 +40,7 @@
         <!-- Título y mensaje dinámico -->
         <div class="text-center q-mt-md">
           <div class="text-subtitle1 text-bold text-primary">
-            {{
-              generacionCompleta
-                ? '¡Reporte listo!'
-                : 'Generando reporte con IA'
-            }}
+            {{ generacionCompleta ? '¡Reporte listo!' : 'Generando reporte' }}
           </div>
           <div class="ia-loader-message text-body2 text-blue-grey-8">
             <transition name="msg-slide" mode="out-in">
@@ -1621,7 +1620,7 @@ const logoOscuro = computed(
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--q-primary), #0e74c7);
+  background: var(--q-primary);
   box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.5);
   animation: ia-core-pulse 1.8s ease-out infinite;
   transition: background 0.4s ease;
