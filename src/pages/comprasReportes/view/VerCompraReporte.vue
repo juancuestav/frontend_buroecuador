@@ -47,13 +47,15 @@
       </div>
 
       <div class="col-12 col-md-7">
-        <div class="glass-layer glass-layer--actions q-pa-md">
+        <div class="glass-layer glass-layer--inputs q-pa-md">
           <q-timeline color="primary">
             <q-timeline-entry
               title="Pago recibido"
               :subtitle="formatearFecha(entidad.fecha_recibido)"
               :icon="
-                entidad.fecha_recibido ? 'bi-check-circle-fill' : 'bi-hourglass-split'
+                entidad.fecha_recibido
+                  ? 'bi-check-circle-fill'
+                  : 'bi-hourglass-split'
               "
               :color="entidad.fecha_recibido ? 'positive' : 'grey-6'"
             />
@@ -61,7 +63,9 @@
               title="Reporte generado"
               :subtitle="formatearFecha(entidad.fecha_generado)"
               :icon="
-                entidad.fecha_generado ? 'bi-check-circle-fill' : 'bi-hourglass-split'
+                entidad.fecha_generado
+                  ? 'bi-check-circle-fill'
+                  : 'bi-hourglass-split'
               "
               :color="entidad.fecha_generado ? 'positive' : 'grey-6'"
             />
@@ -172,8 +176,7 @@ function abrirPromptWhatsapp() {
   $q.dialog({
     html: true,
     title: 'Reenviar por WhatsApp',
-    message:
-      'Confirma el número al que se reenviará el reporte generado.',
+    message: 'Confirma el número al que se reenviará el reporte generado.',
     prompt: {
       model: entidad.telefono ?? '',
       type: 'text',

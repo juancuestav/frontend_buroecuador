@@ -278,9 +278,10 @@ $text-color: $primary; //#51547a;
 
   // Menu item drawer
   .link-active {
-    border-left: 1px solid $primary !important;
+    // border-left: 1px solid $primary !important;
     color: $primary !important;
-    background-color: #e5e5f3;
+    background-color: #ddd;
+    border-radius: 8px;
 
     i {
       color: $primary;
@@ -291,12 +292,17 @@ $text-color: $primary; //#51547a;
     }
   }
 
+  .q-item--clickable:hover {
+    background-color: #efefef;
+    border-radius: 8px;
+  }
+
   .q-item {
     min-height: 14px;
   }
 
   .color-icono {
-    color: #5a5e9a;
+    color: rgba(0, 0, 0, 0.6); //5a5e9a;
     padding: 4px;
   }
 

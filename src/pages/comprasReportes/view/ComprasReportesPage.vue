@@ -7,9 +7,7 @@
         </div>
 
         <!-- Resumen -->
-        <div
-          class="row q-col-gutter-sm glass-layer glass-layer--actions q-pa-sm q-mb-md"
-        >
+        <div class="row q-col-gutter-sm q-mb-md">
           <div class="col-6 col-md-3">
             <div
               class="text-center glass-layer glass-layer--inputs q-pa-md full-height"
@@ -46,7 +44,7 @@
           </div>
         </div>
 
-        <div class="q-pa-md glass-layer glass-layer--actions">
+        <div class="q-pa-md glass-layer glass-layer--inputs">
           <!-- Filtros -->
           <div class="row q-col-gutter-sm q-mb-md items-end">
             <div class="col-6 col-md-2">

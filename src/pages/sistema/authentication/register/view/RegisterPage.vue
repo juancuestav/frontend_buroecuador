@@ -1,5 +1,5 @@
 <template>
-  <q-page class="glass-page-v2 flex flex-center q-px-md q-py-xs">
+  <q-page class="glass-page-v2 glass-auth flex flex-center q-px-md q-py-xs">
     <div class="glass-dots">
       <div class="glass-orb glass-orb--1"></div>
       <div class="glass-orb glass-orb--2"></div>

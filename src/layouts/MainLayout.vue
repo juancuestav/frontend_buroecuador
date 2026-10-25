@@ -1,15 +1,14 @@
 <template>
-  <q-layout view="lHh Lpr lFf" class="glass-page-v2" @scroll="onScroll">
+  <q-layout
+    view="lHh Lpr lFf"
+    style="background-color: #f5f5f7"
+    @scroll="onScroll"
+  >
     <!-- Fondo decorativo (igual que Login/Register), fijo al viewport
     para que el header y el drawer siempre tengan color de sobra que
     desenfocar sin importar cuánto scroll tenga la página. style
     inline porque .glass-dots ya trae su propio position:absolute y
     ganaría por orden de cascada a la clase utilitaria fixed-full. -->
-    <div class="glass-dots" style="position: fixed; inset: 0; z-index: 0">
-      <div class="glass-orb glass-orb--1"></div>
-      <div class="glass-orb glass-orb--2"></div>
-      <div class="glass-orb glass-orb--3"></div>
-    </div>
 
     <!-- Navbar -->
     <q-header
@@ -155,22 +154,45 @@
             <q-avatar size="38px">
               <img v-bind:src="imagenPerfil" />
             </q-avatar>
-            <q-menu>
-              <div
-                class="glass-panel glass-panel--solid no-wrap q-pa-md"
-                style="width: 300px"
-              >
-                <div class="column items-center q-gutter-y-md bg-body q-pa-md">
-                  <q-avatar size="68px" class="q-mb-md">
-                    <img src="~assets/user.png" />
-                  </q-avatar>
-                  {{ nombreUsuario }}
-                  <div class="text-bold">
-                    {{ authenticationStore?.user.rol }}
+            <q-menu
+              anchor="bottom right"
+              self="top right"
+              :offset="[0, 10]"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+              class="user-menu"
+            >
+              <div class="no-wrap user-menu__panel">
+                <!-- Encabezado del usuario -->
+                <div class="user-menu__header">
+                  <div class="row items-center no-wrap">
+                    <q-avatar size="52px" class="user-menu__avatar">
+                      <img :src="imagenPerfil" />
+                    </q-avatar>
+                    <div class="user-menu__info q-ml-md">
+                      <div class="user-menu__name ellipsis">
+                        {{ nombreUsuario }}
+                      </div>
+                      <div
+                        v-if="authenticationStore?.user?.email"
+                        class="user-menu__email ellipsis"
+                      >
+                        {{ authenticationStore.user.email }}
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="rolesUsuario.length" class="user-menu__roles">
+                    <span
+                      v-for="rol in rolesUsuario"
+                      :key="rol"
+                      class="user-menu__role"
+                    >
+                      {{ rol }}
+                    </span>
                   </div>
                 </div>
 
-                <q-list>
+                <q-list class="q-pa-sm">
                   <!-- <q-item
                     clickable
                     v-ripple
@@ -227,15 +249,15 @@
                     <q-item-section>Políticas de privacidad</q-item-section>
                   </q-item> -->
 
-                  <q-separator />
-
-                  <q-item clickable v-ripple @click="logout()">
+                  <q-item
+                    clickable
+                    v-ripple
+                    v-close-popup
+                    class="user-menu__logout"
+                    @click="logout()"
+                  >
                     <q-item-section avatar>
-                      <q-icon
-                        name="bi-box-arrow-right"
-                        size="xs"
-                        class="text-color"
-                      />
+                      <q-icon name="bi-box-arrow-right" size="18px" />
                     </q-item-section>
                     <q-item-section>Cerrar sesión</q-item-section>
                   </q-item>
@@ -326,15 +348,96 @@
   z-index: 10;
 }
 
+// Popup de usuario
+.user-menu__panel {
+  width: 300px;
+  background: #fff;
+}
+
+.user-menu__header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.user-menu__avatar {
+  flex-shrink: 0;
+}
+
+.user-menu__info {
+  min-width: 0;
+}
+
+.user-menu__name {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #1a192e;
+}
+
+.user-menu__email {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #78909c;
+}
+
+.user-menu__roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.user-menu__role {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5b7d10;
+  background: rgba(122, 168, 21, 0.14);
+}
+
+.user-menu__logout {
+  min-height: 40px;
+  border-radius: 8px;
+  color: #c10015;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgba(193, 0, 21, 0.06);
+  }
+}
+
+:global(.body--dark) {
+  .user-menu__panel {
+    background: #0f172a;
+  }
+
+  .user-menu__header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .user-menu__name {
+    color: #fff;
+  }
+
+  .user-menu__role {
+    color: #b5d96a;
+    background: rgba(122, 168, 21, 0.2);
+  }
+}
+
 // Navbar transparente que se desenfoca al hacer scroll
 .header-desktop {
   background: transparent;
   transition: background-color 0.25s ease, backdrop-filter 0.25s ease,
     box-shadow 0.25s ease;
+  border-radius: 0 0 16px 16px !important;
 }
 
 .header-desktop--blur {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 8px 24px -16px rgba(20, 40, 100, 0.35);
@@ -420,6 +523,14 @@ export default defineComponent({
       }
       return ''
     })
+
+    const rolesUsuario = computed<string[]>(
+      () =>
+        authenticationStore.user?.rol
+          ?.split(',')
+          .map((rol: string) => rol.trim())
+          .filter(Boolean) ?? []
+    )
 
     async function logout() {
       await authenticationStore.logout()
@@ -569,6 +680,7 @@ export default defineComponent({
       },
       logout,
       nombreUsuario,
+      rolesUsuario,
       modoOscuro,
       toggleDarkMode,
       mostrarBuscar,
