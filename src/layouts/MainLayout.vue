@@ -150,10 +150,25 @@
           <!-- Notificaciones -->
           <!-- <boton-notificaciones></boton-notificaciones> -->
 
-          <q-btn no-caps flat dense round>
-            <q-avatar size="38px">
-              <img v-bind:src="imagenPerfil" />
+          <div
+            v-ripple
+            class="user-trigger row items-center no-wrap cursor-pointer relative-position"
+            role="button"
+            tabindex="0"
+            :aria-label="`Menú de ${nombreUsuario.trim()}`"
+          >
+            <q-avatar size="34px">
+              <img :src="imagenPerfil" />
             </q-avatar>
+            <span class="user-trigger__name gt-xs ellipsis">
+              {{ nombreUsuario.trim() }}
+            </span>
+            <q-icon
+              name="expand_more"
+              size="18px"
+              class="user-trigger__chevron gt-xs"
+            />
+
             <q-menu
               anchor="bottom right"
               self="top right"
@@ -165,21 +180,18 @@
               <div class="no-wrap user-menu__panel">
                 <!-- Encabezado del usuario -->
                 <div class="user-menu__header">
-                  <div class="row items-center no-wrap">
-                    <q-avatar size="52px" class="user-menu__avatar">
+                  <div class="user-menu__avatar-wrap">
+                    <q-avatar size="64px">
                       <img :src="imagenPerfil" />
                     </q-avatar>
-                    <div class="user-menu__info q-ml-md">
-                      <div class="user-menu__name ellipsis">
-                        {{ nombreUsuario }}
-                      </div>
-                      <div
-                        v-if="authenticationStore?.user?.email"
-                        class="user-menu__email ellipsis"
-                      >
-                        {{ authenticationStore.user.email }}
-                      </div>
-                    </div>
+                    <span class="user-menu__status" title="Sesión activa"></span>
+                  </div>
+                  <div class="user-menu__name">{{ nombreUsuario.trim() }}</div>
+                  <div
+                    v-if="authenticationStore?.user?.email"
+                    class="user-menu__email ellipsis"
+                  >
+                    {{ authenticationStore.user.email }}
                   </div>
                   <div v-if="rolesUsuario.length" class="user-menu__roles">
                     <span
@@ -192,79 +204,20 @@
                   </div>
                 </div>
 
-                <q-list class="q-pa-sm">
-                  <!-- <q-item
-                    clickable
-                    v-ripple
-                    :to="{ name: 'notificaciones_generales' }"
-                  >
-                    <q-item-section avatar>
-                      <q-icon
-                        name="bi-envelope-check"
-                        size="xs"
-                        class="text-color"
-                      />
-                    </q-item-section>
-                    <q-item-section>Novedades</q-item-section>
-                  </q-item>
-
-                  <q-item clickable v-ripple :to="{ name: 'chat_linea' }">
-                    <q-item-section avatar>
-                      <q-icon name="bi-whatsapp" size="xs" class="text-color" />
-                    </q-item-section>
-                    <q-item-section>Chat en línea</q-item-section>
-                  </q-item>
-
-                  <q-separator />
-
-                  <q-item
-                    clickable
-                    v-ripple
-                    target="_blank"
-                    href="https://burodecredito.ec/solicitud-credito"
-                  >
-                    <q-item-section avatar>
-                      <q-icon
-                        name="bi-box-arrow-up-right"
-                        size="xs"
-                        class="text-color"
-                      />
-                    </q-item-section>
-                    <q-item-section>Solicitud de crédito</q-item-section>
-                  </q-item>
-
-                  <q-item
-                    clickable
-                    v-ripple
-                    href="https://burodecredito.ec/politicas-privacidad"
-                    target="_blank"
-                  >
-                    <q-item-section avatar>
-                      <q-icon
-                        name="bi-box-arrow-up-right"
-                        size="xs"
-                        class="text-color"
-                      />
-                    </q-item-section>
-                    <q-item-section>Políticas de privacidad</q-item-section>
-                  </q-item> -->
-
-                  <q-item
-                    clickable
-                    v-ripple
+                <div class="user-menu__footer">
+                  <button
                     v-close-popup
+                    type="button"
                     class="user-menu__logout"
                     @click="logout()"
                   >
-                    <q-item-section avatar>
-                      <q-icon name="bi-box-arrow-right" size="18px" />
-                    </q-item-section>
-                    <q-item-section>Cerrar sesión</q-item-section>
-                  </q-item>
-                </q-list>
+                    <q-icon name="bi-box-arrow-right" size="16px" />
+                    Cerrar sesión
+                  </button>
+                </div>
               </div>
             </q-menu>
-          </q-btn>
+          </div>
         </span>
       </q-toolbar>
     </q-header>
@@ -349,26 +302,65 @@
   z-index: 10;
 }
 
+// Botón de usuario en el navbar
+.user-trigger {
+  gap: 8px;
+  padding: 3px 10px 3px 3px;
+  border-radius: 999px;
+  outline: none;
+  transition: background-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.user-trigger__name {
+  max-width: 220px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a192e;
+}
+
+.user-trigger__chevron {
+  color: #78909c;
+}
+
 // Popup de usuario
 .user-menu__panel {
-  width: 300px;
+  width: 280px;
   background: #fff;
 }
 
 .user-menu__header {
-  padding: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 18px;
+  text-align: center;
 }
 
-.user-menu__avatar {
-  flex-shrink: 0;
+.user-menu__avatar-wrap {
+  position: relative;
+  padding: 3px;
+  border-radius: 50%;
+  border: 2px solid rgba(122, 168, 21, 0.35);
 }
 
-.user-menu__info {
-  min-width: 0;
+.user-menu__status {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #21ba45;
+  border: 2px solid #fff;
 }
 
 .user-menu__name {
+  margin-top: 12px;
   font-size: 15px;
   font-weight: 700;
   line-height: 1.3;
@@ -376,51 +368,78 @@
 }
 
 .user-menu__email {
+  max-width: 100%;
+  margin-top: 2px;
   font-size: 12px;
-  line-height: 1.4;
   color: #78909c;
 }
 
 .user-menu__roles {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 6px;
   margin-top: 12px;
 }
 
 .user-menu__role {
-  padding: 2px 8px;
-  border-radius: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #5b7d10;
-  background: rgba(122, 168, 21, 0.14);
+  background: rgba(122, 168, 21, 0.12);
+}
+
+.user-menu__footer {
+  padding: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .user-menu__logout {
-  min-height: 40px;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
   color: #c10015;
+  background: rgba(193, 0, 21, 0.06);
+  cursor: pointer;
   transition: background-color 0.2s ease;
 
   &:hover {
-    background: rgba(193, 0, 21, 0.06);
+    background: rgba(193, 0, 21, 0.12);
   }
 }
 
 :global(.body--dark) {
+  .user-trigger:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .user-trigger__name,
+  .user-menu__name {
+    color: #fff;
+  }
+
   .user-menu__panel {
     background: #0f172a;
   }
 
-  .user-menu__header {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
+  .user-menu__status {
+    border-color: #0f172a;
   }
 
-  .user-menu__name {
-    color: #fff;
+  .user-menu__footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
   }
 
   .user-menu__role {
@@ -535,9 +554,17 @@ export default defineComponent({
           .filter(Boolean) ?? []
     )
 
-    async function logout() {
-      await authenticationStore.logout()
-      Router.replace({ name: 'Login' })
+    function logout() {
+      $q.dialog({
+        title: 'Cerrar sesión',
+        message: '¿Estás seguro de que deseas cerrar sesión?',
+        cancel: { label: 'Cancelar', flat: true, noCaps: true, color: 'blue-grey' },
+        ok: { label: 'Cerrar sesión', unelevated: true, noCaps: true, color: 'negative' },
+        persistent: true,
+      }).onOk(async () => {
+        await authenticationStore.logout()
+        Router.replace({ name: 'Login' })
+      })
     }
 
     // función para obtener los módulos permitidos
