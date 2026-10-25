@@ -95,7 +95,12 @@
                 color="primary"
                 size="20px"
               />
-              <q-icon v-else :name="paso.icon" color="blue-grey-4" size="20px" />
+              <q-icon
+                v-else
+                :name="paso.icon"
+                color="blue-grey-4"
+                size="20px"
+              />
             </q-item-section>
             <q-item-section>{{ paso.label }}</q-item-section>
           </q-item>
@@ -109,8 +114,8 @@
           >
             <q-icon name="info" color="primary" size="18px" class="q-mr-sm" />
             <span class="text-caption text-blue-grey-8">
-              Está tardando un poco más de lo habitual. Seguimos trabajando,
-              no cierre ni recargue la página.
+              Está tardando un poco más de lo habitual. Seguimos trabajando, no
+              cierre ni recargue la página.
             </span>
           </div>
         </transition>
@@ -131,7 +136,7 @@
               />
               <div>
                 <div class="text-subtitle1 text-bold text-primary">
-                  Reportes con IA
+                  Reportes Multibanco
                 </div>
                 <div class="text-caption text-blue-grey-4">
                   Motor de inteligencia artificial
