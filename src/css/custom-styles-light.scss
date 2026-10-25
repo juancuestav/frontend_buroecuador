@@ -279,12 +279,12 @@ $text-color: $primary; //#51547a;
   // Menu item drawer
   .link-active {
     // border-left: 1px solid $primary !important;
-    color: $primary !important;
-    background-color: #ddd;
+    color: #02076d !important;
+    background-color: rgba(2, 7, 109, 0.1);
     border-radius: 8px;
 
     i {
-      color: $primary;
+      color: #02076d;
     }
 
     .q-item__label {
@@ -293,7 +293,7 @@ $text-color: $primary; //#51547a;
   }
 
   .q-item--clickable:hover {
-    background-color: #efefef;
+    background-color: rgba(2, 7, 109, 0.05);
     border-radius: 8px;
   }
 
