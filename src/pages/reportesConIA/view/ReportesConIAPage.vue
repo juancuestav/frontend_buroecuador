@@ -128,12 +128,9 @@
         <q-card class="ia-fordm-card glass-layer glass-layer--actions">
           <q-card-section class="q-pb-sm">
             <div class="row items-center q-gutter-sm">
-              <q-avatar
-                color="primary"
-                text-color="white"
-                icon="bi-robot"
-                size="36px"
-              />
+              <q-avatar rounded size="38px" class="q-mr-sm">
+                <img :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''" />
+              </q-avatar>
               <div>
                 <div class="text-subtitle1 text-bold text-primary">
                   Reportes Multibanco
@@ -273,6 +270,68 @@
                   </div>
                 </div>
 
+                <div class="col-12">
+                  <div class="q-mb-xs row items-center">
+                    <span>Categoría</span>
+                    <q-badge color="red-8" label="requerido" class="q-ml-xs" />
+                  </div>
+                  <q-select
+                    v-model="categoria"
+                    :options="categoriaOptions"
+                    option-value="value"
+                    option-label="label"
+                    emit-value
+                    map-options
+                    placeholder="Seleccione"
+                    dense
+                    outlined
+                  />
+                </div>
+
+                <div v-if="categoria === 'otro'" class="col-12">
+                  <div class="q-mb-xs row items-center">
+                    <span>Motivo</span>
+                    <q-badge color="red-8" label="requerido" class="q-ml-xs" />
+                  </div>
+                  <q-input
+                    v-model="motivo"
+                    type="textarea"
+                    autogrow
+                    maxlength="255"
+                    counter
+                    placeholder="Describa el motivo de la consulta"
+                    outlined
+                    dense
+                  />
+                </div>
+
+                <div v-if="mostrarCampoCodigo" class="col-12">
+                  <div class="q-mb-xs row items-center">
+                    <span>Código de verificación</span>
+                    <q-badge color="red-8" label="requerido" class="q-ml-xs" />
+                  </div>
+                  <q-input
+                    v-model="codigoVerificacion"
+                    :type="mostrarCodigo ? 'text' : 'password'"
+                    autocomplete="one-time-code"
+                    maxlength="20"
+                    outlined
+                    dense
+                  >
+                    <template #prepend>
+                      <q-icon name="bi-shield-lock" size="18px" />
+                    </template>
+                    <template #append>
+                      <q-icon
+                        :name="mostrarCodigo ? 'visibility_off' : 'visibility'"
+                        class="cursor-pointer"
+                        size="18px"
+                        @click="mostrarCodigo = !mostrarCodigo"
+                      />
+                    </template>
+                  </q-input>
+                </div>
+
                 <div class="col-12 q-mt-md">
                   <q-btn
                     type="submit"
@@ -281,6 +340,7 @@
                     no-caps
                     unelevated
                     :disable="cargandoEnvio"
+                    rounded
                   >
                     <q-icon name="bi-robot" class="q-mr-sm" />
                     Generar Reporte con IA
@@ -303,13 +363,47 @@
                 icon="manage_search"
                 size="36px"
               />
-              <div>
+              <div class="col">
                 <div class="text-subtitle1 text-bold text-positive">
                   Reportes generados
                 </div>
                 <div class="text-caption text-blue-grey-4">
-                  Busca por identificación o nombre
+                  Busca por identificación, celular, nombre o fecha
                 </div>
+              </div>
+
+              <!-- Contador de reportes del asesor -->
+              <div class="row items-center no-wrap q-gutter-sm">
+                <div class="ia-contador row items-center no-wrap">
+                  <q-icon
+                    name="bi-file-earmark-check"
+                    color="positive"
+                    size="20px"
+                    class="q-mr-sm"
+                  />
+                  <div>
+                    <div class="ia-contador__label">Generados hoy</div>
+                    <div class="ia-contador__valor">
+                      <q-spinner-dots
+                        v-if="conteoPropio === null"
+                        size="16px"
+                        color="positive"
+                      />
+                      <template v-else>{{ conteoPropio }}</template>
+                    </div>
+                  </div>
+                </div>
+                <q-btn
+                  v-if="puedeVerConteoAsesores"
+                  icon="groups"
+                  label="Por asesor"
+                  color="positive"
+                  outline
+                  dense
+                  no-caps
+                  class="q-px-sm"
+                  @click="abrirConteoAsesores"
+                />
               </div>
             </div>
           </q-card-section>
@@ -317,52 +411,113 @@
           <q-separator color="grey-4" />
 
           <q-card-section class="glass-layer glass-layer--inputs">
-            <div class="row q-col-gutter-sm items-end">
-              <div class="col-12 col-md-3">
-                <div class="q-mb-xs">Buscar por</div>
-                <q-select
-                  v-model="criterioBuscarPor"
-                  :options="buscarPorOptions"
-                  option-value="value"
-                  option-label="label"
-                  dense
-                  outlined
-                  color="green"
-                  map-options
-                  emit-value
-                  popup-content-class="ia-dropdown"
-                />
-              </div>
+            <q-form @submit.prevent="buscarReportes">
+              <div class="row q-col-gutter-sm items-end">
+                <div class="col-12 col-sm-6 col-md-4">
+                  <div class="q-mb-xs">Identificación</div>
+                  <q-input
+                    v-model="filtros.identificacion"
+                    mask="#############"
+                    inputmode="numeric"
+                    placeholder="Cédula o RUC"
+                    outlined
+                    dense
+                    color="green"
+                    clearable
+                  />
+                </div>
 
-              <div class="col-12 col-md-9">
-                <div class="q-mb-xs">Texto de búsqueda</div>
-                <q-input
-                  v-model="criterioBusqueda"
-                  outlined
-                  dense
-                  color="green"
-                  clearable
-                  :placeholder="
-                    criterioBuscarPor === 'identificacion'
-                      ? 'Ej. 1790012345001'
-                      : 'Ej. Nombre o empresa'
-                  "
-                  @keyup.enter="buscarReportes"
+                <div class="col-12 col-sm-6 col-md-4">
+                  <div class="q-mb-xs">Celular</div>
+                  <q-input
+                    v-model="filtros.celular"
+                    mask="###############"
+                    inputmode="tel"
+                    placeholder="Ej. 0999999999"
+                    outlined
+                    dense
+                    color="green"
+                    clearable
+                  />
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <div class="q-mb-xs">Nombre / Empresa</div>
+                  <q-input
+                    v-model="filtros.nombre"
+                    placeholder="Ej. Juan Pérez"
+                    outlined
+                    dense
+                    color="green"
+                    clearable
+                  />
+                </div>
+
+                <div
+                  v-for="campo in camposFecha"
+                  :key="campo.clave"
+                  class="col-6 col-md-3"
                 >
-                  <template #after>
-                    <q-btn
-                      label="Buscar"
-                      color="green"
-                      icon="search"
-                      unelevated
-                      no-caps
-                      :loading="cargandoBusqueda"
-                      @click="buscarReportes"
-                    />
-                  </template>
-                </q-input>
+                  <div class="q-mb-xs">{{ campo.label }}</div>
+                  <q-input
+                    v-model="filtros[campo.clave]"
+                    mask="####-##-##"
+                    placeholder="AAAA-MM-DD"
+                    outlined
+                    dense
+                    color="green"
+                    clearable
+                  >
+                    <template #append>
+                      <q-icon name="event" class="cursor-pointer">
+                        <q-popup-proxy
+                          cover
+                          transition-show="scale"
+                          transition-hide="scale"
+                        >
+                          <q-date
+                            v-model="filtros[campo.clave]"
+                            mask="YYYY-MM-DD"
+                            color="green"
+                          >
+                            <div class="row justify-end">
+                              <q-btn
+                                v-close-popup
+                                label="Cerrar"
+                                color="green"
+                                flat
+                                no-caps
+                              />
+                            </div>
+                          </q-date>
+                        </q-popup-proxy>
+                      </q-icon>
+                    </template>
+                  </q-input>
+                </div>
+
+                <div class="col-12 col-md-6 row justify-end q-gutter-sm">
+                  <q-btn
+                    label="Limpiar"
+                    icon="filter_alt_off"
+                    color="blue-grey"
+                    flat
+                    no-caps
+                    :disable="cargandoBusqueda"
+                    @click="limpiarFiltros"
+                  />
+                  <q-btn
+                    type="submit"
+                    label="Buscar"
+                    icon="search"
+                    color="green"
+                    unelevated
+                    no-caps
+                    :loading="cargandoBusqueda"
+                  />
+                </div>
               </div>
-            </div>
+            </q-form>
           </q-card-section>
 
           <q-separator color="grey-4" />
@@ -396,6 +551,19 @@
                     <q-tooltip>Ver PDF</q-tooltip>
                   </q-btn>
                   <q-btn
+                    icon="download"
+                    color="primary"
+                    size="sm"
+                    label="Descargar"
+                    outline
+                    dense
+                    no-caps
+                    class="q-px-sm"
+                    @click="descargarPdf(props.row)"
+                  >
+                    <q-tooltip>Descargar PDF</q-tooltip>
+                  </q-btn>
+                  <q-btn
                     icon="bi-whatsapp"
                     color="green"
                     size="sm"
@@ -426,6 +594,60 @@
         </q-card>
       </div>
     </div>
+
+    <!-- Conteo de reportes por asesor -->
+    <q-dialog v-model="mostrarConteoAsesores">
+      <q-card class="ia-conteo-card q-pa-md">
+        <div class="row items-center q-mb-md">
+          <div class="text-subtitle1 text-bold col">Reportes por asesor</div>
+          <q-btn icon="close" flat round dense v-close-popup />
+        </div>
+
+        <q-input
+          v-model="fechaConteo"
+          mask="####-##-##"
+          label="Fecha"
+          outlined
+          dense
+          class="q-mb-md"
+          @update:model-value="consultarConteoAsesores"
+        >
+          <template #append>
+            <q-icon name="event" class="cursor-pointer">
+              <q-popup-proxy cover>
+                <q-date
+                  v-model="fechaConteo"
+                  mask="YYYY-MM-DD"
+                  @update:model-value="consultarConteoAsesores"
+                />
+              </q-popup-proxy>
+            </q-icon>
+          </template>
+        </q-input>
+
+        <q-table
+          :rows="conteoAsesores"
+          :columns="columnasConteo"
+          :loading="cargandoConteo"
+          row-key="user_id"
+          dense
+          flat
+          hide-bottom
+          :rows-per-page-options="[0]"
+          :pagination="{ rowsPerPage: 0 }"
+          no-data-label="Ningún asesor generó reportes en esta fecha."
+        >
+          <template #bottom-row>
+            <q-tr v-if="conteoAsesores.length">
+              <q-td class="text-bold">Total</q-td>
+              <q-td class="text-right text-bold">{{
+                totalConteoAsesores
+              }}</q-td>
+            </q-tr>
+          </template>
+        </q-table>
+      </q-card>
+    </q-dialog>
 
     <!-- Visor PDF -->
     <q-dialog
@@ -460,11 +682,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
-import { ApiN8N } from '../api/ApiN8N'
+import { AxiosHttpRepository } from 'shared/http/infraestructure/AxiosHttpRepository'
 import { useNotificaciones } from 'shared/notificaciones'
+import { useAuthenticationStore } from 'stores/authentication'
+import { useConfiguracionGeneralStore } from 'stores/configuracion_general'
+import { endpoints } from 'config/api'
 
 interface ReporteGenerado {
   id: number
@@ -472,14 +697,38 @@ interface ReporteGenerado {
   identificacion: string
   tipoReporte: string
   fecha: string
+  fecha_generado?: string
   ruta_archivo: string // Agregado para almacenar la ruta
   telefono_cliente: string
 }
+
+interface ConteoAsesor {
+  user_id: number | null
+  asesor: string
+  total: number
+}
+
+type FiltrosBusqueda = {
+  identificacion: string
+  celular: string
+  nombre: string
+  fecha_desde: string
+  fecha_hasta: string
+}
+
+// Fecha de hoy (YYYY-MM-DD) en la zona horaria del negocio
+const hoy = () =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Guayaquil' }).format(
+    new Date()
+  )
 
 const $q = useQuasar()
 const route = useRoute()
 const { notificarCorrecto, notificarError, notificarAdvertencia } =
   useNotificaciones()
+const axios = AxiosHttpRepository.getInstance()
+const authenticationStore = useAuthenticationStore()
+const configuracionGeneralStore = useConfiguracionGeneralStore()
 
 // Estados del Formulario
 const tipoIdentificacion = ref<'cedula' | 'ruc'>('cedula')
@@ -488,6 +737,12 @@ const tipoReporte = ref('normal')
 const ws = ref('')
 const compraId = ref('')
 const informacionPersonal = ref<File | null>(null)
+const categoria = ref<string | null>(null)
+const motivo = ref('')
+const codigoVerificacion = ref('')
+const mostrarCodigo = ref(false)
+// Se muestra si el backend lo exige aunque la configuración cargada diga lo contrario
+const forzarCampoCodigo = ref(false)
 const cargandoEnvio = ref(false)
 const animacionIA = ref(false)
 
@@ -554,8 +809,18 @@ const cargandoInfoPersonal = ref(false)
 const infoPersonalLista = ref(false)
 
 // Estados de Búsqueda
-const criterioBuscarPor = ref<'identificacion' | 'nombre'>('identificacion')
-const criterioBusqueda = ref('')
+const filtrosVacios = (): FiltrosBusqueda => ({
+  identificacion: '',
+  celular: '',
+  nombre: '',
+  fecha_desde: '',
+  fecha_hasta: '',
+})
+const filtros = reactive<FiltrosBusqueda>(filtrosVacios())
+const camposFecha: { clave: 'fecha_desde' | 'fecha_hasta'; label: string }[] = [
+  { clave: 'fecha_desde', label: 'Fecha desde' },
+  { clave: 'fecha_hasta', label: 'Fecha hasta' },
+]
 const cargandoBusqueda = ref(false)
 const reportesGenerados = ref<ReporteGenerado[]>([])
 
@@ -563,15 +828,46 @@ const reportesGenerados = ref<ReporteGenerado[]>([])
 const mostrarVisorPdf = ref(false)
 const urlPdfActual = ref<string | null>(null)
 
-// Opciones
-const buscarPorOptions = [
-  { label: 'Identificación', value: 'identificacion' },
-  { label: 'Nombre / Empresa', value: 'nombre' },
+// Estados del contador de reportes
+const conteoPropio = ref<number | null>(null)
+const mostrarConteoAsesores = ref(false)
+const fechaConteo = ref(hoy())
+const conteoAsesores = ref<ConteoAsesor[]>([])
+const cargandoConteo = ref(false)
+const columnasConteo: Array<{
+  name: string
+  label: string
+  field: string
+  align: 'left' | 'right'
+}> = [
+  { name: 'asesor', label: 'Asesor', field: 'asesor', align: 'left' },
+  { name: 'total', label: 'Reportes', field: 'total', align: 'right' },
 ]
 
+const puedeVerConteoAsesores = computed(() =>
+  authenticationStore.can('ver.conteo_reportes_asesores')
+)
+const totalConteoAsesores = computed(() =>
+  conteoAsesores.value.reduce((total, fila) => total + fila.total, 0)
+)
+
+const mostrarCampoCodigo = computed(
+  () =>
+    forzarCampoCodigo.value ||
+    (configuracionGeneralStore.configuracion?.requiere_codigo_verificacion ??
+      true)
+)
+
+// Opciones
 const buscarPorOptionsIdentificacion = [
   { label: 'Cédula', value: 'cedula' },
   { label: 'RUC', value: 'ruc' },
+]
+
+const categoriaOptions = [
+  { label: 'Compra de reporte', value: 'compra_reporte' },
+  { label: 'Revisión de crédito', value: 'revision_credito' },
+  { label: 'Otro', value: 'otro' },
 ]
 
 const tipoReporteOptions = computed(() => {
@@ -687,6 +983,10 @@ onMounted(() => {
   if (typeof compraIdQuery === 'string') {
     compraId.value = compraIdQuery
   }
+
+  // Refresca la configuración por si cambió el requisito del código
+  configuracionGeneralStore.consultarConfiguracion()
+  consultarConteoPropio()
 })
 
 // --- MÉTODOS ---
@@ -749,7 +1049,25 @@ function validarFormulario() {
     notificarAdvertencia('Debe seleccionar el tipo de reporte.')
     return false
   }
+  if (!categoria.value) {
+    notificarAdvertencia('Debe seleccionar la categoría.')
+    return false
+  }
+  if (categoria.value === 'otro' && !motivo.value.trim()) {
+    notificarAdvertencia('Debe ingresar el motivo.')
+    return false
+  }
+  if (mostrarCampoCodigo.value && !codigoVerificacion.value.trim()) {
+    notificarAdvertencia('Debe ingresar el código de verificación.')
+    return false
+  }
   return true
+}
+
+function obtenerMensajeError(error: any, porDefecto: string): string {
+  const errores = error?.response?.data?.errors
+  if (errores) return (Object.values(errores)[0] as string[])[0]
+  return error?.response?.data?.message || porDefecto
 }
 
 async function enviarReporte() {
@@ -772,36 +1090,76 @@ async function enviarReporte() {
     formData.append('compra_id', compraId.value)
   }
 
+  formData.append('categoria', categoria.value as string)
+  if (categoria.value === 'otro') {
+    formData.append('motivo', motivo.value.trim())
+  }
+
+  if (mostrarCampoCodigo.value) {
+    formData.append('codigo_verificacion', codigoVerificacion.value.trim())
+  }
+
   cargandoEnvio.value = true
   iniciarAnimacionIA()
 
   try {
-    await ApiN8N.post('/generar-reporte', formData)
+    await axios.post(
+      axios.getEndpoint(endpoints.reportes_multibanco_generar),
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    )
     await finalizarAnimacionIA(true)
     notificarCorrecto('El reporte se ha generado exitosamente.')
 
     // Buscar automáticamente el reporte recién generado
-    criterioBuscarPor.value = 'identificacion'
-    criterioBusqueda.value = identificacion.value.trim()
+    Object.assign(filtros, filtrosVacios(), {
+      identificacion: identificacion.value.trim(),
+    })
 
     informacionPersonal.value = null
     identificacion.value = ''
+    codigoVerificacion.value = ''
+    categoria.value = null
+    motivo.value = ''
 
     buscarReportes()
+    consultarConteoPropio()
   } catch (error: any) {
     console.error(error)
     await finalizarAnimacionIA(false)
-    notificarError('Error al enviar el reporte a n8n.')
+
+    if (error?.response?.data?.errors?.codigo_verificacion) {
+      forzarCampoCodigo.value = true
+    }
+    notificarError(obtenerMensajeError(error, 'Error al generar el reporte.'))
   } finally {
     cargandoEnvio.value = false
   }
 }
 
-async function buscarReportes() {
-  const termino = criterioBusqueda.value.trim()
+function limpiarFiltros() {
+  Object.assign(filtros, filtrosVacios())
+  reportesGenerados.value = []
+}
 
-  if (!termino) {
-    notificarAdvertencia('Ingrese un valor para buscar reportes existentes.')
+async function buscarReportes() {
+  const parametros = Object.fromEntries(
+    Object.entries(filtros)
+      .map(([clave, valor]) => [clave, (valor ?? '').trim()])
+      .filter(([, valor]) => valor)
+  )
+
+  if (!Object.keys(parametros).length) {
+    notificarAdvertencia('Ingrese al menos un filtro para buscar reportes.')
+    return
+  }
+
+  if (
+    parametros.fecha_desde &&
+    parametros.fecha_hasta &&
+    parametros.fecha_desde > parametros.fecha_hasta
+  ) {
+    notificarAdvertencia('La fecha desde no puede ser mayor a la fecha hasta.')
     return
   }
 
@@ -809,9 +1167,10 @@ async function buscarReportes() {
   reportesGenerados.value = []
 
   try {
-    const response = await ApiN8N.get('/reportes/buscar', {
-      params: { q: termino },
-    })
+    const response: any = await axios.get(
+      axios.getEndpoint(endpoints.reportes_multibanco_buscar),
+      { params: parametros }
+    )
 
     // Mapeo seguro asegurando que tomamos la ruta del archivo del JSON
     reportesGenerados.value = (response.data.resultados || []).map(
@@ -838,38 +1197,44 @@ async function buscarReportes() {
     )
   } catch (error: any) {
     console.error(error)
-    notificarError('Error al consultar los reportes en n8n.')
+    notificarError(
+      obtenerMensajeError(error, 'Error al consultar los reportes.')
+    )
   } finally {
     cargandoBusqueda.value = false
   }
 }
 
-// Lógica para Abrir PDF
+// Lógica para Abrir y descargar PDF
+async function obtenerPdfBlob(id: number): Promise<Blob> {
+  const response: any = await axios.get(
+    axios.getEndpoint(endpoints.reportes_multibanco) + `/${id}/pdf`,
+    { responseType: 'blob' } // Indispensable para manejar binarios
+  )
+  return new Blob([response.data], { type: 'application/pdf' })
+}
+
+function guardarArchivo(url: string, nombre: string) {
+  const link = document.createElement('a')
+  link.href = url
+  link.target = '_blank'
+  link.download = nombre
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+
+  setTimeout(() => window.URL.revokeObjectURL(url), 1000)
+}
+
 async function abrirVisorPdf(id: number) {
   try {
     $q.loading.show({ message: 'Obteniendo documento...' })
 
-    // Llamada al webhook que acabas de configurar
-    const response = await ApiN8N.get('/ver-reporte', {
-      params: { id },
-      responseType: 'blob', // Indispensable para manejar binarios
-    })
-
-    // Crear una URL local para el objeto Blob
-    const blob = new Blob([response.data], { type: 'application/pdf' })
-    const url = window.URL.createObjectURL(blob)
+    const url = window.URL.createObjectURL(await obtenerPdfBlob(id))
 
     if ($q.platform.is.mobile) {
       // En móviles, forzamos la descarga o apertura en nueva pestaña
-      const link = document.createElement('a')
-      link.href = url
-      link.target = '_blank'
-      link.download = `Reporte_${id}.pdf`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-
-      setTimeout(() => window.URL.revokeObjectURL(url), 1000)
+      guardarArchivo(url, `Reporte_${id}.pdf`)
     } else {
       // Asignar al ref que usa tu iframe en el q-dialog
       urlPdfActual.value = url
@@ -881,6 +1246,63 @@ async function abrirVisorPdf(id: number) {
   } finally {
     $q.loading.hide()
   }
+}
+
+async function descargarPdf(fila: ReporteGenerado) {
+  try {
+    $q.loading.show({ message: 'Descargando reporte...' })
+
+    const url = window.URL.createObjectURL(await obtenerPdfBlob(fila.id))
+    const fecha = (fila.fecha_generado ?? '').slice(0, 10) || hoy()
+    guardarArchivo(url, `Reporte_${fila.identificacion}_${fecha}.pdf`)
+  } catch (error) {
+    console.error('Error al descargar PDF:', error)
+    notificarError('No se pudo descargar el reporte.')
+  } finally {
+    $q.loading.hide()
+  }
+}
+
+// Contador de reportes generados por asesor
+async function consultarConteo(fecha: string) {
+  const response: any = await axios.get(
+    axios.getEndpoint(endpoints.reportes_multibanco_conteo_diario),
+    { params: { fecha } }
+  )
+  return response.data
+}
+
+async function consultarConteoPropio() {
+  try {
+    const { propio } = await consultarConteo(hoy())
+    conteoPropio.value = propio
+  } catch (error) {
+    console.error('Error al consultar el contador:', error)
+    conteoPropio.value = 0
+  }
+}
+
+async function consultarConteoAsesores() {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaConteo.value ?? '')) return
+
+  cargandoConteo.value = true
+  try {
+    const { asesores } = await consultarConteo(fechaConteo.value)
+    conteoAsesores.value = asesores ?? []
+  } catch (error: any) {
+    console.error(error)
+    notificarError(
+      obtenerMensajeError(error, 'No se pudo consultar el conteo por asesor.')
+    )
+  } finally {
+    cargandoConteo.value = false
+  }
+}
+
+function abrirConteoAsesores() {
+  fechaConteo.value = hoy()
+  mostrarConteoAsesores.value = true
+  consultarConteoAsesores()
 }
 
 async function enviarWebhookN8n(fila: ReporteGenerado) {
@@ -918,10 +1340,13 @@ async function enviarWebhookN8n(fila: ReporteGenerado) {
   try {
     $q.loading.show({ message: 'Enviando petición a n8n...' })
 
-    await ApiN8N.post('/reportes/enviar-wa', {
-      id: fila.id,
-      telefono_cliente: telefonoCliente,
-    })
+    await axios.post(
+      axios.getEndpoint(endpoints.reportes_multibanco_enviar_wa),
+      {
+        id: fila.id,
+        telefono_cliente: telefonoCliente,
+      }
+    )
 
     notificarCorrecto(`Reporte de ${fila.nombre} enviado con éxito desde n8n.`)
   } catch (error: any) {
@@ -931,6 +1356,14 @@ async function enviarWebhookN8n(fila: ReporteGenerado) {
     $q.loading.hide()
   }
 }
+
+const logoClaro = computed(
+  () => configuracionGeneralStore.configuracion?.logo_claro
+)
+
+const logoOscuro = computed(
+  () => configuracionGeneralStore.configuracion?.logo_oscuro
+)
 </script>
 
 <style scoped>
@@ -964,6 +1397,30 @@ async function enviarWebhookN8n(fila: ReporteGenerado) {
 /* === Empty state === */
 .ia-empty-state {
   opacity: 0.7;
+}
+
+/* === Contador de reportes === */
+.ia-contador {
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(33, 186, 69, 0.1);
+}
+.ia-contador__label {
+  font-size: 11px;
+  line-height: 1;
+  color: #607d8b;
+}
+.ia-contador__valor {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  min-height: 22px;
+}
+
+.ia-conteo-card {
+  width: 420px;
+  max-width: 92vw;
+  border-radius: 16px;
 }
 
 /* === Loader generación IA === */
