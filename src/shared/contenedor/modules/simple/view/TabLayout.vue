@@ -13,6 +13,8 @@
       {{ tituloPagina }}
     </div>
 
+    <slot name="encabezado" />
+
     <!-- Tabs -->
     <q-tabs
       v-model="tabs"

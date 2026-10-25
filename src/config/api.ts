@@ -67,4 +67,13 @@ export const endpoints = {
   permisos_roles_usuario: new Endpoint('permisos_roles_usuario'),
   user_profiles: new Endpoint('user-profiles'),
   compras: new Endpoint('compras'),
+  codigos_verificacion: new Endpoint('codigos-verificacion'),
+  codigos_verificacion_estado: new Endpoint('codigos-verificacion/estado'),
+  reportes_multibanco_generar: new Endpoint('reportes-multibanco/generar'),
+  reportes_multibanco_buscar: new Endpoint('reportes-multibanco/buscar'),
+  reportes_multibanco_conteo_diario: new Endpoint(
+    'reportes-multibanco/conteo-diario'
+  ),
+  reportes_multibanco_enviar_wa: new Endpoint('reportes-multibanco/enviar-wa'),
+  reportes_multibanco: new Endpoint('reportes-multibanco'),
 }

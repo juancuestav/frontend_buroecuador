@@ -38,6 +38,7 @@ export class Configuracion extends EntidadAuditable {
   facebook: string | null
   instagram: string | null
   twitter: string | null
+  requiere_codigo_verificacion: boolean
 
   constructor() {
     super()
@@ -75,5 +76,6 @@ export class Configuracion extends EntidadAuditable {
     this.facebook = null
     this.instagram = null
     this.twitter = null
+    this.requiere_codigo_verificacion = true
   }
 }

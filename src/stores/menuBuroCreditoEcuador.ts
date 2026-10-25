@@ -39,6 +39,12 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: store.can('acceder.compras_reportes'),
   },
   {
+    title: 'Códigos de verificación',
+    icon: 'bi-shield-lock',
+    link: 'codigos-verificacion',
+    can: store.can('acceder.codigos_verificacion'),
+  },
+  {
     title: 'Dashboard Precalifica',
     icon: 'bi-pie-chart',
     link: 'dashboard-precalifica',

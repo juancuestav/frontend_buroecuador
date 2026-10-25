@@ -210,6 +210,13 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: '/codigos-verificacion',
+        name: 'codigos_verificacion',
+        component: () =>
+          import('pages/codigosVerificacion/view/CodigoVerificacionPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: '/compras-reportes',
         name: 'compras_reportes',
         component: () =>
