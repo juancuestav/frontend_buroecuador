@@ -93,6 +93,20 @@
               :disable="disabled"
             />
           </div>
+
+          <!-- Un solo uso -->
+          <div class="col-12 col-md-6">
+            <q-toggle
+              v-model="codigo.un_solo_uso"
+              label="Un solo uso"
+              color="primary"
+              :disable="disabled"
+            />
+            <div class="text-caption text-blue-grey-6">
+              El código se elimina automáticamente después de generar un
+              reporte con éxito.
+            </div>
+          </div>
         </div>
       </q-form>
     </template>

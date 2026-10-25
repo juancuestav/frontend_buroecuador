@@ -5,6 +5,7 @@ export class CodigoVerificacion extends EntidadAuditable {
   descripcion: string | null
   codigo: string | null
   activo: boolean
+  un_solo_uso: boolean
   codigo_enmascarado: string | null
   ultimo_uso_at: string | null
   creado_por: string | null
@@ -15,6 +16,7 @@ export class CodigoVerificacion extends EntidadAuditable {
     this.descripcion = null
     this.codigo = null
     this.activo = true
+    this.un_solo_uso = false
     this.codigo_enmascarado = null
     this.ultimo_uso_at = null
     this.creado_por = null

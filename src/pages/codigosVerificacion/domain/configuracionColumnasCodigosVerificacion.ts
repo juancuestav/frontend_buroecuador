@@ -25,6 +25,14 @@ export const configuracionColumnasCodigosVerificacion: ColumnConfig<CodigoVerifi
       sortable: true,
     },
     {
+      name: 'un_solo_uso',
+      field: 'un_solo_uso',
+      label: 'Un solo uso',
+      align: 'left',
+      type: 'boolean',
+      sortable: true,
+    },
+    {
       name: 'ultimo_uso_at',
       field: 'ultimo_uso_at',
       label: 'Último uso',
