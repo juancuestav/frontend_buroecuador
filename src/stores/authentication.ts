@@ -97,11 +97,22 @@ export const useAuthenticationStore = defineStore('authentication', () => {
 
   async function logout(): Promise<void> {
     // const axiosRepo = AxiosHttpRepository.getInstance()
-    await axiosRepo.post('api/user/logout')
-    // LocalStorage.remove('token')
+    try {
+      await axiosRepo.post('api/user/logout')
+    } catch {
+      // Se ignora: el cierre local continúa abajo.
+    } finally {
+      // Aunque el backend rechace la petición (p. ej. token ya invalidado
+      // por inactividad), la sesión local debe cerrarse igual.
+      await limpiarSesionLocal()
+    }
+  }
+
+  async function limpiarSesionLocal(): Promise<void> {
     await authenticateLocalStorage.removeToken()
     await authenticatePreferences.removeToken()
-    await getUser()
+    AxiosHttpRepository.token = ''
+    setUser(null)
   }
 
   async function getUser() {
@@ -260,6 +271,7 @@ export const useAuthenticationStore = defineStore('authentication', () => {
     login,
     configuracion,
     logout,
+    limpiarSesionLocal,
     permisos,
     can,
     getUser,

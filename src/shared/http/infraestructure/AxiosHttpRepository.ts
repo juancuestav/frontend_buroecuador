@@ -5,6 +5,8 @@ import { HttpRepository } from '../domain/HttpRepository'
 import { Endpoint } from '../domain/Endpoint'
 import { Platform } from 'quasar'
 
+export const EVENTO_SESION_EXPIRADA = 'sesion-expirada'
+
 // SINGLETON
 export class AxiosHttpRepository implements HttpRepository {
   private static instance: AxiosHttpRepository
@@ -25,6 +27,18 @@ export class AxiosHttpRepository implements HttpRepository {
         // Authorization: `Bearer ${this.token}`,
       },
     })
+
+    // Token rechazado (p. ej. invalidado por inactividad en el backend):
+    // se avisa al layout para que cierre la sesión local y lleve al login.
+    this.axiosInst.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error?.response?.status === 401 && this.token) {
+          window.dispatchEvent(new CustomEvent(EVENTO_SESION_EXPIRADA))
+        }
+        return Promise.reject(error)
+      }
+    )
   }
 
   public static getInstance(): AxiosHttpRepository {

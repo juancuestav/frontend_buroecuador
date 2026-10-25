@@ -322,6 +322,7 @@
     <!-- Router -->
     <q-page-container class="my-font relative-position" style="z-index: 1">
       <simple-chat></simple-chat>
+      <aviso-inactividad></aviso-inactividad>
 
       <router-view v-slot="{ Component }">
         <!-- <essential-loading></essential-loading> -->
@@ -465,6 +466,7 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import EssentialLoading from 'components/loading/view/EssentialLoading.vue'
 import FooterComponent from 'components/FooterComponent.vue'
 import SimpleChat from 'components/chat/view/SimpleChat.vue'
+import AvisoInactividad from 'components/sesion/AvisoInactividad.vue'
 import EssentialLink from 'components/EssentialLink.vue'
 import BotonNotificaciones from 'components/notificaciones/view/BotonNotificaciones.vue'
 import { MenuOption } from 'shared/menu/MenuOption'
@@ -475,6 +477,7 @@ export default defineComponent({
     EssentialLink,
     EssentialLoading,
     SimpleChat,
+    AvisoInactividad,
     FooterComponent,
     BotonNotificaciones,
   },
