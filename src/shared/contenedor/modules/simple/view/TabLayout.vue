@@ -114,7 +114,11 @@
           @eliminar="accionTabla.eliminar"
           @filtrar="filtrarTodos"
           :mixin="mixin"
-        ></essential-table-pagination>
+        >
+          <template v-if="$slots['filtros-listado']" #filtros="scope">
+            <slot name="filtros-listado" v-bind="scope" />
+          </template>
+        </essential-table-pagination>
 
         <essential-table
           v-else

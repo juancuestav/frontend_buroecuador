@@ -33,6 +33,7 @@ export default defineComponent({
       disabled,
       listadosAuxiliares,
       accion,
+      filtros,
     } = mixin.useReferencias()
 
     const { setValidador, obtenerListados, cargarVista } =
@@ -100,6 +101,13 @@ export default defineComponent({
       })
     }
 
+    // filtros.fields se envía en cada búsqueda y cambio de página del listado
+    const rolFiltro = ref<number | null>(null)
+    const filtrarPorRol = (recargar: () => Promise<void>) => {
+      filtros.fields = { ...filtros.fields, rol: rolFiltro.value ?? undefined }
+      recargar()
+    }
+
     const ampliarLimiteConsultas = () => {
       const data: CustomActionPrompt = {
         titulo: 'Ampliar limite de consultas',
@@ -137,6 +145,8 @@ export default defineComponent({
       ampliarLimiteConsultas,
       mostrarLimiteConsultas,
       mostrarTipoCliente,
+      rolFiltro,
+      filtrarPorRol,
     }
   },
 })

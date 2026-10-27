@@ -5,6 +5,25 @@
     titulo-pagina="Usuarios"
     paginate
   >
+    <template #filtros-listado="{ recargar }">
+      <div class="col-12 col-md-3">
+        <q-select
+          v-model="rolFiltro"
+          :options="listadosAuxiliares.roles"
+          :option-label="(item) => item.name"
+          :option-value="(item) => item.id"
+          label="Filtrar por rol"
+          options-dense
+          emit-value
+          map-options
+          clearable
+          dense
+          outlined
+          @update:model-value="filtrarPorRol(recargar)"
+        />
+      </div>
+    </template>
+
     <template #formulario>
       <q-form @submit.prevent>
         <div class="row q-col-gutter-sm q-py-md">

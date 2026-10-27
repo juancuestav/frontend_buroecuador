@@ -279,6 +279,14 @@
         </div>
       </div>
 
+      <!-- Filtros propios de cada listado; recargar aplica la búsqueda y filtros.fields -->
+      <div
+        v-if="$slots.filtros && !mostrarFiltros"
+        class="row q-col-gutter-xs full-width q-mb-md"
+      >
+        <slot name="filtros" :recargar="toSearch" />
+      </div>
+
       <div
         class="row full-width justify-between q-col-gutter-x-sm items-center q-mb-md"
       >
