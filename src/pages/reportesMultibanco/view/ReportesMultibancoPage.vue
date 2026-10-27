@@ -1,20 +1,20 @@
 <template>
-  <q-page class="ia-page" padding>
-    <!-- Animación IA al enviar -->
+  <q-page class="multibanco-page" padding>
+    <!-- Animación al enviar -->
     <q-dialog
-      v-model="animacionIA"
+      v-model="animacionGeneracion"
       persistent
       transition-show="scale"
       transition-hide="fade"
     >
-      <q-card class="ia-loader-card glass-layer glass-layer--input q-pa-lg">
+      <q-card class="multibanco-loader-card glass-layer glass-layer--input q-pa-lg">
         <!-- Orbe animado -->
         <div
-          :class="['ia-loader-orb q-mx-auto', generacionCompleta && 'is-done']"
+          :class="['multibanco-loader-orb q-mx-auto', generacionCompleta && 'is-done']"
         >
-          <div class="ia-loader-ring ia-loader-ring--1"></div>
-          <div class="ia-loader-ring ia-loader-ring--2"></div>
-          <div class="ia-loader-core">
+          <div class="multibanco-loader-ring multibanco-loader-ring--1"></div>
+          <div class="multibanco-loader-ring multibanco-loader-ring--2"></div>
+          <div class="multibanco-loader-core">
             <transition name="fade-scale" mode="out-in">
               <q-icon
                 v-if="generacionCompleta"
@@ -23,13 +23,6 @@
                 color="white"
                 size="34px"
               />
-              <!-- <q-icon
-                v-else
-                key="ia"
-                name="bi-robot"
-                color="white"
-                size="30px"
-              /> -->
               <q-avatar v-else rounded-circle size="38px">
                 <img :src="($q.dark.isActive ? logoOscuro : logoClaro) ?? ''" />
               </q-avatar>
@@ -42,7 +35,7 @@
           <div class="text-subtitle1 text-bold text-primary">
             {{ generacionCompleta ? '¡Reporte listo!' : 'Generando reporte' }}
           </div>
-          <div class="ia-loader-message text-body2 text-blue-grey-8">
+          <div class="multibanco-loader-message text-body2 text-blue-grey-8">
             <transition name="msg-slide" mode="out-in">
               <span :key="mensajeActual">{{ mensajeActual }}</span>
             </transition>
@@ -53,7 +46,7 @@
         <div class="q-mt-md">
           <div class="row items-center justify-between q-mb-xs">
             <span class="text-caption text-blue-grey-6">
-              {{ Math.round(progresoIA) }}%
+              {{ Math.round(progresoGeneracion) }}%
             </span>
             <span class="text-caption text-blue-grey-6">
               <q-icon name="schedule" size="14px" class="q-mr-xs" />
@@ -61,28 +54,28 @@
             </span>
           </div>
           <q-linear-progress
-            :value="progresoIA / 100"
+            :value="progresoGeneracion / 100"
             :color="generacionCompleta ? 'positive' : 'primary'"
             size="8px"
             rounded
             stripe
             animation-speed="400"
-            class="ia-loader-progress"
+            class="multibanco-loader-progress"
           />
         </div>
 
         <!-- Pasos -->
-        <q-list dense class="q-mt-md ia-loader-steps">
+        <q-list dense class="q-mt-md multibanco-loader-steps">
           <q-item
-            v-for="(paso, index) in pasosIA"
+            v-for="(paso, index) in pasosGeneracion"
             :key="paso.label"
             :class="[
-              'ia-loader-step',
+              'multibanco-loader-step',
               index < pasoActual && 'is-done',
               index === pasoActual && 'is-active',
             ]"
           >
-            <q-item-section avatar class="ia-loader-step__icon">
+            <q-item-section avatar class="multibanco-loader-step__icon">
               <q-icon
                 v-if="index < pasoActual"
                 name="check_circle"
@@ -109,7 +102,7 @@
         <transition name="fade-scale">
           <div
             v-if="demoraLarga && !generacionCompleta"
-            class="ia-loader-hint row no-wrap items-center q-mt-md q-pa-sm"
+            class="multibanco-loader-hint row no-wrap items-center q-mt-md q-pa-sm"
           >
             <q-icon name="info" color="primary" size="18px" class="q-mr-sm" />
             <span class="text-caption text-blue-grey-8">
@@ -124,7 +117,7 @@
     <div class="row q-col-gutter-md">
       <!-- Panel formulario -->
       <div class="col-12 col-md-3 col-lg-3">
-        <q-card class="ia-fordm-card glass-layer glass-layer--actions">
+        <q-card class="multibanco-fordm-card glass-layer glass-layer--actions">
           <q-card-section class="q-pb-sm">
             <div class="row items-center q-gutter-sm">
               <q-avatar rounded size="38px" class="q-mr-sm">
@@ -135,7 +128,7 @@
                   Reportes Multibanco
                 </div>
                 <div class="text-caption text-blue-grey-4">
-                  Motor de inteligencia artificial
+                  Consulta y generación de reportes
                 </div>
               </div>
             </div>
@@ -346,15 +339,15 @@
       <div class="col-12 col-md-9 col-lg-9">
         <q-card class="glass-layer glass-layer--actions">
           <q-card-section class="q-pb-sm">
-            <div class="ia-header">
-              <div class="ia-header__titulo">
+            <div class="multibanco-header">
+              <div class="multibanco-header__titulo">
                 <q-avatar
                   color="positive"
                   text-color="white"
                   icon="manage_search"
                   size="36px"
                 />
-                <div class="ia-header__texto">
+                <div class="multibanco-header__texto">
                   <div class="text-subtitle1 text-bold text-positive">
                     Reportes generados
                   </div>
@@ -365,8 +358,8 @@
               </div>
 
               <!-- Contador de reportes del asesor -->
-              <div class="ia-header__acciones">
-                <div class="ia-contador row items-center no-wrap">
+              <div class="multibanco-header__acciones">
+                <div class="multibanco-contador row items-center no-wrap">
                   <q-icon
                     name="bi-file-earmark-check"
                     color="positive"
@@ -374,8 +367,8 @@
                     class="q-mr-sm"
                   />
                   <div>
-                    <div class="ia-contador__label">Generados hoy</div>
-                    <div class="ia-contador__valor">
+                    <div class="multibanco-contador__label">Generados hoy</div>
+                    <div class="multibanco-contador__valor">
                       <q-spinner-dots
                         v-if="conteoPropio === null"
                         size="16px"
@@ -525,7 +518,7 @@
               :rows-per-page-options="[0]"
               :pagination="{ rowsPerPage: 0 }"
               hide-bottom
-              class="ia-table"
+              class="multibanco-table"
             >
               <template v-slot:body-cell-acciones="props">
                 <q-td :props="props" class="q-gutter-xs">
@@ -574,7 +567,7 @@
 
             <div
               v-else-if="!cargandoBusqueda"
-              class="ia-empty-state text-center q-py-xl"
+              class="multibanco-empty-state text-center q-py-xl"
             >
               <q-icon name="search_off" size="48px" color="blue-grey-6" />
               <div class="text-body2 text-blue-grey-5 q-mt-sm">
@@ -589,7 +582,7 @@
 
     <!-- Conteo de reportes por asesor -->
     <q-dialog v-model="mostrarConteoAsesores">
-      <q-card class="ia-conteo-card q-pa-md">
+      <q-card class="multibanco-conteo-card q-pa-md">
         <div class="row items-center q-mb-md">
           <div class="text-subtitle1 text-bold col">Reportes por asesor</div>
           <q-btn icon="close" flat round dense v-close-popup />
@@ -735,13 +728,13 @@ const codigoVerificacion = ref('')
 // Se muestra si el backend lo exige aunque la configuración cargada diga lo contrario
 const forzarCampoCodigo = ref(false)
 const cargandoEnvio = ref(false)
-const animacionIA = ref(false)
+const animacionGeneracion = ref(false)
 
 // Estados de la animación de generación
-const pasosIA = [
+const pasosGeneracion = [
   { label: 'Validando datos', icon: 'fact_check' },
   { label: 'Consultando información crediticia', icon: 'travel_explore' },
-  { label: 'Analizando historial con IA', icon: 'psychology' },
+  { label: 'Analizando historial crediticio', icon: 'analytics' },
   { label: 'Calculando indicadores de riesgo', icon: 'insights' },
   { label: 'Redactando y generando el PDF', icon: 'picture_as_pdf' },
 ]
@@ -755,7 +748,7 @@ const mensajesPorPaso = [
     'Recopilando datos de las entidades...',
   ],
   [
-    'La IA está leyendo el historial de pagos...',
+    'Leyendo el historial de pagos...',
     'Detectando patrones de comportamiento...',
     'Comparando con perfiles similares...',
   ],
@@ -776,10 +769,10 @@ const ROTACION_MENSAJE_MS = 3200
 
 const pasoActual = ref(0)
 const indiceMensaje = ref(0)
-const progresoIA = ref(0)
+const progresoGeneracion = ref(0)
 const segundosTranscurridos = ref(0)
 const generacionCompleta = ref(false)
-let temporizadoresIA: ReturnType<typeof setInterval>[] = []
+let temporizadoresGeneracion: ReturnType<typeof setInterval>[] = []
 
 const mensajeActual = computed(() => {
   if (generacionCompleta.value) return 'Mostrando el reporte generado...'
@@ -982,49 +975,49 @@ onMounted(() => {
 
 // --- MÉTODOS ---
 
-function detenerAnimacionIA() {
-  temporizadoresIA.forEach(clearInterval)
-  temporizadoresIA = []
+function detenerAnimacionGeneracion() {
+  temporizadoresGeneracion.forEach(clearInterval)
+  temporizadoresGeneracion = []
 }
 
-function iniciarAnimacionIA() {
-  detenerAnimacionIA()
+function iniciarAnimacionGeneracion() {
+  detenerAnimacionGeneracion()
   pasoActual.value = 0
   indiceMensaje.value = 0
-  progresoIA.value = 0
+  progresoGeneracion.value = 0
   segundosTranscurridos.value = 0
   generacionCompleta.value = false
-  animacionIA.value = true
+  animacionGeneracion.value = true
 
-  temporizadoresIA.push(
+  temporizadoresGeneracion.push(
     setInterval(() => segundosTranscurridos.value++, 1000),
     setInterval(() => indiceMensaje.value++, ROTACION_MENSAJE_MS),
     setInterval(() => {
       // El último paso se queda activo hasta que responda el servidor
-      if (pasoActual.value < pasosIA.length - 1) {
+      if (pasoActual.value < pasosGeneracion.length - 1) {
         pasoActual.value++
         indiceMensaje.value = 0
       }
     }, DURACION_PASO_MS),
     // Avance asintótico: se acerca a 95% sin llegar nunca a completarse
     setInterval(() => {
-      progresoIA.value += (95 - progresoIA.value) * 0.03
+      progresoGeneracion.value += (95 - progresoGeneracion.value) * 0.03
     }, 400)
   )
 }
 
-async function finalizarAnimacionIA(exito: boolean) {
-  detenerAnimacionIA()
+async function finalizarAnimacionGeneracion(exito: boolean) {
+  detenerAnimacionGeneracion()
   if (exito) {
-    pasoActual.value = pasosIA.length
-    progresoIA.value = 100
+    pasoActual.value = pasosGeneracion.length
+    progresoGeneracion.value = 100
     generacionCompleta.value = true
     await new Promise((resolve) => setTimeout(resolve, 1200))
   }
-  animacionIA.value = false
+  animacionGeneracion.value = false
 }
 
-onBeforeUnmount(detenerAnimacionIA)
+onBeforeUnmount(detenerAnimacionGeneracion)
 
 function limpiarInfoPersonal() {
   informacionPersonal.value = null
@@ -1091,7 +1084,7 @@ async function enviarReporte() {
   }
 
   cargandoEnvio.value = true
-  iniciarAnimacionIA()
+  iniciarAnimacionGeneracion()
   const enviadoEn = Date.now()
 
   try {
@@ -1105,13 +1098,13 @@ async function enviarReporte() {
     const resultado = await esperarGeneracion(response.data.generacion_id)
 
     if (resultado.estado === 'error') {
-      await finalizarAnimacionIA(false)
+      await finalizarAnimacionGeneracion(false)
       notificarError(resultado.mensaje || 'No se pudo generar el reporte.')
       return
     }
 
     if (resultado.estado !== 'completado') {
-      await finalizarAnimacionIA(false)
+      await finalizarAnimacionGeneracion(false)
       notificarAdvertencia(
         'No se recibió confirmación del reporte. Búscalo en unos minutos antes de volver a generarlo.'
       )
@@ -1121,7 +1114,7 @@ async function enviarReporte() {
       return
     }
 
-    await finalizarAnimacionIA(true)
+    await finalizarAnimacionGeneracion(true)
     notificarCorrecto('El reporte se ha generado exitosamente.')
 
     // Buscar automáticamente el reporte recién generado
@@ -1139,7 +1132,7 @@ async function enviarReporte() {
     consultarConteoPropio()
   } catch (error: any) {
     console.error(error)
-    await finalizarAnimacionIA(false)
+    await finalizarAnimacionGeneracion(false)
 
     if (esConexionInterrumpida(error)) {
       const identificacionEnviada = identificacion.value.trim()
@@ -1496,8 +1489,8 @@ const logoOscuro = computed(
 
 <style scoped>
 /* === Cards futuristas === */
-.ia-form-card,
-.ia-results-card {
+.multibanco-form-card,
+.multibanco-results-card {
   background-color: #f5f5fa;
 
   border-color: #ddd !important;
@@ -1505,115 +1498,115 @@ const logoOscuro = computed(
 }
 
 /* === Tabla === */
-.ia-table {
+.multibanco-table {
   background: transparent;
   border-radius: 8px;
   overflow: hidden;
 }
-.ia-table .q-table__top,
-.ia-table thead tr th {
+.multibanco-table .q-table__top,
+.multibanco-table thead tr th {
   background: #0d2137;
   color: #90caf9;
   font-size: 0.7rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.ia-table tbody tr:hover td {
+.multibanco-table tbody tr:hover td {
   background: rgba(0, 188, 212, 0.06);
 }
 
 /* === Empty state === */
-.ia-empty-state {
+.multibanco-empty-state {
   opacity: 0.7;
 }
 
 /* === Encabezado de reportes generados === */
-.ia-header {
+.multibanco-header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
 }
-.ia-header__titulo {
+.multibanco-header__titulo {
   display: flex;
   align-items: center;
   gap: 10px;
   flex: 1 1 260px;
   min-width: 0;
 }
-.ia-header__texto {
+.multibanco-header__texto {
   min-width: 0;
 }
-.ia-header__acciones {
+.multibanco-header__acciones {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 /* En móvil el contador baja a su propia línea y ocupa todo el ancho */
 @media (max-width: 599px) {
-  .ia-header__acciones {
+  .multibanco-header__acciones {
     width: 100%;
   }
-  .ia-header__acciones .ia-contador {
+  .multibanco-header__acciones .multibanco-contador {
     flex: 1;
   }
 }
 
 /* === Contador de reportes === */
-.ia-contador {
+.multibanco-contador {
   gap: 2px;
   padding: 6px 12px;
   border-radius: 10px;
   background: rgba(33, 186, 69, 0.1);
 }
-.ia-contador__label {
+.multibanco-contador__label {
   font-size: 11px;
   line-height: 1;
   color: #607d8b;
 }
-.ia-contador__valor {
+.multibanco-contador__valor {
   font-size: 18px;
   font-weight: 700;
   line-height: 1.2;
   min-height: 22px;
 }
 
-.ia-conteo-card {
+.multibanco-conteo-card {
   width: 420px;
   max-width: 92vw;
   border-radius: 16px;
 }
 
-/* === Loader generación IA === */
-.ia-loader-card {
+/* === Loader de generación === */
+.multibanco-loader-card {
   width: 420px;
   max-width: 92vw;
   border-radius: 20px;
 }
 
-.ia-loader-orb {
+.multibanco-loader-orb {
   position: relative;
   width: 96px;
   height: 96px;
 }
-.ia-loader-ring {
+.multibanco-loader-ring {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   border: 3px solid transparent;
 }
-.ia-loader-ring--1 {
+.multibanco-loader-ring--1 {
   border-top-color: var(--q-primary);
   border-right-color: var(--q-primary);
-  animation: ia-spin 1.4s linear infinite;
+  animation: multibanco-spin 1.4s linear infinite;
 }
-.ia-loader-ring--2 {
+.multibanco-loader-ring--2 {
   inset: 10px;
   border-bottom-color: var(--q-positive);
   border-left-color: var(--q-positive);
-  animation: ia-spin 2s linear infinite reverse;
+  animation: multibanco-spin 2s linear infinite reverse;
 }
-.ia-loader-core {
+.multibanco-loader-core {
   position: absolute;
   inset: 22px;
   border-radius: 50%;
@@ -1622,25 +1615,25 @@ const logoOscuro = computed(
   justify-content: center;
   background: var(--q-primary);
   box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.5);
-  animation: ia-core-pulse 1.8s ease-out infinite;
+  animation: multibanco-core-pulse 1.8s ease-out infinite;
   transition: background 0.4s ease;
 }
-.ia-loader-orb.is-done .ia-loader-ring {
+.multibanco-loader-orb.is-done .multibanco-loader-ring {
   animation: none;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-.ia-loader-orb.is-done .ia-loader-core {
+.multibanco-loader-orb.is-done .multibanco-loader-core {
   background: var(--q-positive);
-  animation: ia-core-done 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: multibanco-core-done 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes ia-spin {
+@keyframes multibanco-spin {
   to {
     transform: rotate(360deg);
   }
 }
-@keyframes ia-core-pulse {
+@keyframes multibanco-core-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.45);
   }
@@ -1651,7 +1644,7 @@ const logoOscuro = computed(
     box-shadow: 0 0 0 0 rgba(25, 118, 210, 0);
   }
 }
-@keyframes ia-core-done {
+@keyframes multibanco-core-done {
   0% {
     transform: scale(0.7);
   }
@@ -1660,34 +1653,34 @@ const logoOscuro = computed(
   }
 }
 
-.ia-loader-message {
+.multibanco-loader-message {
   min-height: 24px;
   margin-top: 4px;
 }
 
-.ia-loader-progress {
+.multibanco-loader-progress {
   transition: all 0.4s ease;
 }
 
-.ia-loader-step {
+.multibanco-loader-step {
   border-radius: 8px;
   min-height: 34px;
   color: #90a4ae;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-.ia-loader-step__icon {
+.multibanco-loader-step__icon {
   min-width: 32px;
 }
-.ia-loader-step.is-active {
+.multibanco-loader-step.is-active {
   color: var(--q-primary);
   font-weight: 600;
   background: rgba(25, 118, 210, 0.08);
 }
-.ia-loader-step.is-done {
+.multibanco-loader-step.is-done {
   color: #455a64;
 }
 
-.ia-loader-hint {
+.multibanco-loader-hint {
   border-radius: 10px;
   background: rgba(25, 118, 210, 0.08);
 }

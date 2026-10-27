@@ -28,9 +28,9 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
   },
   {
     title: 'Reportes Multibanco',
-    icon: 'bi-robot',
-    link: 'reportes-con-ia',
-    can: store.can('acceder.reportes_con_ia'),
+    icon: 'bi-bank',
+    link: 'reportes-multibanco',
+    can: store.can('acceder.reportes_multibanco'),
   },
   {
     title: 'Compras de Reportes',

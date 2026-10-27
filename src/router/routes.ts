@@ -203,11 +203,16 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true },
       },
       {
-        path: '/reportes-con-ia',
-        name: 'reportes_con_ia',
+        path: '/reportes-multibanco',
+        name: 'reportes_multibanco',
         component: () =>
-          import('pages/reportesConIA/view/ReportesConIAPage.vue'),
+          import('pages/reportesMultibanco/view/ReportesMultibancoPage.vue'),
         meta: { requiresAuth: true },
+      },
+      // Enlaces guardados con la ruta anterior
+      {
+        path: '/reportes-con-ia',
+        redirect: { name: 'reportes_multibanco' },
       },
       {
         path: '/codigos-verificacion',
