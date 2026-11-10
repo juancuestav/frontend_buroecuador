@@ -178,7 +178,7 @@ export interface CampoLectura {
 }
 
 // Reporte PDF generado con la respuesta de Equifax de la revisión
-export type TipoReporte = 'normal' | 'gold' | 'premium'
+export type TipoReporte = 'normal' | 'gold' | 'premium' | 'empresa'
 
 export interface ReporteDisponible {
   tipo_reporte: TipoReporte

@@ -155,6 +155,7 @@ const OPCIONES_TIPO: { label: string; value: TipoReporte }[] = [
   { label: 'Normal', value: 'normal' },
   { label: 'Gold', value: 'gold' },
   { label: 'Premium', value: 'premium' },
+  { label: 'Empresa', value: 'empresa' },
 ]
 // Los reportes de esta pantalla siempre son de revisión de crédito
 const CATEGORIA = 'revision_credito'
