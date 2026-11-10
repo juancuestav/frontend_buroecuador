@@ -1,6 +1,14 @@
 // Dependencias
-import { defineAsyncComponent, defineComponent, ref, watch } from 'vue'
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  onMounted,
+  ref,
+  watch,
+} from 'vue'
 import { endpoints } from 'config/api'
+import { useAuthenticationStore } from 'stores/authentication'
 
 // Componentes
 import TabLayout from 'shared/contenedor/modules/simple/view/TabLayout.vue'
@@ -52,6 +60,39 @@ export default defineComponent({
       notificarInformacion,
     } = useNotificaciones()
 
+    // Permisos de la pantalla: ver todas las revisiones y elegir "Pertenece a"
+    const autenticacion = useAuthenticationStore()
+    const puedeVerTodas = autenticacion.can('ver.revision_creditos_todas')
+    const puedeAsignarAsesor = autenticacion.can(
+      'asignar.asesor_revision_creditos'
+    )
+    const usuarioActual = {
+      id: autenticacion.user?.id as number,
+      nombre: autenticacion.nombreUsuario as string,
+    }
+
+    // Asesores para "Pertenece a" y el filtro del historial (solo con permiso)
+    const asesores = ref<{ id: number; nombre: string }[]>([])
+    const asesorId = ref<number>(usuarioActual.id)
+    const opcionesPerteneceA = computed(() =>
+      puedeAsignarAsesor && asesores.value.length
+        ? asesores.value
+        : [usuarioActual]
+    )
+
+    async function cargarAsesores() {
+      if (!puedeVerTodas && !puedeAsignarAsesor) return
+      try {
+        const response: any = await axios.get(
+          axios.getEndpoint(endpoints.revision_creditos_asesores)
+        )
+        asesores.value = response.data.asesores
+      } catch (error) {
+        // Sin la lista, "Pertenece a" queda con el usuario actual
+      }
+    }
+    onMounted(cargarAsesores)
+
     const cedula = ref<string | null>('')
     const forzarEquifax = ref(false)
     const revision = ref<RevisionCredito | null>(null)
@@ -97,6 +138,7 @@ export default defineComponent({
           axios.post(axios.getEndpoint(endpoints.revision_creditos), {
             identificacion: cedula.value,
             forzar_equifax: forzarEquifax.value,
+            asesor_id: asesorId.value,
           })
         )
         forzarEquifax.value = false
@@ -163,6 +205,7 @@ export default defineComponent({
       if (historialDesactualizado) listar({ ...filtros.fields, paginate: 1 })
     })
 
+    const filtroAsesor = ref<number | null>(null)
     const filtroResultado = ref<string | null>(null)
     const filtroDesde = ref<string | null>(null)
     const filtroHasta = ref<string | null>(null)
@@ -187,6 +230,7 @@ export default defineComponent({
       filtros.fields = {
         ...filtros.fields,
         resultado: filtroResultado.value ?? undefined,
+        asesor_id: filtroAsesor.value ?? undefined,
         fecha_desde: filtroDesde.value ?? undefined,
         fecha_hasta: filtroHasta.value ?? undefined,
       }
@@ -198,8 +242,12 @@ export default defineComponent({
       if (!valor || String(valor).length === 10) filtrar(recargar)
     }
 
+    // Impresión / "Guardar como PDF" (estilos en imprimir.scss)
+    const imprimir = () => window.print()
+
     return {
       mixin,
+      imprimir,
       configuracionColumnasRevisionesCredito,
       cedula,
       forzarEquifax,
@@ -210,6 +258,12 @@ export default defineComponent({
       revisar,
       continuar,
       filtroResultado,
+      filtroAsesor,
+      puedeVerTodas,
+      puedeAsignarAsesor,
+      asesores,
+      asesorId,
+      opcionesPerteneceA,
       filtroDesde,
       filtroHasta,
       opcionesResultado,

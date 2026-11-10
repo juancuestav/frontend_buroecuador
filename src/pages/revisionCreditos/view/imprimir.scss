@@ -1,0 +1,118 @@
+// Impresión / "Guardar como PDF" de la Revisión de créditos.
+// Solo aplica cuando esta pantalla tiene una revisión abierta
+// (body:has(.revision-imprimible)), para no afectar a las demás páginas.
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body:has(.revision-imprimible) {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+
+    // Navegación, controles y elementos flotantes
+    .q-header,
+    .q-drawer,
+    .q-drawer-container,
+    .q-footer,
+    .q-tabs,
+    .chat,
+    .no-imprimir,
+    .q-btn,
+    .q-notifications,
+    .glass-orb,
+    .glass-dots {
+      display: none !important;
+    }
+
+    // El contenido ocupa toda la hoja (sin el espacio del menú y del encabezado)
+    .q-layout,
+    .q-page-container,
+    .q-page {
+      padding: 0 !important;
+      min-height: 0 !important;
+    }
+
+    // Sin efecto vidrio ni sombras: fondo blanco liso
+    .q-card,
+    .q-tab-panels,
+    .q-tab-panel,
+    .glass-layer,
+    .glass-layer--inputs,
+    .glass-layer--actions,
+    .glass-layer--tabla {
+      background: #fff !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: none !important;
+      border: none !important;
+      overflow: visible !important;
+    }
+
+    .q-tab-panel {
+      padding: 0 !important;
+    }
+
+    // La hoja es angosta: se mantienen las columnas de escritorio
+    .revision-imprimible {
+      .col-md-4 {
+        flex: 0 0 33.333% !important;
+        width: 33.333% !important;
+        max-width: 33.333% !important;
+      }
+      .col-md-6 {
+        flex: 0 0 50% !important;
+        width: 50% !important;
+        max-width: 50% !important;
+      }
+      .col-lg-3 {
+        flex: 0 0 25% !important;
+        width: 25% !important;
+        max-width: 25% !important;
+      }
+    }
+
+    // Campos de solo lectura con texto legible (sin el gris de deshabilitado)
+    .q-field--disabled .q-field__control > div,
+    .q-field--disabled .q-field__native {
+      opacity: 1 !important;
+    }
+
+    // Tarjetas más compactas para que entren cuatro por fila
+    .kpi {
+      padding: 10px 12px !important;
+    }
+    .kpi__valor {
+      font-size: 1.3rem !important;
+    }
+
+    // Cortes de página: no partir tarjetas, filas ni gráficos
+    .seccion-revision header,
+    .text-bold {
+      break-after: avoid;
+    }
+    .kpi,
+    .validacion,
+    .callout,
+    .apexcharts-canvas,
+    tr {
+      break-inside: avoid;
+    }
+
+    // Tablas: todo el contenido visible y en letra pequeña
+    .q-table__middle,
+    .tabla-operaciones {
+      overflow: visible !important;
+    }
+    .tabla-operaciones table {
+      min-width: 0 !important;
+      font-size: 6.5pt !important;
+    }
+    .tabla-operaciones thead tr th,
+    .tabla-operaciones tbody tr td {
+      padding: 4px 2px !important;
+    }
+  }
+}

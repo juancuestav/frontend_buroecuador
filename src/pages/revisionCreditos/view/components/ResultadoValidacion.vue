@@ -3,6 +3,10 @@
     label="Resultado de la revisión"
     :caption="`Revisión #${revision.id} · ${revision.created_at}${
       revision.asesor ? ' · ' + revision.asesor : ''
+    }${
+      revision.registrado_por
+        ? ' (registrada por ' + revision.registrado_por + ')'
+        : ''
     }`"
   >
     <!-- Resultado (callout) -->
@@ -17,7 +21,13 @@
       </div>
     </div>
 
+    <!-- Datos del cliente (los pasa la página), justo bajo la calificación -->
+    <div v-if="$slots['despues-calificacion']" class="q-mb-lg">
+      <slot name="despues-calificacion" />
+    </div>
+
     <!-- Validaciones -->
+    <div class="text-bold q-mb-sm">Validaciones</div>
     <div class="row q-col-gutter-md q-mb-lg">
       <div
         v-for="(v, i) in revision.validaciones"

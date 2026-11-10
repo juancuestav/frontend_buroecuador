@@ -1,14 +1,18 @@
 <template>
-  <seccion-revision label="Datos del cliente" caption="Registro Civil">
-    <campos-lectura :campos="campos" />
-  </seccion-revision>
+  <!-- Se muestra dentro de "Resultado de la revisión", bajo la calificación -->
+  <div class="datos-cliente">
+    <div class="datos-cliente__titulo">
+      Datos del cliente
+      <span class="datos-cliente__fuente">· Registro Civil</span>
+    </div>
+    <campos-lectura :campos="campos" solo-texto />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { CampoLectura, ClienteRevision } from '../../domain/RevisionCredito'
 import { formatearFecha } from '../../domain/formato'
-import SeccionRevision from './SeccionRevision.vue'
 import CamposLectura from './CamposLectura.vue'
 
 const props = defineProps<{ cliente: ClienteRevision }>()
@@ -43,3 +47,22 @@ const campos = computed<CampoLectura[]>(() => {
   return lista
 })
 </script>
+
+<style scoped>
+.datos-cliente {
+  padding: 14px 16px;
+  border: 1px solid #e6e8eb;
+  border-radius: 10px;
+}
+
+.datos-cliente__titulo {
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.datos-cliente__fuente {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: #78909c;
+}
+</style>

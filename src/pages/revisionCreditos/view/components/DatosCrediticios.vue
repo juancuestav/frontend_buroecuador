@@ -26,8 +26,10 @@
         <div class="text-bold">Score crediticio</div>
         <VueApexCharts
           v-if="visible"
+          class="grafico"
           :key="`score-${instanciaId}`"
           type="radialBar"
+          width="320"
           height="260"
           :options="opcionesScore"
           :series="[porcentaje(equifax.score.valor, ESCALA_SCORE)]"
@@ -50,8 +52,10 @@
         <div class="text-bold">Score sobreendeudamiento</div>
         <VueApexCharts
           v-if="visible"
+          class="grafico"
           :key="`sobre-${instanciaId}`"
           type="radialBar"
+          width="320"
           height="260"
           :options="opcionesSobreendeudamiento"
           :series="[porcentaje(sobre.valor, ESCALA_SCORE)]"
@@ -618,6 +622,12 @@ const columnasAntiguedad: ColumnConfig<Fila<typeof porAntiguedad>>[] = [
 
 .chips-operaciones {
   gap: 8px;
+}
+
+// Ancho fijo (320px) centrado: se ve igual en pantalla y cabe en media hoja impresa
+.grafico {
+  display: flex;
+  justify-content: center;
 }
 
 .sin-datos {
