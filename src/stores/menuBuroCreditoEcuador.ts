@@ -33,6 +33,12 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: store.can('acceder.reportes_multibanco'),
   },
   {
+    title: 'Revisión de créditos',
+    icon: 'bi-clipboard-check',
+    link: 'revision-creditos',
+    can: store.can('acceder.revision_creditos'),
+  },
+  {
     title: 'Compras de Reportes',
     icon: 'bi-bar-chart-line-fill',
     link: 'compras-reportes',

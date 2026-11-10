@@ -1,0 +1,32 @@
+// Chip suave compartido por la revisión de créditos: fondo tenue, borde y
+// texto del mismo tono. Uso: <span class="chip-moderno chip-moderno--azul">
+.chip-moderno {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+
+  $tonos: (
+    violeta: #5e35b1,
+    azul: #1e63d6,
+    teal: #00897b,
+    naranja: #e65100,
+    rojo: #d32f2f,
+    verde: #2e7d32,
+    gris: #607d8b,
+  );
+
+  @each $nombre, $color in $tonos {
+    &--#{$nombre} {
+      color: $color;
+      background: rgba($color, 0.08);
+      border-color: rgba($color, 0.28);
+    }
+  }
+}

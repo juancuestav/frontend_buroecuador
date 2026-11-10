@@ -2,7 +2,7 @@
 import { CustomActionTable } from 'components/tables/domain/CustomActionTable'
 import { EntidadAuditable } from 'shared/entidad/domain/entidadAuditable'
 import { ColumnConfig } from 'components/tables/domain/ColumnConfig'
-import { computed, defineComponent, ref, watchEffect } from 'vue'
+import { computed, defineComponent, ref, watch, watchEffect } from 'vue'
 import { useCargandoStore } from 'stores/cargando'
 import { useRouter } from 'vue-router'
 import { acciones } from 'config/utils'
@@ -153,6 +153,19 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    labelFormulario: {
+      type: String,
+      default: 'Formulario',
+    },
+    labelListado: {
+      type: String,
+      default: 'Listado',
+    },
+    // Carga el listado la primera vez que se abre su pestaña, no al montar
+    listadoDiferido: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: { EssentialTable, ButtonSubmits, EssentialTablePagination },
   setup(props) {
@@ -190,11 +203,17 @@ export default defineComponent({
       listadoCargado = true
     } */
 
+    const cargarListado = () =>
+      props.paginate ? listar({ paginate: 1 }) : listar()
+
     if (props.mostrarListado) {
-      if (props.paginate) {
-        listar({ paginate: 1 })
-      } else {
-        listar()
+      if (!props.listadoDiferido) cargarListado()
+      else {
+        const detener = watch(tabs, (tab) => {
+          if (tab !== 'listado') return
+          detener()
+          cargarListado()
+        })
       }
     }
 

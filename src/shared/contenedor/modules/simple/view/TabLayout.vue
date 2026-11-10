@@ -27,14 +27,14 @@
       <q-tab
         v-if="mostrarFormulario"
         name="formulario"
-        label="Formulario"
+        :label="labelFormulario"
         :class="{ 'tab-inactive': tabs !== 'formulario' }"
         no-caps
       />
       <q-tab
         v-if="mostrarListado"
         name="listado"
-        label="Listado"
+        :label="labelListado"
         :class="{ 'tab-inactive': tabs !== 'listado' }"
         no-caps
       />
@@ -63,9 +63,11 @@
           <slot name="formulario" />
         </div>
         <!-- <div :class="{ 'q-pa-md': full }"> -->
-        <div class="row justify-end q-col-gutter-x-xs q-pa-md">
+        <div
+          v-if="mostrarButtonSubmits"
+          class="row justify-end q-col-gutter-x-xs q-pa-md"
+        >
           <button-submits
-            v-if="mostrarButtonSubmits"
             :accion="accion"
             :permitirGuardar="puedeCrear"
             :disabled="storeCargando.cargando"

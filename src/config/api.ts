@@ -79,4 +79,9 @@ export const endpoints = {
     'reportes-multibanco/generaciones'
   ),
   reportes_multibanco: new Endpoint('reportes-multibanco'),
+  revision_creditos: new Endpoint('revision-creditos'),
+  revision_creditos_generaciones: new Endpoint(
+    'revision-creditos/generaciones'
+  ),
+  revision_creditos_reportes: new Endpoint('revision-creditos/reportes'),
 }

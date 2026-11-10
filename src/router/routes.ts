@@ -209,6 +209,13 @@ const routes: RouteRecordRaw[] = [
           import('pages/reportesMultibanco/view/ReportesMultibancoPage.vue'),
         meta: { requiresAuth: true },
       },
+      {
+        path: '/revision-creditos',
+        name: 'revision_creditos',
+        component: () =>
+          import('pages/revisionCreditos/view/RevisionCreditosPage.vue'),
+        meta: { requiresAuth: true },
+      },
       // Enlaces guardados con la ruta anterior
       {
         path: '/reportes-con-ia',
