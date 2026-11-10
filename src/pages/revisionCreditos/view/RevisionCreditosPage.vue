@@ -22,7 +22,7 @@
           option-value="id"
           option-label="nombre"
           label="Asesor"
-          options-dense
+          popup-content-class="opciones-amplias"
           emit-value
           map-options
           clearable
@@ -36,7 +36,7 @@
           v-model="filtroResultado"
           :options="opcionesResultado"
           label="Resultado"
-          options-dense
+          popup-content-class="opciones-amplias"
           emit-value
           map-options
           clearable
@@ -158,12 +158,12 @@
             <q-select
               v-model="asesorId"
               :options="opcionesPerteneceA"
+              popup-content-class="opciones-amplias"
               option-value="id"
               option-label="nombre"
               :disable="procesando || !puedeAsignarAsesor"
               emit-value
               map-options
-              options-dense
               outlined
               dense
             />
@@ -230,6 +230,13 @@
 <!-- Global (sin scoped): reglas de impresión de esta pantalla -->
 <style lang="scss">
 @import './imprimir.scss';
+
+// Listas desplegables de esta pantalla con más espacio: el estilo global
+// (custom-styles-light.scss) reduce .q-item a 14px de alto mínimo
+.q-menu.opciones-amplias .q-item {
+  min-height: 40px;
+  padding: 8px 16px;
+}
 </style>
 
 <style scoped>
