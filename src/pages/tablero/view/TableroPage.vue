@@ -9,7 +9,7 @@
 
     <div
       v-if="mostrarBuroCreditoEcuadorEcuador"
-      class="row q-col-gutter-sm glass-layer glass-layer--actions q-pa-sm"
+      class="row q-col-gutter-sm q-pa-sm"
     >
       <!-- Usuarios verificados -->
       <div class="col col-12 col-md-3">
