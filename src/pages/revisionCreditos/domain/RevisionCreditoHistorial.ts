@@ -14,6 +14,7 @@ export class RevisionCreditoHistorial extends EntidadAuditable {
   score: number | null
   equifax: string | null
   asesor: string | null
+  pertenece_a: string | null
 
   constructor() {
     super()
@@ -25,5 +26,6 @@ export class RevisionCreditoHistorial extends EntidadAuditable {
     this.score = null
     this.equifax = null
     this.asesor = null
+    this.pertenece_a = null
   }
 }

@@ -4,8 +4,8 @@
     :caption="`Revisión #${revision.id} · ${revision.created_at}${
       revision.asesor ? ' · ' + revision.asesor : ''
     }${
-      revision.registrado_por
-        ? ' (registrada por ' + revision.registrado_por + ')'
+      revision.pertenece_a && revision.pertenece_a_id !== revision.asesor_id
+        ? ' · Pertenece a ' + revision.pertenece_a
         : ''
     }`"
   >

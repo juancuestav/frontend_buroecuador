@@ -145,11 +145,12 @@ export interface RevisionCredito {
   analisis: string | null
   validaciones: Validacion[]
   autorizaciones: Autorizacion[]
-  // Asesor al que pertenece ("Pertenece a")
+  // Asesor que hizo la consulta
   asesor: string | null
   asesor_id: number | null
-  // Quién la registró, solo si es otra persona
-  registrado_por: string | null
+  // Asesor al que pertenece ("Pertenece a")
+  pertenece_a: string | null
+  pertenece_a_id: number | null
   created_at: string
   cliente: ClienteRevision
   relacion_laboral: {

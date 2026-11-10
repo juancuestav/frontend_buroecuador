@@ -15,22 +15,40 @@
     <!-- Historial: filtros propios del listado -->
     <template #filtros-listado="{ recargar }">
       <!-- Solo quien puede ver todas las revisiones filtra por asesor -->
-      <div v-if="puedeVerTodas" class="col-12 col-md-3">
-        <q-select
-          v-model="filtroAsesor"
-          :options="asesores"
-          option-value="id"
-          option-label="nombre"
-          label="Asesor"
-          popup-content-class="opciones-amplias"
-          emit-value
-          map-options
-          clearable
-          dense
-          outlined
-          @update:model-value="filtrar(recargar)"
-        />
-      </div>
+      <template v-if="puedeVerTodas">
+        <div class="col-12 col-md-3">
+          <q-select
+            v-model="filtroAsesor"
+            :options="asesores"
+            option-value="id"
+            option-label="nombre"
+            label="Asesor"
+            popup-content-class="opciones-amplias"
+            emit-value
+            map-options
+            clearable
+            dense
+            outlined
+            @update:model-value="filtrar(recargar)"
+          />
+        </div>
+        <div class="col-12 col-md-3">
+          <q-select
+            v-model="filtroPerteneceA"
+            :options="asesores"
+            option-value="id"
+            option-label="nombre"
+            label="Pertenece a"
+            popup-content-class="opciones-amplias"
+            emit-value
+            map-options
+            clearable
+            dense
+            outlined
+            @update:model-value="filtrar(recargar)"
+          />
+        </div>
+      </template>
       <div class="col-12 col-md-3">
         <q-select
           v-model="filtroResultado"

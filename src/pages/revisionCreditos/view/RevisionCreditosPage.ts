@@ -205,7 +205,9 @@ export default defineComponent({
       if (historialDesactualizado) listar({ ...filtros.fields, paginate: 1 })
     })
 
+    // Asesor que hizo la consulta y asesor al que pertenece
     const filtroAsesor = ref<number | null>(null)
+    const filtroPerteneceA = ref<number | null>(null)
     const filtroResultado = ref<string | null>(null)
     const filtroDesde = ref<string | null>(null)
     const filtroHasta = ref<string | null>(null)
@@ -230,7 +232,8 @@ export default defineComponent({
       filtros.fields = {
         ...filtros.fields,
         resultado: filtroResultado.value ?? undefined,
-        asesor_id: filtroAsesor.value ?? undefined,
+        usuario_id: filtroAsesor.value ?? undefined,
+        pertenece_a_id: filtroPerteneceA.value ?? undefined,
         fecha_desde: filtroDesde.value ?? undefined,
         fecha_hasta: filtroHasta.value ?? undefined,
       }
@@ -259,6 +262,7 @@ export default defineComponent({
       continuar,
       filtroResultado,
       filtroAsesor,
+      filtroPerteneceA,
       puedeVerTodas,
       puedeAsignarAsesor,
       asesores,

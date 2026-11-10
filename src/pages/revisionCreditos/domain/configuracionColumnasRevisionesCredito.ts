@@ -54,4 +54,10 @@ export const configuracionColumnasRevisionesCredito: ColumnConfig<RevisionCredit
       label: 'Asesor',
       align: 'left',
     },
+    {
+      name: 'pertenece_a',
+      field: 'pertenece_a',
+      label: 'Pertenece a',
+      align: 'left',
+    },
   ]
