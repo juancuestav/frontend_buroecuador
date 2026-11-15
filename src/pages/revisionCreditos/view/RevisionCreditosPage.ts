@@ -15,8 +15,9 @@ import TabLayout from 'shared/contenedor/modules/simple/view/TabLayout.vue'
 import ResultadoValidacion from './components/ResultadoValidacion.vue'
 import DatosCliente from './components/DatosCliente.vue'
 import RelacionLaboral from './components/RelacionLaboral.vue'
-import DialogoCodigoAutorizacion from './components/DialogoCodigoAutorizacion.vue'
+import DialogoRevisionDetenida from './components/DialogoRevisionDetenida.vue'
 import GenerarReporte from './components/GenerarReporte.vue'
+import DashboardRevisiones from './components/DashboardRevisiones.vue'
 
 // Logica y controladores
 import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
@@ -28,6 +29,7 @@ import { RevisionCreditoController } from '../infraestructure/RevisionCreditoCon
 import { RevisionCreditoHistorial } from '../domain/RevisionCreditoHistorial'
 import { RevisionCredito } from '../domain/RevisionCredito'
 import { obtenerMensajeError } from '../domain/formato'
+import { EstadoResultado } from '../domain/ResumenRevisiones'
 
 export default defineComponent({
   components: {
@@ -35,8 +37,9 @@ export default defineComponent({
     ResultadoValidacion,
     DatosCliente,
     RelacionLaboral,
-    DialogoCodigoAutorizacion,
+    DialogoRevisionDetenida,
     GenerarReporte,
+    DashboardRevisiones,
     // ApexCharts (pesado) solo se descarga cuando la revisión llega a Equifax
     DatosCrediticios: defineAsyncComponent(
       () => import('./components/DatosCrediticios.vue')
@@ -97,16 +100,17 @@ export default defineComponent({
     const forzarEquifax = ref(false)
     const revision = ref<RevisionCredito | null>(null)
     const procesando = ref(false)
-    const dialogoCodigo = ref(false)
-    const errorCodigo = ref<string | null>(null)
+    const dialogoDetenida = ref(false)
+    const errorContinuar = ref<string | null>(null)
 
     // TabLayout carga el historial la primera vez que se abre su pestaña
     // (listado-diferido). Después solo se recarga si hubo revisiones nuevas.
     let historialAbierto = false
     let historialDesactualizado = false
+    let resumenDesactualizado = false
 
-    watch(dialogoCodigo, (abierto) => {
-      if (abierto) errorCodigo.value = null
+    watch(dialogoDetenida, (abierto) => {
+      if (abierto) errorContinuar.value = null
     })
 
     /*************
@@ -119,6 +123,7 @@ export default defineComponent({
         const response = await accion()
         mostrarResultado(response.data.modelo, response.data.mensaje)
         historialDesactualizado = true
+        resumenDesactualizado = true
         return true
       } finally {
         cargando.desactivar()
@@ -150,19 +155,20 @@ export default defineComponent({
     }
 
     /**
-     * Continúa una revisión detenida (con código) o reintenta Equifax (sin código).
+     * Continúa una revisión detenida (solo con permiso; el backend lo indica
+     * en puede_continuar) o reintenta la consulta a Equifax.
      */
-    async function continuar(codigo: string | null) {
+    async function continuar() {
       if (!revision.value) return
       const id = revision.value.id
-      errorCodigo.value = null
+      errorContinuar.value = null
 
       try {
         await ejecutar(() =>
           axios.post(
             axios.getEndpoint({ endpoint: endpoints.revision_creditos, id }) +
               '/continuar',
-            { codigo_autorizacion: codigo, forzar_equifax: forzarEquifax.value }
+            { forzar_equifax: forzarEquifax.value }
           )
         )
       } catch (error: any) {
@@ -170,14 +176,14 @@ export default defineComponent({
           error?.response?.status === 429
             ? 'Demasiados intentos. Espere un minuto antes de volver a intentar.'
             : obtenerMensajeError(error, 'No se pudo continuar la revisión.')
-        if (dialogoCodigo.value) errorCodigo.value = mensaje
+        if (dialogoDetenida.value) errorContinuar.value = mensaje
         else notificarError(mensaje)
       }
     }
 
     function mostrarResultado(modelo: RevisionCredito, mensaje: string) {
       revision.value = modelo
-      dialogoCodigo.value = modelo.estado === 'detenida'
+      dialogoDetenida.value = modelo.estado === 'detenida'
 
       if (modelo.estado === 'detenida') notificarAdvertencia(mensaje)
       else if (modelo.estado === 'pendiente_equifax') notificarError(mensaje)
@@ -196,13 +202,21 @@ export default defineComponent({
      *************/
     onListado(() => (historialDesactualizado = false))
 
+    // El resumen se carga solo al montarse (primera apertura del historial)
+    const dashboard = ref<InstanceType<typeof DashboardRevisiones> | null>(null)
+
     watch(tabs, (tab) => {
       if (tab !== 'listado') return
       if (!historialAbierto) {
         historialAbierto = true
+        resumenDesactualizado = false
         return
       }
       if (historialDesactualizado) listar({ ...filtros.fields, paginate: 1 })
+      if (resumenDesactualizado) {
+        resumenDesactualizado = false
+        dashboard.value?.cargar()
+      }
     })
 
     // Asesor que hizo la consulta y asesor al que pertenece
@@ -245,6 +259,29 @@ export default defineComponent({
       if (!valor || String(valor).length === 10) filtrar(recargar)
     }
 
+    /**
+     * Clic en una cifra del resumen: aplica los filtros que la reproducen
+     * (resultado y desde el inicio del periodo, sin filtros de asesor) para
+     * contrastarla con las filas del historial.
+     */
+    function verEnHistorial(filtro: {
+      resultado: EstadoResultado | null
+      desde: string | null
+    }) {
+      filtroAsesor.value = null
+      filtroPerteneceA.value = null
+      filtroResultado.value = filtro.resultado
+      filtroDesde.value = filtro.desde
+      filtroHasta.value = null
+      filtrar(async () => {
+        await listar({ ...filtros.fields, paginate: 1 })
+      })
+      // La tabla está justo debajo del resumen
+      const tabla = (dashboard.value?.$el as HTMLElement | undefined)
+        ?.nextElementSibling
+      tabla?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
     // Impresión / "Guardar como PDF" (estilos en imprimir.scss)
     const imprimir = () => window.print()
 
@@ -256,8 +293,8 @@ export default defineComponent({
       forzarEquifax,
       revision,
       procesando,
-      dialogoCodigo,
-      errorCodigo,
+      dialogoDetenida,
+      errorContinuar,
       revisar,
       continuar,
       filtroResultado,
@@ -273,6 +310,8 @@ export default defineComponent({
       opcionesResultado,
       filtrar,
       filtrarFecha,
+      dashboard,
+      verEnHistorial,
     }
   },
 })

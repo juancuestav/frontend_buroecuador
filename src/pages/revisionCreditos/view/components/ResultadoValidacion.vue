@@ -78,8 +78,8 @@
         :key="i"
         class="text-caption text-orange-9 q-mb-xs"
       >
-        <q-icon name="bi-key-fill" class="q-mr-xs" />
-        {{ NOMBRE_PASO[a.paso] }}: continuó con código de autorización{{
+        <q-icon name="bi-person-check-fill" class="q-mr-xs" />
+        {{ NOMBRE_PASO[a.paso] }}: se continuó con autorización{{
           a.usuario ? ` (${a.usuario}${a.fecha ? ', ' + a.fecha : ''})` : ''
         }}
       </div>
@@ -91,12 +91,12 @@
         v-if="revision.estado === 'detenida'"
         color="warning"
         text-color="black"
-        icon="bi-shield-lock"
-        label="Ingresar código para continuar"
+        icon-right="bi-arrow-right"
+        label="Continuar con las validaciones"
         no-caps
         unelevated
         :loading="cargando"
-        @click="emit('pedir-codigo')"
+        @click="emit('continuar')"
       />
       <q-btn
         v-if="revision.estado === 'pendiente_equifax'"
@@ -123,7 +123,7 @@ import SeccionRevision from './SeccionRevision.vue'
 
 const props = defineProps<{ revision: RevisionCredito; cargando?: boolean }>()
 const emit = defineEmits<{
-  (e: 'pedir-codigo'): void
+  (e: 'continuar'): void
   (e: 'reintentar'): void
 }>()
 
@@ -144,10 +144,10 @@ const ESTADOS: Record<
     texto: 'No cumple',
   },
   autorizada: {
-    icono: 'bi-key-fill',
+    icono: 'bi-person-check-fill',
     color: 'orange-8',
     tono: 'naranja',
-    texto: 'Autorizada con código',
+    texto: 'Autorizada',
   },
   no_evaluada: {
     icono: 'bi-dash-circle',
@@ -162,11 +162,15 @@ const resultado = computed(() => {
   if (r.estado === 'detenida') {
     return {
       tono: 'advertencia',
-      icono: 'bi-key-fill',
+      icono: 'bi-exclamation-octagon-fill',
       titulo: 'Perfil no califica',
       subtitulo: `Revisión detenida en: ${
         NOMBRE_PASO[r.paso_detenido ?? 'ed']
-      }. Se requiere código de autorización para continuar.`,
+      }.${
+        r.puede_continuar
+          ? ' Puede continuar con las siguientes validaciones.'
+          : ''
+      }`,
     }
   }
   if (r.estado === 'pendiente_equifax') {

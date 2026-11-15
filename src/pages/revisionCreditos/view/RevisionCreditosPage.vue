@@ -12,17 +12,28 @@
     paginate
     listado-diferido
   >
-    <!-- Historial: filtros propios del listado -->
+    <!-- Historial: resumen sobre la tabla -->
+    <template #antes-listado>
+      <dashboard-revisiones
+        ref="dashboard"
+        @ver-en-historial="verEnHistorial"
+      />
+    </template>
+
+    <!-- Historial: filtros propios del listado (etiqueta sobre el campo,
+    columnas de igual ancho para que el espacio entre ellos sea uniforme) -->
     <template #filtros-listado="{ recargar }">
       <!-- Solo quien puede ver todas las revisiones filtra por asesor -->
       <template v-if="puedeVerTodas">
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-sm-6 col-md">
+          <label class="q-mb-sm block">Asesor</label>
           <q-select
             v-model="filtroAsesor"
             :options="asesores"
             option-value="id"
             option-label="nombre"
-            label="Asesor"
+            :display-value="filtroAsesor ? undefined : 'Todos'"
+            :class="{ 'filtro-vacio': !filtroAsesor }"
             popup-content-class="opciones-amplias"
             emit-value
             map-options
@@ -32,13 +43,15 @@
             @update:model-value="filtrar(recargar)"
           />
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-sm-6 col-md">
+          <label class="q-mb-sm block">Pertenece a</label>
           <q-select
             v-model="filtroPerteneceA"
             :options="asesores"
             option-value="id"
             option-label="nombre"
-            label="Pertenece a"
+            :display-value="filtroPerteneceA ? undefined : 'Todos'"
+            :class="{ 'filtro-vacio': !filtroPerteneceA }"
             popup-content-class="opciones-amplias"
             emit-value
             map-options
@@ -49,11 +62,13 @@
           />
         </div>
       </template>
-      <div class="col-12 col-md-3">
+      <div class="col-12 col-sm-6 col-md">
+        <label class="q-mb-sm block">Resultado</label>
         <q-select
           v-model="filtroResultado"
           :options="opcionesResultado"
-          label="Resultado"
+          :display-value="filtroResultado ? undefined : 'Todos'"
+          :class="{ 'filtro-vacio': !filtroResultado }"
           popup-content-class="opciones-amplias"
           emit-value
           map-options
@@ -63,10 +78,10 @@
           @update:model-value="filtrar(recargar)"
         />
       </div>
-      <div class="col-6 col-md-2">
+      <div class="col-6 col-md">
+        <label class="q-mb-sm block">Desde</label>
         <q-input
           v-model="filtroDesde"
-          label="Desde"
           mask="####-##-##"
           placeholder="AAAA-MM-DD"
           clearable
@@ -91,10 +106,10 @@
           </template>
         </q-input>
       </div>
-      <div class="col-6 col-md-2">
+      <div class="col-6 col-md">
+        <label class="q-mb-sm block">Hasta</label>
         <q-input
           v-model="filtroHasta"
-          label="Hasta"
           mask="####-##-##"
           placeholder="AAAA-MM-DD"
           clearable
@@ -214,8 +229,8 @@
         <resultado-validacion
           :revision="revision"
           :cargando="procesando"
-          @pedir-codigo="dialogoCodigo = true"
-          @reintentar="continuar(null)"
+          @continuar="dialogoDetenida = true"
+          @reintentar="continuar"
         >
           <template #despues-calificacion>
             <datos-cliente :cliente="revision.cliente" />
@@ -232,11 +247,12 @@
         <relacion-laboral :relacion="revision.relacion_laboral" />
       </div>
 
-      <dialogo-codigo-autorizacion
-        v-model="dialogoCodigo"
+      <!-- Al detenerse: con permiso se continúa, sin él solo se cierra -->
+      <dialogo-revision-detenida
+        v-model="dialogoDetenida"
         :revision="revision"
         :cargando="procesando"
-        :error="errorCodigo"
+        :error="errorContinuar"
         @confirmar="continuar"
       />
     </template>

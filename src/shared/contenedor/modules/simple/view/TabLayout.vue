@@ -85,6 +85,9 @@
       de su propio q-card, que ahora es de vidrio globalmente; no se
       envuelve en otro glass-panel para no anidar dos cards. -->
       <q-tab-panel name="listado">
+        <!-- Contenido propio de la pantalla sobre la tabla (p. ej. un resumen) -->
+        <slot name="antes-listado" />
+
         <essential-table-pagination
           v-if="paginate"
           ref="refTabla"

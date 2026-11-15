@@ -85,4 +85,5 @@ export const endpoints = {
   ),
   revision_creditos_reportes: new Endpoint('revision-creditos/reportes'),
   revision_creditos_asesores: new Endpoint('revision-creditos/asesores'),
+  revision_creditos_resumen: new Endpoint('revision-creditos/resumen'),
 }

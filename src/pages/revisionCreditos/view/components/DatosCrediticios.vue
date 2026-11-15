@@ -164,7 +164,7 @@
 <script setup lang="ts">
 // Este componente se carga de forma diferida (defineAsyncComponent en la
 // página): ApexCharts solo se descarga cuando hay datos de Equifax.
-import { computed, onActivated, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import VueApexCharts from 'vue3-apexcharts'
 import { ApexOptions } from 'apexcharts'
 import { ColumnConfig } from 'components/tables/domain/ColumnConfig'
@@ -188,6 +188,7 @@ import {
 import SeccionRevision from './SeccionRevision.vue'
 import CamposLectura from './CamposLectura.vue'
 import TablaOperaciones from './TablaOperaciones.vue'
+import { useGraficoVisible } from '../composables/useGraficoVisible'
 
 const SCORE_MINIMO = 750
 // Escala fija de ambos scores (Equifax 0–999)
@@ -200,55 +201,10 @@ const props = defineProps<{
   relacion: RevisionCredito['relacion_laboral']
 }>()
 
-// La sección puede montarse dentro de una pestaña oculta (al abrir una
-// revisión desde el historial) o mientras el panel entra con la transición
-// de escala de q-tab-panels. ApexCharts mide con getBoundingClientRect, que
-// incluye esa transformación, y dibujaría el arco diminuto. Por eso los
-// gráficos se crean (o recrean) solo cuando el contenedor es visible y su
-// tamaño en pantalla coincide con el del layout (transición terminada).
+// Los gráficos se crean solo cuando el contenedor es visible y sin la
+// transformación de la transición de pestañas (ver useGraficoVisible)
 const contenedorGraficos = ref<HTMLElement | null>(null)
-const visible = ref(false)
-const instanciaId = ref(0)
-let observador: ResizeObserver | null = null
-let esperando = 0
-
-function sinTransformacion(el: HTMLElement): boolean {
-  return (
-    el.offsetWidth > 0 &&
-    Math.abs(el.getBoundingClientRect().width - el.offsetWidth) < 1
-  )
-}
-
-function mostrarCuandoEsteEstable() {
-  cancelAnimationFrame(esperando)
-  let intentos = 0
-  const revisar = () => {
-    const el = contenedorGraficos.value
-    if (!el || el.offsetWidth === 0) return
-    if (sinTransformacion(el) || ++intentos > 90) {
-      visible.value = true
-      instanciaId.value++
-    } else esperando = requestAnimationFrame(revisar)
-  }
-  esperando = requestAnimationFrame(revisar)
-}
-
-onMounted(() => {
-  observador = new ResizeObserver(([entrada]) => {
-    if (entrada.contentRect.width === 0) visible.value = false
-    else if (!visible.value) mostrarCuandoEsteEstable()
-  })
-  if (contenedorGraficos.value) observador.observe(contenedorGraficos.value)
-})
-onBeforeUnmount(() => {
-  observador?.disconnect()
-  cancelAnimationFrame(esperando)
-})
-// Al volver a la página (keep-alive) o a la pestaña, se redibujan
-onActivated(() => {
-  visible.value = false
-  mostrarCuandoEsteEstable()
-})
+const { visible, instanciaId } = useGraficoVisible(contenedorGraficos)
 
 const sobre = computed(() => props.equifax.score_sobreendeudamiento)
 const vencimientos = computed(() => props.equifax.vencimientos)
