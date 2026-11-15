@@ -30,3 +30,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+// Filtro de listado sin selección: su display-value ("Todos") se ve como un
+// placeholder. Uso: :class="{ 'filtro-vacio': !valor }" en el q-select
+.filtro-vacio .q-field__native {
+  color: #9e9e9e;
+}

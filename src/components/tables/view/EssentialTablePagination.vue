@@ -216,29 +216,26 @@
         </div>
       </transition>
 
-      <div
-        v-if="permitirBuscar && !mostrarFiltros"
-        class="row q-col-gutter-xs full-width q-mb-md"
-      >
-        <div class="col-md-8 col-12">
-          <q-input
-            v-model="filter"
-            outlined
-            dense
-            clearable
-            class=""
-            placeholder="Buscar..."
-            debounce="300"
-            color="primary"
-          >
-            <template v-slot:append>
-              <q-icon name="search"></q-icon>
-            </template>
-          </q-input>
-        </div>
+      <div v-if="permitirBuscar && !mostrarFiltros" class="full-width q-mb-md">
+        <!-- Buscar · Columnas · Filtros avanzados · Pantalla completa -->
+        <div class="row q-col-gutter-sm items-center">
+          <div class="col-12 col-md">
+            <q-input
+              v-model="filter"
+              outlined
+              dense
+              clearable
+              placeholder="Buscar..."
+              debounce="300"
+              color="primary"
+            >
+              <template v-slot:append>
+                <q-icon name="search"></q-icon>
+              </template>
+            </q-input>
+          </div>
 
-        <div v-if="mostrarColumnasVisibles" class="col-md-4 col-12">
-          <div class="row">
+          <div v-if="mostrarColumnasVisibles" class="col col-md-auto">
             <q-select
               v-model="visibleColumns"
               multiple
@@ -251,9 +248,45 @@
               :options="configuracionColumnas"
               option-value="name"
               options-cover
-              class="col-9"
+              class="selector-columnas"
             />
+          </div>
 
+          <div v-if="$slots.filtros" class="col-auto">
+            <q-btn
+              :outline="!filtrosPropiosAbiertos"
+              :unelevated="filtrosPropiosAbiertos"
+              color="primary"
+              no-caps
+              icon="bi-sliders"
+              :label="
+                filtrosPropiosAbiertos
+                  ? 'Ocultar filtros avanzados'
+                  : 'Mostrar filtros avanzados'
+              "
+              class="boton-filtros-avanzados"
+              :aria-expanded="filtrosPropiosAbiertos"
+              @click="filtrosPropiosAbiertos = !filtrosPropiosAbiertos"
+            >
+              <q-badge
+                v-if="filtrosActivos"
+                floating
+                rounded
+                color="negative"
+                :label="filtrosActivos"
+              >
+                <q-tooltip class="bg-dark">
+                  {{
+                    filtrosActivos === 1
+                      ? '1 filtro aplicado'
+                      : `${filtrosActivos} filtros aplicados`
+                  }}
+                </q-tooltip>
+              </q-badge>
+            </q-btn>
+          </div>
+
+          <div v-if="mostrarColumnasVisibles" class="col-auto">
             <q-btn
               flat
               round
@@ -267,7 +300,6 @@
                   inFullscreen = !props.inFullscreen
                 }
               "
-              class="q-ml-md"
             >
               <q-tooltip class="bg-dark">{{
                 props.inFullscreen
@@ -277,12 +309,24 @@
             </q-btn>
           </div>
         </div>
+
+        <!-- Filtros propios de cada listado (slot "filtros"), bajo el buscador;
+        recargar aplica la búsqueda y filtros.fields -->
+        <q-slide-transition v-if="$slots.filtros">
+          <div v-show="filtrosPropiosAbiertos">
+            <div class="q-pt-md">
+              <div class="row q-col-gutter-sm">
+                <slot name="filtros" :recargar="toSearch" />
+              </div>
+            </div>
+          </div>
+        </q-slide-transition>
       </div>
 
-      <!-- Filtros propios de cada listado; recargar aplica la búsqueda y filtros.fields -->
+      <!-- Sin buscador, los filtros propios se muestran siempre -->
       <div
-        v-if="$slots.filtros && !mostrarFiltros"
-        class="row q-col-gutter-xs full-width q-mb-md"
+        v-else-if="$slots.filtros && !mostrarFiltros"
+        class="row q-col-gutter-sm full-width q-mb-md"
       >
         <slot name="filtros" :recargar="toSearch" />
       </div>
@@ -1825,6 +1869,18 @@
 </template>
 
 <style lang="scss">
+// Barra de búsqueda: el selector de columnas y el botón de filtros miden lo
+// mismo que los inputs dense (40px)
+.selector-columnas {
+  min-width: 200px;
+}
+
+.boton-filtros-avanzados {
+  min-height: 40px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
 /* .filtros {
   position: relative;
   left: -16px;

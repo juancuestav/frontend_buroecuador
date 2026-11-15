@@ -443,6 +443,28 @@ export default defineComponent({
       mostrarFiltros.value ? 'Ocultar filtros avanzados' : 'Mostrar filtros avanzados'
     )
 
+    /**
+     * Filtros propios del listado (slot "filtros"): se despliegan bajo el
+     * buscador con el botón "Mostrar filtros avanzados".
+     */
+    const filtrosPropiosAbiertos = ref(false)
+    const CLAVES_NO_FILTRO = ['search', 'paginate', 'page']
+    const filtrosActivos = computed(
+      () =>
+        Object.entries(filtros.fields ?? {}).filter(
+          ([clave, valor]) =>
+            !CLAVES_NO_FILTRO.includes(clave) &&
+            valor !== undefined &&
+            valor !== null &&
+            valor !== ''
+        ).length
+    )
+    // Si se aplican filtros desde fuera del panel (p. ej. desde un resumen),
+    // se despliega para que se vea qué está filtrando la tabla
+    watch(filtrosActivos, (actual, anterior) => {
+      if (actual > anterior) filtrosPropiosAbiertos.value = true
+    })
+
     const refTableFilters = ref()
     function resetearFiltros() {
       refTableFilters.value.resetearFiltros()
@@ -549,6 +571,8 @@ export default defineComponent({
       resaltar,
       mostrarFiltros,
       tituloBotonFiltros,
+      filtrosPropiosAbiertos,
+      filtrosActivos,
       abrirModalEntidad,
       abrirModalEditar,
       exportTable,

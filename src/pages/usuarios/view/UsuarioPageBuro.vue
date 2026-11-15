@@ -6,13 +6,15 @@
     paginate
   >
     <template #filtros-listado="{ recargar }">
-      <div class="col-12 col-md-3">
+      <div class="col-12 col-sm-6 col-md-3">
+        <label class="q-mb-sm block">Rol</label>
         <q-select
           v-model="rolFiltro"
           :options="listadosAuxiliares.roles"
           :option-label="(item) => item.name"
           :option-value="(item) => item.id"
-          label="Filtrar por rol"
+          :display-value="rolFiltro ? undefined : 'Todos'"
+          :class="{ 'filtro-vacio': !rolFiltro }"
           options-dense
           emit-value
           map-options
@@ -350,10 +352,7 @@
               outlined
             >
               <template v-slot:error>
-                <div
-                  v-for="error of v$.tipo_cliente.$errors"
-                  :key="error.$uid"
-                >
+                <div v-for="error of v$.tipo_cliente.$errors" :key="error.$uid">
                   <div class="error-msg">{{ error.$message }}</div>
                 </div>
               </template>
