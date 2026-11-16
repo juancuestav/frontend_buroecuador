@@ -49,6 +49,23 @@ export class ContenedorSimpleMixin<
     }
   }
 
+  /**
+   * Muestra el error de una petición: los errores de validación (422) si los
+   * hay; si no, el `mensaje` del backend o el texto de respaldo. Un 404, 405
+   * o 500 de Laravel no trae `errors` ni `mensaje`, y sin el respaldo la
+   * operación fallaba sin ningún aviso en pantalla.
+   */
+  private notificarErrorPeticion(error: unknown, respaldo: string) {
+    if (isAxiosError(error) && error.erroresValidacion.length > 0) {
+      notificarMensajesError(error.erroresValidacion, this.notificaciones)
+      return
+    }
+    const mensaje = isAxiosError(error)
+      ? error.mensaje
+      : (error as Error | undefined)?.message
+    this.notificaciones.notificarError(mensaje || respaldo)
+  }
+
   useReferencias() {
     return { entidad: this.entidad as T, ...this.refs }
   }
@@ -114,7 +131,7 @@ export class ContenedorSimpleMixin<
     // this.statusEssentialLoading.activar()
     const idEntidad = data.id
     try {
-      this.cargarVista(async () => {
+      await this.cargarVista(async () => {
         const { result } = await this.controller.consultar(idEntidad, {
           ...this.argsDefault,
           ...params,
@@ -128,10 +145,7 @@ export class ContenedorSimpleMixin<
       // const usuario = new Usuario()
       // usuario.hydrate(result)
     } catch (error) {
-      if (isAxiosError(error)) {
-        const mensajes: string[] = error.erroresValidacion
-        await notificarMensajesError(mensajes, this.notificaciones)
-      }
+      this.notificarErrorPeticion(error, 'No se pudo consultar el registro.')
     } finally {
       // this.hooks.onConsultado(result)
       // this.statusEssentialLoading.desactivar()
@@ -268,11 +282,7 @@ export class ContenedorSimpleMixin<
       this.reestablecer() // antes estaba arriba de onGuardado
       return copiaEntidad
     } catch (error: any) {
-      if (isAxiosError(error)) {
-        const mensajes: string[] = error.erroresValidacion
-        await notificarMensajesError(mensajes, this.notificaciones)
-      }
-
+      this.notificarErrorPeticion(error, 'No se pudo guardar el registro.')
       throw error
     } finally {
       this.statusEssentialLoading.desactivar()
@@ -416,12 +426,7 @@ export class ContenedorSimpleMixin<
         const id: number = response.data.modelo.id ?? 0
         this.hooks.onModificado(id, response.data)
       } catch (error: any) {
-        if (isAxiosError(error)) {
-          const mensajes: string[] = error.erroresValidacion
-          notificarMensajesError(mensajes, this.notificaciones)
-        } else {
-          this.notificaciones.notificarError(error.message)
-        }
+        this.notificarErrorPeticion(error, 'No se pudo actualizar el registro.')
       }
     })
   }
@@ -456,12 +461,7 @@ export class ContenedorSimpleMixin<
         this.reestablecer()
         this.hooks.onModificado(id, response.data)
       } catch (error: any) {
-        if (isAxiosError(error)) {
-          const mensajes: string[] = error.erroresValidacion
-          notificarMensajesError(mensajes, this.notificaciones)
-        } else {
-          this.notificaciones.notificarError(error.message)
-        }
+        this.notificarErrorPeticion(error, 'No se pudo actualizar el registro.')
         throw error
       }
     })
@@ -486,18 +486,9 @@ export class ContenedorSimpleMixin<
           this.reestablecer()
           if (callback) callback()
         })
-        .catch((error) => {
-          if (isAxiosError(error) && error.erroresValidacion.length > 0) {
-            notificarMensajesError(error.erroresValidacion, this.notificaciones)
-          } else {
-            // Un 500 de Laravel no trae `errors` ni `mensaje`: sin este
-            // respaldo el borrado fallaba sin ningún aviso en pantalla
-            const mensaje = isAxiosError(error) ? error.mensaje : error.message
-            this.notificaciones.notificarError(
-              mensaje || 'No se pudo eliminar el registro.'
-            )
-          }
-        })
+        .catch((error) =>
+          this.notificarErrorPeticion(error, 'No se pudo eliminar el registro.')
+        )
     })
   }
 
