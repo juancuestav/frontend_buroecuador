@@ -4,20 +4,21 @@
       <!-- Empleado -->
       <div class="col-12 col-md-5">
         <div class="col-12 col-md-5 q-mb-md">
-          <label class="q-mb-sm block">Seleccione un usuario</label>
+          <label class="q-mb-sm block">Buscar usuario</label>
           <q-select
-            v-model="empleado"
+            v-model="usuario"
             :options="usuarios"
             options-dense
             dense
             outlined
-            error-message="Debe seleccionar un usuario"
             use-input
-            input-debounce="0"
+            input-debounce="400"
+            hint="Nombre, apellidos, identificación o email (mín. 3 caracteres)"
             @filter="filtrarUsuarios"
-            @update:model-value="filtrarRolesEmpleados"
+            @update:model-value="consultarPermisosUsuario"
             :option-value="(v) => v.id"
-            :option-label="(v) => v.name + ' ' + v.apellidos"
+            :option-label="nombreUsuario"
+            clearable
             emit-value
             map-options
           ></q-select>
@@ -48,7 +49,7 @@
       <div class="col-12 col-md-2"></div>
       <!-- Permisos -->
       <div class="col-12 col-md-5" v-if="permisos">
-        <div class="col-12 col-md-5 q-mb-md" v-if="listado">
+        <div class="col-12 col-md-5 q-mb-md">
           <q-card>
             <q-card-section>
               <div class="text-h6">
@@ -103,7 +104,7 @@
         <q-btn
           class="full-width block"
           color="positive"
-          @click="crear_permiso()"
+          @click="crearPermiso()"
           unelevated
           square
           ><q-icon name="bi-plus"></q-icon
