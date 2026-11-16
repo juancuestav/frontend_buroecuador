@@ -7,7 +7,7 @@ import { getVisibleColumns, formatBytes } from 'shared/utils'
 import { ColumnConfig } from '../domain/ColumnConfig'
 import { TipoSeleccion } from 'config/utils'
 import { ParamsType } from 'config/types'
-import { exportFile } from 'quasar'
+import { exportFile, useQuasar } from 'quasar'
 
 // Componentes
 import PrevisualizarTablaPdf from 'components/tables/view/PrevisualizarTablaPdf.vue'
@@ -18,6 +18,7 @@ import VisorArchivos from './VisorArchivos.vue'
 
 // Logica y controladores
 import { VisibleModal } from '../application/VisibleModal'
+import { useAltoTablaVisible } from '../application/useAltoTablaVisible'
 import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
 
 export default defineComponent({
@@ -285,6 +286,16 @@ export default defineComponent({
     const selected = ref([])
     const visibleColumns = ref(getVisibleColumns(props.configuracionColumnas))
     const refTable = ref()
+
+    const $q = useQuasar()
+    // Alto que deja la barra de scroll horizontal dentro de la ventana
+    const { alto: altoVisible, ajustarAlto } = useAltoTablaVisible(refTable)
+    watch(listado, ajustarAlto)
+    const estiloAlto = computed(() =>
+      altoVisible.value && props.altoFijo && !inFullscreen.value && !$q.screen.xs
+        ? { height: altoVisible.value + 'px' }
+        : undefined
+    )
     const archivos = ref([])
     const loading = ref(false)
     // const filtros = ref()
@@ -542,6 +553,7 @@ export default defineComponent({
 
     return {
       refTable,
+      estiloAlto,
       refEditarModal,
       refTableFilters,
       resetearFiltros,

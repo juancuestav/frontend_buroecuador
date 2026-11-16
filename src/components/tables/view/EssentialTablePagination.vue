@@ -27,7 +27,7 @@
     :visible-columns="visibleColumns"
     :separator="$q.screen.xs ? 'horizontal' : separador"
     :hide-bottom="!mostrarFooter"
-    :style="estilos"
+    :style="[estilos, estiloAlto]"
     class="bg-body-table my-sticky-column-table my-sticky-header-column-table"
     :class="{
       'alto-fijo-desktop': !inFullscreen && altoFijo && !$q.screen.xs,
