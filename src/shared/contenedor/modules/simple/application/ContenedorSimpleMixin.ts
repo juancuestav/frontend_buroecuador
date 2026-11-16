@@ -487,10 +487,16 @@ export class ContenedorSimpleMixin<
           if (callback) callback()
         })
         .catch((error) => {
-          if (isAxiosError(error)) {
-            const mensajes: string[] = error.erroresValidacion
-            notificarMensajesError(mensajes, this.notificaciones)
-          } else this.notificaciones.notificarError(error.message)
+          if (isAxiosError(error) && error.erroresValidacion.length > 0) {
+            notificarMensajesError(error.erroresValidacion, this.notificaciones)
+          } else {
+            // Un 500 de Laravel no trae `errors` ni `mensaje`: sin este
+            // respaldo el borrado fallaba sin ningún aviso en pantalla
+            const mensaje = isAxiosError(error) ? error.mensaje : error.message
+            this.notificaciones.notificarError(
+              mensaje || 'No se pudo eliminar el registro.'
+            )
+          }
         })
     })
   }
