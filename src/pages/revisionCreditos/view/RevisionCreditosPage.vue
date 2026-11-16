@@ -164,6 +164,22 @@
                   unelevated
                   @click="revisar"
                 />
+                <q-btn
+                  class="q-ml-xs"
+                  color="primary"
+                  icon="bi-eraser"
+                  :label="$q.screen.xs ? undefined : 'Limpiar'"
+                  aria-label="Limpiar"
+                  :disable="procesando"
+                  no-caps
+                  outline
+                  @click="limpiar"
+                >
+                  <q-tooltip class="bg-dark">
+                    Borra la identificación y el resultado para una nueva
+                    consulta
+                  </q-tooltip>
+                </q-btn>
               </template>
             </q-input>
           </div>

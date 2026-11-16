@@ -138,6 +138,11 @@ export default defineComponent({
         return
       }
 
+      // Sin la revisión anterior en pantalla: mientras se consulta, o si la
+      // nueva consulta falla, se veía la cédula nueva con datos del cliente
+      // anterior
+      limpiarResultado()
+
       try {
         await ejecutar(() =>
           axios.post(axios.getEndpoint(endpoints.revision_creditos), {
@@ -179,6 +184,22 @@ export default defineComponent({
         if (dialogoDetenida.value) errorContinuar.value = mensaje
         else notificarError(mensaje)
       }
+    }
+
+    /** Quita de pantalla la revisión mostrada y el diálogo de revisión detenida */
+    function limpiarResultado() {
+      revision.value = null
+      dialogoDetenida.value = false
+      errorContinuar.value = null
+    }
+
+    /** Botón "Limpiar": deja el formulario como al abrir la pantalla */
+    function limpiar() {
+      if (procesando.value) return
+      cedula.value = ''
+      forzarEquifax.value = false
+      asesorId.value = usuarioActual.id
+      limpiarResultado()
     }
 
     function mostrarResultado(modelo: RevisionCredito, mensaje: string) {
@@ -296,6 +317,7 @@ export default defineComponent({
       dialogoDetenida,
       errorContinuar,
       revisar,
+      limpiar,
       continuar,
       filtroResultado,
       filtroAsesor,
