@@ -21,13 +21,25 @@
       </div>
 
       <!-- IESS -->
-      <template v-if="afiliacion">
-        <div class="text-bold text-primary q-mb-sm">IESS</div>
+      <div class="q-mb-sm">
+        <div class="text-bold text-primary">IESS</div>
+        <!-- La base del IESS es una foto mensual de los afiliados activos -->
+        <div v-if="corteIess" class="text-caption text-grey-7">
+          <q-icon name="bi-calendar-event" class="q-mr-xs" />
+          Información del IESS con corte a {{ corteIess }}
+        </div>
+      </div>
+
+      <div v-if="!afiliacion" class="text-grey-8">
+        No registra afiliación al IESS.
+      </div>
+
+      <template v-else>
         <campos-lectura :campos="camposIess" />
 
         <div v-if="otrasAfiliaciones.length" class="q-mt-md">
           <div class="text-bold q-mb-sm">
-            Otras afiliaciones ({{ otrasAfiliaciones.length }})
+            Otros empleadores ({{ otrasAfiliaciones.length }})
           </div>
           <essential-table
             :configuracionColumnas="columnasAfiliaciones"
@@ -42,7 +54,7 @@
 
       <!-- RUC -->
       <template v-if="ruc || rucEquifax">
-        <q-separator v-if="afiliacion" class="q-my-md" />
+        <q-separator class="q-my-md" />
         <div class="text-bold text-primary q-mb-sm">
           RUC {{ ruc?.numero ?? rucEquifax?.numero }}
           <span v-if="!ruc" class="text-weight-regular text-grey-7">
@@ -69,6 +81,7 @@ import EssentialTable from 'components/tables/view/EssentialTable.vue'
 import { CampoLectura, RevisionCredito } from '../../domain/RevisionCredito'
 import {
   formatearFecha,
+  formatearMesAnio,
   formatearMoneda,
   textoAnios,
 } from '../../domain/formato'
@@ -77,8 +90,15 @@ import CamposLectura from './CamposLectura.vue'
 
 const props = defineProps<{ relacion: RevisionCredito['relacion_laboral'] }>()
 
-// El backend ordena las afiliaciones: primero la vigente más antigua
+// El backend ordena las afiliaciones: primero la más antigua de las que
+// califican (seguro general a tiempo completo)
 const afiliacion = computed(() => props.relacion.iess[0] ?? null)
+// "septiembre de 2026"
+const corteIess = computed(() => {
+  const fecha =
+    props.relacion.iess_fecha_corte ?? afiliacion.value?.fecha_corte ?? null
+  return fecha ? formatearMesAnio(fecha) : null
+})
 const ruc = computed(() => props.relacion.ruc)
 const rucEquifax = computed(() => props.relacion.ruc_equifax ?? null)
 // Estado que se muestra: el de Equifax tiene prioridad (más actualizado que la base local)
@@ -136,6 +156,16 @@ const tags = computed<Tag[]>(() => {
         tono: 'azul',
         icono: 'bi-calendar-check',
       })
+    // No es seguro general a tiempo completo
+    if (a.vigente && a.motivo_no_califica)
+      lista.push({
+        texto:
+          a.tipo_afiliacion === 'general'
+            ? 'Tiempo parcial'
+            : a.tipo_afiliacion_texto,
+        tono: 'rojo',
+        icono: 'bi-x-circle',
+      })
   }
   const e = rucEquifax.value
   const estado = estadoRuc.value
@@ -176,24 +206,33 @@ const tags = computed<Tag[]>(() => {
 const camposIess = computed<CampoLectura[]>(() => {
   const a = afiliacion.value
   if (!a) return []
-  const lista: CampoLectura[] = [
+  return [
     { etiqueta: 'Empresa', valor: a.empresa, clase: 'col-12 col-md-8' },
     { etiqueta: 'RUC del empleador', valor: a.ruc_empleador },
+    {
+      etiqueta: 'Tipo de afiliación',
+      valor: a.tiempo_completo
+        ? a.tipo_afiliacion_texto
+        : `${a.tipo_afiliacion_texto} · tiempo parcial`,
+      resaltar: true,
+    },
+    { etiqueta: 'Tipo de empleador', valor: a.tipo_empresa },
     { etiqueta: 'Cargo', valor: a.cargo },
     { etiqueta: 'Sueldo', valor: formatearMoneda(a.sueldo) },
     { etiqueta: 'Fecha de ingreso', valor: formatearFecha(a.fecha_ingreso) },
     {
-      etiqueta: 'Tiempo afiliado',
+      // La base del IESS solo trae afiliaciones vigentes al corte
+      etiqueta: 'Fecha de salida',
+      valor: a.fecha_salida
+        ? formatearFecha(a.fecha_salida)
+        : 'Sin fecha de salida (vigente al corte)',
+    },
+    {
+      etiqueta: a.fecha_corte ? 'Tiempo afiliado al corte' : 'Tiempo afiliado',
       valor: textoAnios(a.anios),
       resaltar: true,
     },
   ]
-  if (a.fecha_salida)
-    lista.push({
-      etiqueta: 'Fecha de salida',
-      valor: formatearFecha(a.fecha_salida),
-    })
-  return lista
 })
 
 const camposRuc = computed<CampoLectura[]>(() => {
@@ -239,6 +278,9 @@ const otrasAfiliaciones = computed(() =>
   props.relacion.iess.slice(1).map((a, i) => ({
     id: i,
     empresa: a.empresa ?? '—',
+    tipo: a.tiempo_completo
+      ? a.tipo_afiliacion_texto
+      : `${a.tipo_afiliacion_texto} · tiempo parcial`,
     fecha_ingreso: formatearFecha(a.fecha_ingreso),
     fecha_salida: a.fecha_salida ? formatearFecha(a.fecha_salida) : 'VIGENTE',
     tiempo: textoAnios(a.anios),
@@ -249,6 +291,7 @@ type FilaAfiliacion = (typeof otrasAfiliaciones.value)[number]
 
 const columnasAfiliaciones: ColumnConfig<FilaAfiliacion>[] = [
   { name: 'empresa', field: 'empresa', label: 'Empresa', align: 'left' },
+  { name: 'tipo', field: 'tipo', label: 'Tipo', align: 'left' },
   {
     name: 'fecha_ingreso',
     field: 'fecha_ingreso',

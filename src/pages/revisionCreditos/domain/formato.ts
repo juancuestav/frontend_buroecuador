@@ -30,6 +30,29 @@ export function formatearFechaBarra(fecha: string | null | undefined): string {
   return formatearFecha(fecha).replace(/-/g, '/')
 }
 
+const MESES = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+]
+
+// "2026-09-30" → "septiembre de 2026"
+export function formatearMesAnio(fecha: string | null | undefined): string {
+  if (!fecha) return '—'
+  const [anio, mes] = fecha.substring(0, 10).split('-')
+  const nombre = MESES[Number(mes) - 1]
+  return nombre && anio ? `${nombre} de ${anio}` : fecha
+}
+
 export function textoAnios(anios: number | null | undefined): string {
   if (anios === null || anios === undefined) return '—'
   return `${anios} ${anios === 1 ? 'año' : 'años'}`

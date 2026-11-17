@@ -33,16 +33,36 @@ export interface ClienteRevision {
   conyuge: { nombres: string | null; cedula: string | null } | null
 }
 
+// Tipo de afiliación deducido del tipo de empleador y del cargo (solo 'general' pasa)
+export type TipoAfiliacion =
+  | 'general'
+  | 'campesino'
+  | 'voluntario'
+  | 'hogar'
+  | 'sin_dependencia'
+  | 'ruc_propio'
+
 export interface AfiliacionIess {
   empresa: string | null
   ruc_empleador: string | null
+  tipo_empresa: string | null
   cargo: string | null
   sueldo: number | null
   fecha_ingreso: string | null
+  // La base del IESS solo trae afiliaciones vigentes: casi siempre viene vacía
   fecha_salida: string | null
+  // Último día del mes de corte de la base del IESS
+  fecha_corte: string | null
   vigente: boolean
+  tipo_afiliacion: TipoAfiliacion
+  tipo_afiliacion_texto: string
+  tiempo_completo: boolean
+  // Por qué no califica por tipo o jornada (la antigüedad va aparte)
+  motivo_no_califica: string | null
+  // Años al corte (o a la fecha de la revisión si es anterior)
   anios: number | null
   cumple_antiguedad: boolean
+  califica: boolean
 }
 
 export interface RucCliente {
@@ -156,6 +176,8 @@ export interface RevisionCredito {
   relacion_laboral: {
     consultada: boolean
     iess: AfiliacionIess[]
+    // Fecha de corte de la base del IESS (también cuando no hay afiliación)
+    iess_fecha_corte: string | null
     ruc: RucCliente | null
     // RUC según Equifax (informativo, solo si ya se consultó en el paso 4)
     ruc_equifax: RucEquifax | null
