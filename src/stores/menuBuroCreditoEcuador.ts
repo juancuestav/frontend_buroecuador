@@ -39,6 +39,12 @@ export const menuBuroCreditoEcuador: Ref<MenuOption[]> = computed(() => [
     can: store.can('acceder.revision_creditos'),
   },
   {
+    title: 'Ingreso de créditos',
+    icon: 'bi-file-earmark-text',
+    link: 'solicitudes-credito',
+    can: store.can('acceder.solicitudes_credito'),
+  },
+  {
     title: 'Compras de Reportes',
     icon: 'bi-bar-chart-line-fill',
     link: 'compras-reportes',
