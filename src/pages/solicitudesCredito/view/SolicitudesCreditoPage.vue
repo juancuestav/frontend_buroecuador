@@ -12,7 +12,17 @@
     paginate
     listado-diferido
   >
-    <!-- Historial: botón de nueva solicitud y resumen sobre la tabla -->
+    <!-- Dashboard en su propia pestaña -->
+    <template #dashboard>
+      <dashboard-solicitudes
+        ref="dashboard"
+        @ver-en-historial="verEnHistorial"
+        @parametros="dialogoParametros = true"
+      />
+      <dialogo-parametros v-model="dialogoParametros" />
+    </template>
+
+    <!-- Historial: botón de nueva solicitud sobre la tabla -->
     <template #antes-listado>
       <div class="row justify-end q-mb-md">
         <q-btn
@@ -24,12 +34,6 @@
           @click="nuevaSolicitud"
         />
       </div>
-      <dashboard-solicitudes
-        ref="dashboard"
-        @ver-en-historial="verEnHistorial"
-        @parametros="dialogoParametros = true"
-      />
-      <dialogo-parametros v-model="dialogoParametros" />
     </template>
 
     <template #filtros-listado="{ recargar }">
@@ -136,7 +140,6 @@
           :solicitud="solicitud"
           @actualizada="actualizada"
           @enviada="actualizada"
-          @eliminada="eliminada"
         />
         <detalle-solicitud
           v-else

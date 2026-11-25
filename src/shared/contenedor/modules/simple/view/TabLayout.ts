@@ -161,6 +161,11 @@ export default defineComponent({
       type: String,
       default: 'Listado',
     },
+    // Pestaña "Dashboard" (se muestra solo si se usa el slot dashboard)
+    labelDashboard: {
+      type: String,
+      default: 'Dashboard',
+    },
     // Carga el listado la primera vez que se abre su pestaña, no al montar
     listadoDiferido: {
       type: Boolean,
@@ -212,7 +217,9 @@ export default defineComponent({
         const detener = watch(tabs, (tab) => {
           if (tab !== 'listado') return
           detener()
-          cargarListado()
+          // Con los filtros que la pantalla haya fijado antes de abrir la pestaña
+          if (props.paginate) listar({ ...filtros.fields, paginate: 1 })
+          else listar({ ...filtros.fields })
         })
       }
     }

@@ -2,8 +2,13 @@
   <div>
     <!-- Encabezado de una solicitud ya creada -->
     <div v-if="solicitud" class="row items-center q-mb-md q-gutter-sm">
-      <div class="text-subtitle1 text-bold col-12 col-sm">
-        Solicitud #{{ solicitud.id }} · {{ solicitud.nombres }}
+      <div class="col-12 col-sm">
+        <div class="text-subtitle1 text-bold">Solicitud #{{ solicitud.id }} · {{ solicitud.nombres }}</div>
+        <div class="text-caption text-grey-8">
+          Cédula {{ solicitud.identificacion }} · Monto solicitado
+          {{ formatearMoneda(solicitud.monto_solicitado) }}<template v-if="solicitud.dia_pago">
+            · Día de pago: {{ solicitud.dia_pago }} de cada mes</template>
+        </div>
       </div>
       <span class="chip-estado" :style="estiloEstado(solicitud.estado)">
         {{ solicitud.estado_texto }}
@@ -11,15 +16,6 @@
       <span v-if="solicitud.con_autorizacion" class="chip-estado chip-estado--aviso">
         Con autorización
       </span>
-      <q-btn
-        v-if="solicitud.permisos.eliminar"
-        flat
-        no-caps
-        color="negative"
-        icon="bi-trash"
-        label="Eliminar borrador"
-        @click="eliminar"
-      />
     </div>
     <div
       v-if="solicitud?.estado === 'LISTO_PARA_ENVIAR' && solicitud.observacion"
@@ -110,8 +106,8 @@
 import { computed, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificaciones } from 'shared/notificaciones'
-import { obtenerMensajeError } from 'pages/revisionCreditos/domain/formato'
-import { SolicitudCredito } from '../../domain/SolicitudCredito'
+import { formatearMoneda, obtenerMensajeError } from 'pages/revisionCreditos/domain/formato'
+import { DatosCliente, SolicitudCredito } from '../../domain/SolicitudCredito'
 import { estiloEstado } from '../../domain/estados'
 import { solicitudesApi } from '../../infraestructure/solicitudesApi'
 import PasoCliente from './PasoCliente.vue'
@@ -136,7 +132,6 @@ const props = defineProps<{ solicitud: SolicitudCredito | null }>()
 const emit = defineEmits<{
   (e: 'actualizada', modelo: SolicitudCredito): void
   (e: 'enviada', modelo: SolicitudCredito): void
-  (e: 'eliminada'): void
 }>()
 
 const $q = useQuasar()
@@ -163,12 +158,12 @@ function puedeIrA(numero: number) {
   return numero <= props.solicitud.paso
 }
 
-async function guardarCliente(revisionId: number) {
+async function guardarCliente(revisionId: number, cliente: DatosCliente) {
   guardando.value = true
   try {
     const respuesta = props.solicitud
-      ? await solicitudesApi.guardarPaso(props.solicitud.id, 1, { revision_credito_id: revisionId })
-      : await solicitudesApi.crear(revisionId)
+      ? await solicitudesApi.guardarPaso(props.solicitud.id, 1, { revision_credito_id: revisionId, ...cliente })
+      : await solicitudesApi.crear(revisionId, cliente)
     emit('actualizada', respuesta.modelo)
     if (!props.solicitud) notificarCorrecto('Solicitud creada como borrador.')
     paso.value = 2
@@ -236,24 +231,6 @@ function enviar() {
   })
 }
 
-function eliminar() {
-  if (!props.solicitud) return
-  const id = props.solicitud.id
-  $q.dialog({
-    title: 'Eliminar borrador',
-    message: 'Se eliminará el borrador y sus documentos. ¿Desea continuar?',
-    cancel: { label: 'Cancelar', flat: true, noCaps: true },
-    ok: { label: 'Eliminar', color: 'negative', unelevated: true, noCaps: true },
-  }).onOk(async () => {
-    try {
-      await solicitudesApi.eliminar(id)
-      notificarCorrecto('Borrador eliminado.')
-      emit('eliminada')
-    } catch (error) {
-      notificarError(obtenerMensajeError(error, 'No se pudo eliminar el borrador.'))
-    }
-  })
-}
 </script>
 
 <style scoped lang="scss">

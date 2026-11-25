@@ -47,6 +47,26 @@
           hint="Ingreso mensual promedio; debe respaldarse con las declaraciones"
         />
       </div>
+      <div v-if="conRuc" class="col-12">
+        <label class="q-mb-sm row items-center">
+          Descripción de la actividad del cliente
+          <q-icon name="bi-info-circle" size="15px" class="q-ml-sm text-grey-7 cursor-pointer">
+            <q-tooltip class="bg-dark" max-width="300px">
+              Breve descripción de la actividad que realiza el cliente, mientras más detalles, mejor.
+            </q-tooltip>
+          </q-icon>
+        </label>
+        <q-input
+          v-model="actividad"
+          type="textarea"
+          autogrow
+          maxlength="2000"
+          :rules="[(v) => !!(v && v.trim()) || 'Describa la actividad que realiza el cliente']"
+          :disable="!editable"
+          outlined
+          dense
+        />
+      </div>
       <div class="col-12 col-sm-6 col-md-4">
         <label class="q-mb-sm block">Cuota estimada buró de crédito</label>
         <q-input
@@ -145,6 +165,7 @@ const plazoAnios = ref<number | null>(
   props.solicitud.plazo_meses ? Math.round(props.solicitud.plazo_meses / 12) : aniosMaximos.value
 )
 const monto = ref<number | null>(props.solicitud.monto_solicitado)
+const actividad = ref<string>(props.solicitud.actividad_descripcion ?? '')
 
 const plazoMeses = computed(() => (plazoAnios.value && plazoAnios.value > 0 ? plazoAnios.value * 12 : null))
 const textoAnios = computed(() => `${plazoAnios.value} ${plazoAnios.value === 1 ? 'año' : 'años'}`)
@@ -237,6 +258,7 @@ async function obtenerDatos() {
     ingreso_ruc: conRuc.value ? ingresoRuc.value : null,
     plazo_meses: plazoMeses.value,
     monto_solicitado: monto.value,
+    actividad_descripcion: conRuc.value ? actividad.value.trim() : null,
   }
 }
 

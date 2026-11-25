@@ -1,6 +1,7 @@
 import { endpoints } from 'config/api'
 import { AxiosHttpRepository } from 'shared/http/infraestructure/AxiosHttpRepository'
 import {
+  DatosCliente,
   ParametrosSolicitud,
   RevisionParaSolicitud,
   SolicitudCredito,
@@ -38,13 +39,15 @@ export const solicitudesApi = {
         '/continuar',
       { forzar_equifax: false }
     ),
-  crear: (revisionId: number) =>
-    datos<Respuesta>(axios.post(base(), { revision_credito_id: revisionId })),
+  crear: (revisionId: number, cliente: DatosCliente) =>
+    datos<Respuesta>(axios.post(base(), { revision_credito_id: revisionId, ...cliente })),
   obtener: (id: number) => datos<Respuesta>(axios.get(de(id))),
   guardarPaso: (id: number, paso: number, cuerpo: Record<string, any>) =>
     datos<Respuesta>(axios.put(`${de(id)}/pasos/${paso}`, cuerpo)),
   enviar: (id: number) => datos<Respuesta>(axios.post(`${de(id)}/enviar`)),
-  eliminar: (id: number) => axios.delete(de(id)),
+  /** Asesores para "Pertenece a" */
+  asesores: () =>
+    datos<{ asesores: { id: number; nombre: string }[] }>(axios.get(`${base()}/asesores`)),
 
   subirDocumento: (id: number, documentoId: number, archivo: File) => {
     const formulario = new FormData()
@@ -65,6 +68,20 @@ export const solicitudesApi = {
       responseType: 'blob',
     })
     return URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+  },
+  /** Descarga el PDF con su nombre original */
+  descargarDocumento: async (id: number, documentoId: number, nombre: string) => {
+    const response: any = await axios.get(`${de(id)}/documentos/${documentoId}/archivo?descargar=1`, {
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+    const enlace = document.createElement('a')
+    enlace.href = url
+    enlace.download = nombre.toLowerCase().endsWith('.pdf') ? nombre : `${nombre}.pdf`
+    document.body.appendChild(enlace)
+    enlace.click()
+    enlace.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 60 * 1000)
   },
   pedirDocumento: (id: number, nombre: string, detalle: string | null) =>
     datos<Respuesta>(axios.post(`${de(id)}/documentos`, { nombre, detalle })),

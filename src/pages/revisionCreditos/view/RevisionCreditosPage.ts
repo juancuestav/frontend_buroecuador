@@ -104,7 +104,8 @@ export default defineComponent({
     const errorContinuar = ref<string | null>(null)
 
     // TabLayout carga el historial la primera vez que se abre su pestaña
-    // (listado-diferido). Después solo se recarga si hubo revisiones nuevas.
+    // (listado-diferido) y el resumen se carga al abrir la pestaña Dashboard.
+    // Después solo se recargan si hubo revisiones nuevas.
     let historialAbierto = false
     let historialDesactualizado = false
     let resumenDesactualizado = false
@@ -223,21 +224,21 @@ export default defineComponent({
      *************/
     onListado(() => (historialDesactualizado = false))
 
-    // El resumen se carga solo al montarse (primera apertura del historial)
+    // El resumen se carga al montarse (primera apertura de su pestaña)
     const dashboard = ref<InstanceType<typeof DashboardRevisiones> | null>(null)
 
     watch(tabs, (tab) => {
-      if (tab !== 'listado') return
-      if (!historialAbierto) {
-        historialAbierto = true
+      if (tab === 'dashboard') {
+        if (resumenDesactualizado && dashboard.value) dashboard.value.cargar()
         resumenDesactualizado = false
         return
       }
-      if (historialDesactualizado) listar({ ...filtros.fields, paginate: 1 })
-      if (resumenDesactualizado) {
-        resumenDesactualizado = false
-        dashboard.value?.cargar()
+      if (tab !== 'listado') return
+      if (!historialAbierto) {
+        historialAbierto = true
+        return
       }
+      if (historialDesactualizado) listar({ ...filtros.fields, paginate: 1 })
     })
 
     // Asesor que hizo la consulta y asesor al que pertenece
@@ -294,13 +295,12 @@ export default defineComponent({
       filtroResultado.value = filtro.resultado
       filtroDesde.value = filtro.desde
       filtroHasta.value = null
+      // Primera apertura del historial: TabLayout lo carga con estos filtros
+      const yaAbierto = historialAbierto
       filtrar(async () => {
-        await listar({ ...filtros.fields, paginate: 1 })
+        if (yaAbierto) await listar({ ...filtros.fields, paginate: 1 })
       })
-      // La tabla está justo debajo del resumen
-      const tabla = (dashboard.value?.$el as HTMLElement | undefined)
-        ?.nextElementSibling
-      tabla?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      tabs.value = 'listado'
     }
 
     // Impresión / "Guardar como PDF" (estilos en imprimir.scss)

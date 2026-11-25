@@ -1,5 +1,8 @@
 <template>
-  <div class="tarjeta-doc" :class="`tarjeta-doc--${documento.estado}`">
+  <div
+    class="tarjeta-doc"
+    :class="[`tarjeta-doc--${documento.estado}`, { 'tarjeta-doc--destacado': documento.destacado }]"
+  >
     <!-- Área principal: si se puede subir, abre el selector de archivos -->
     <div
       class="tarjeta-doc__cuerpo row no-wrap items-center"
@@ -17,6 +20,7 @@
         <div class="tarjeta-doc__nombre" :title="documento.nombre">
           {{ documento.nombre }}
           <span v-if="documento.adicional" class="tarjeta-doc__etiqueta">Adicional</span>
+          <span v-if="documento.destacado" class="tarjeta-doc__etiqueta tarjeta-doc__etiqueta--importante">Importante</span>
         </div>
         <div v-if="documento.detalle" class="tarjeta-doc__detalle" :title="documento.detalle">{{ documento.detalle }}</div>
         <div class="tarjeta-doc__estado" :title="textoEstado">{{ textoEstado }}</div>
@@ -26,36 +30,50 @@
       </div>
     </div>
 
-    <div class="tarjeta-doc__acciones row items-center q-gutter-xs">
+    <!-- Acciones repartidas en partes iguales, separadas por una línea -->
+    <div class="tarjeta-doc__acciones row no-wrap items-stretch">
       <q-btn
         v-if="documento.tiene_archivo"
-        flat dense no-caps size="sm" icon="bi-eye" label="Ver"
+        class="tarjeta-doc__accion"
+        flat no-caps icon="bi-eye" label="Ver"
         @click="ver"
       />
       <q-btn
+        v-if="documento.tiene_archivo"
+        class="tarjeta-doc__accion"
+        flat no-caps icon="bi-download" label="Descargar"
+        @click="descargar"
+      />
+      <q-btn
         v-if="documento.tiene_archivo && puedeQuitar"
-        flat dense no-caps size="sm" icon="bi-trash" label="Quitar" color="negative"
+        class="tarjeta-doc__accion"
+        flat no-caps icon="bi-trash" label="Quitar" color="negative"
         @click="quitar"
       />
-      <q-checkbox
+      <div
         v-if="documento.permite_no_tiene && editable"
-        :model-value="documento.estado === 'no_tiene'"
-        label="No tiene"
-        dense
-        size="sm"
-        :disable="procesando"
-        @update:model-value="marcarNoTiene"
-      />
-      <q-space />
+        class="tarjeta-doc__accion row items-center justify-center"
+      >
+        <q-checkbox
+          :model-value="documento.estado === 'no_tiene'"
+          label="No tiene"
+          dense
+          size="sm"
+          :disable="procesando"
+          @update:model-value="marcarNoTiene"
+        />
+      </div>
       <template v-if="gestionar">
         <q-btn
           v-if="documento.estado === 'subido'"
-          flat dense no-caps size="sm" icon="bi-x-circle" label="Rechazar" color="negative"
+          class="tarjeta-doc__accion"
+          flat no-caps icon="bi-x-circle" label="Rechazar" color="negative"
           @click="rechazar"
         />
         <q-btn
           v-if="documento.adicional"
-          flat dense no-caps size="sm"
+          class="tarjeta-doc__accion"
+          flat no-caps
           :icon="documento.abierto ? 'bi-lock' : 'bi-unlock'"
           :label="documento.abierto ? 'Cerrar pedido' : 'Reabrir pedido'"
           @click="cambiarPedido"
@@ -196,6 +214,18 @@ function rechazar() {
 }
 
 /** PDF privado: se descarga con el token y se abre en otra pestaña */
+async function descargar() {
+  try {
+    await solicitudesApi.descargarDocumento(
+      props.solicitudId,
+      props.documento.id,
+      props.documento.nombre_archivo ?? props.documento.nombre
+    )
+  } catch (e) {
+    notificarError('No se pudo descargar el documento.')
+  }
+}
+
 async function ver() {
   try {
     $q.loading.show({ message: 'Obteniendo documento...' })
@@ -228,7 +258,7 @@ $tonos: (
 
 .tarjeta-doc {
   // Alto fijo: no cambia al subir, quitar o rechazar un documento
-  height: 172px;
+  height: 178px;
   border-radius: 14px;
   border: 1px solid;
   overflow: hidden;
@@ -282,6 +312,16 @@ $tonos: (
     @include recortar(2);
   }
 
+  // Pagaré firmado: borde más marcado para que no pase desapercibido
+  &--destacado {
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
+  }
+
+  &__etiqueta--importante {
+    color: #c2410c;
+  }
+
   &__etiqueta {
     font-size: 0.7rem;
     font-weight: 600;
@@ -305,9 +345,32 @@ $tonos: (
   }
 
   &__acciones {
-    padding: 4px 8px;
-    height: 38px;
+    height: 44px;
     flex-shrink: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  // Cada acción ocupa una parte igual del ancho
+  &__accion {
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    & + & {
+      border-left: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    :deep(.q-icon) {
+      font-size: 17px;
+      margin-right: 6px;
+    }
+
+    :deep(.q-btn__content) {
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
   }
 }
 </style>

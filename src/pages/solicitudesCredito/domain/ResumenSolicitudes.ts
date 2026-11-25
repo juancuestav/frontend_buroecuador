@@ -21,7 +21,7 @@ export interface ResumenSolicitudes {
   }[]
   por_asesor:
     | {
-        asesor_id: number
+        asesor_id: number | null
         asesor: string | null
         total: number
         por_estado: Record<EstadoSolicitud, number>

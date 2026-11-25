@@ -136,7 +136,7 @@
                 <tr v-if="!datos.por_asesor.length">
                   <td :colspan="datos.estados.length + 4" class="text-center text-grey-7">Sin solicitudes.</td>
                 </tr>
-                <tr v-for="a in datos.por_asesor" :key="a.asesor_id">
+                <tr v-for="(a, i) in datos.por_asesor" :key="i">
                   <td>{{ a.asesor }}</td>
                   <td v-for="e in datos.estados" :key="e.estado" class="text-center">{{ a.por_estado[e.estado] || '·' }}</td>
                   <td class="text-right text-bold">{{ a.total }}</td>

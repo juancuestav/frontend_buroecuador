@@ -55,6 +55,7 @@ export default defineComponent({
 
     let historialAbierto = false
     let historialDesactualizado = false
+    let dashboardDesactualizado = false
     const dashboard = ref<InstanceType<typeof DashboardSolicitudes> | null>(null)
 
     function nuevaSolicitud() {
@@ -71,14 +72,9 @@ export default defineComponent({
       modoNuevo.value = false
       if (otra) claveFlujo.value++
       historialDesactualizado = true
+      dashboardDesactualizado = true
     }
 
-    function eliminada() {
-      solicitud.value = null
-      modoNuevo.value = false
-      historialDesactualizado = true
-      tabs.value = 'listado'
-    }
 
     // "Consultar" en el historial abre la solicitud
     onConsultado((modelo: SolicitudCredito) => {
@@ -89,16 +85,20 @@ export default defineComponent({
 
     onListado(() => (historialDesactualizado = false))
 
+    // El dashboard se carga al abrir su pestaña por primera vez; después solo
+    // se recarga si hubo cambios. Igual el historial (listado diferido).
     watch(tabs, (tab) => {
+      if (tab === 'dashboard') {
+        if (dashboardDesactualizado) dashboard.value?.cargar()
+        dashboardDesactualizado = false
+        return
+      }
       if (tab !== 'listado') return
       if (!historialAbierto) {
         historialAbierto = true
         return
       }
-      if (historialDesactualizado) {
-        listar({ ...filtros.fields, paginate: 1 })
-        dashboard.value?.cargar()
-      }
+      if (historialDesactualizado) listar({ ...filtros.fields, paginate: 1 })
     })
 
     // Enlace de una notificación: /solicitudes-credito?solicitud=ID
@@ -112,6 +112,7 @@ export default defineComponent({
     // Novedad en tiempo real de la solicitud abierta: se recarga
     async function alActualizarse(evento: Event) {
       historialDesactualizado = true
+      dashboardDesactualizado = true
       const id = (evento as CustomEvent<{ id: number }>).detail?.id
       if (!id || id !== solicitud.value?.id) return
       try {
@@ -174,9 +175,12 @@ export default defineComponent({
       filtroAsesor.value = null
       filtroDesde.value = filtro.desde
       filtroHasta.value = null
+      // Primera apertura del historial: TabLayout lo carga con estos filtros
+      const cargar = historialAbierto ? () => listar({ ...filtros.fields, paginate: 1 }) : async () => undefined
       filtrar(async () => {
-        await listar({ ...filtros.fields, paginate: 1 })
+        await cargar()
       })
+      tabs.value = 'listado'
     }
 
     return {
@@ -189,7 +193,6 @@ export default defineComponent({
       dashboard,
       nuevaSolicitud,
       actualizada,
-      eliminada,
       verEnHistorial,
       puedeVerTodas,
       asesores,

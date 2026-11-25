@@ -91,7 +91,10 @@ const camposCliente = computed(() => [
       ? `${formatearFechaBarra(props.solicitud.equifax_consultado_at)} (hace ${props.solicitud.equifax_dias} días)`
       : null,
   },
-  { etiqueta: 'Asesor', valor: props.solicitud.asesor },
+  { etiqueta: 'Pertenece a', valor: props.solicitud.asesor },
+  ...(props.solicitud.registrado_por && props.solicitud.registrado_por_id !== props.solicitud.asesor_id
+    ? [{ etiqueta: 'Registrada por', valor: props.solicitud.registrado_por }]
+    : []),
   {
     etiqueta: 'Autorización',
     valor: props.solicitud.con_autorizacion
@@ -123,11 +126,15 @@ const camposEconomicos = computed(() => {
     { etiqueta: 'Relación económica', valor: s.tipo_ingreso ? TIPOS[s.tipo_ingreso] : null },
     ...(conIess ? [{ etiqueta: 'Ingreso IESS', valor: formatearMoneda(s.ingreso_iess) }] : []),
     ...(conRuc ? [{ etiqueta: 'Ingreso RUC', valor: formatearMoneda(s.ingreso_ruc) }] : []),
+    ...(conRuc && s.actividad_descripcion
+      ? [{ etiqueta: 'Actividad del cliente', valor: s.actividad_descripcion, clase: 'col-12' }]
+      : []),
     { etiqueta: 'Ingresos totales', valor: formatearMoneda(s.ingresos_totales) },
     { etiqueta: 'Cuota buró', valor: formatearMoneda(s.cuota_buro) },
     { etiqueta: 'Ingreso neto', valor: formatearMoneda(s.ingreso_neto) },
     { etiqueta: 'Capacidad de pago', valor: formatearMoneda(s.capacidad_pago), resaltar: true },
     { etiqueta: 'Plazo', valor: textoPlazo(s.plazo_meses) },
+    { etiqueta: 'Día de pago', valor: s.dia_pago ? `${s.dia_pago} de cada mes` : null },
     { etiqueta: 'Monto sugerido (máximo)', valor: formatearMoneda(s.monto_sugerido) },
     { etiqueta: 'Monto solicitado', valor: formatearMoneda(s.monto_solicitado), resaltar: true },
     { etiqueta: 'Cuota del préstamo', valor: formatearMoneda(s.cuota_prestamo) },

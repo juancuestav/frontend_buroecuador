@@ -38,6 +38,8 @@ export interface DocumentoSolicitud {
   clave: string
   nombre: string
   detalle: string | null
+  /** Se resalta (pagaré firmado) */
+  destacado: boolean
   adicional: boolean
   abierto: boolean
   permite_no_tiene: boolean
@@ -87,8 +89,12 @@ export interface SolicitudCredito {
   id: number
   identificacion: string
   nombres: string | null
+  /** "Pertenece a": nombre escrito en "Otro" o el del asesor con cuenta */
   asesor: string | null
-  asesor_id: number
+  asesor_id: number | null
+  pertenece_a_nombre: string | null
+  registrado_por: string | null
+  registrado_por_id: number | null
   estado: EstadoSolicitud
   estado_texto: string
   paso: number
@@ -117,6 +123,9 @@ export interface SolicitudCredito {
   tasa_anual: number | null
   porcentaje_capacidad: number | null
   plazo_meses: number | null
+  /** Día del mes en que se pagan las cuotas (3 a 28) */
+  dia_pago: number | null
+  actividad_descripcion: string | null
   monto_sugerido: number | null
   monto_solicitado: number | null
   cuota_prestamo: number | null
@@ -130,6 +139,7 @@ export interface SolicitudCredito {
   created_at: string | null
   enviado_at: string | null
 
+  otras_solicitudes: SolicitudExistente[]
   economicos: DatosEconomicos
   parametros: ParametrosSolicitud
   revision: RevisionCredito
@@ -138,10 +148,33 @@ export interface SolicitudCredito {
   permisos: {
     editar: boolean
     enviar: boolean
-    eliminar: boolean
     gestionar: boolean
     comentar: boolean
+    /** Sin enviar: el administrador solo puede pasarla a "No procede" */
+    no_procede: boolean
   }
+}
+
+/** Otra solicitud de la misma cédula (de cualquier asesor) */
+export interface SolicitudExistente {
+  id: number
+  banco: Banco | null
+  banco_nombre: string | null
+  estado: EstadoSolicitud
+  estado_texto: string
+  asesor: string | null
+  created_at: string | null
+  /** Impide otra solicitud en ese banco (todas menos Negado y No procede) */
+  bloquea: boolean
+}
+
+/** Datos del paso Cliente */
+export interface DatosCliente {
+  monto_solicitado: number | null
+  plazo_meses: number | null
+  dia_pago: number | null
+  asesor_id?: number | null
+  pertenece_a_nombre?: string | null
 }
 
 /** Respuesta de POST solicitudes-credito/revisar (paso 1) */
@@ -154,7 +187,7 @@ export interface RevisionParaSolicitud {
     autorizado_por: string | null
     motivo: string | null
   }
-  solicitudes_activas: { id: number; banco: string | null; estado: string }[]
+  solicitudes_existentes: SolicitudExistente[]
 }
 
 export const BANCOS: { value: Banco; label: string }[] = [

@@ -12,8 +12,8 @@
     paginate
     listado-diferido
   >
-    <!-- Historial: resumen sobre la tabla -->
-    <template #antes-listado>
+    <!-- Dashboard en su propia pestaña -->
+    <template #dashboard>
       <dashboard-revisiones
         ref="dashboard"
         @ver-en-historial="verEnHistorial"

@@ -31,6 +31,14 @@
         :class="{ 'tab-inactive': tabs !== 'formulario' }"
         no-caps
       />
+      <!-- Pestaña opcional: solo si la pantalla usa el slot "dashboard" -->
+      <q-tab
+        v-if="$slots.dashboard"
+        name="dashboard"
+        :label="labelDashboard"
+        :class="{ 'tab-inactive': tabs !== 'dashboard' }"
+        no-caps
+      />
       <q-tab
         v-if="mostrarListado"
         name="listado"
@@ -79,6 +87,11 @@
           />
         </div>
         <!-- </div> -->
+      </q-tab-panel>
+
+      <!-- Dashboard (opcional) -->
+      <q-tab-panel v-if="$slots.dashboard" name="dashboard">
+        <slot name="dashboard" />
       </q-tab-panel>
 
       <!-- Listado: essential-table(-pagination) ya se renderiza dentro

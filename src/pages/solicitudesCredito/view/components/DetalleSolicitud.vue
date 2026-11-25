@@ -4,9 +4,16 @@
     <div class="encabezado row items-start q-col-gutter-md q-mb-md">
       <div class="col-12 col-md">
         <div class="text-h6 text-bold">Solicitud #{{ solicitud.id }} · {{ solicitud.nombres }}</div>
+        <div class="text-body2 text-grey-9 q-mt-xs">
+          Cédula <b>{{ solicitud.identificacion }}</b> · Monto solicitado
+          <b>{{ formatearMoneda(solicitud.monto_solicitado) }}</b><template v-if="solicitud.dia_pago">
+            · Día de pago: <b>{{ solicitud.dia_pago }} de cada mes</b></template>
+        </div>
         <div class="text-caption text-grey-7">
-          Cédula {{ solicitud.identificacion }} · {{ solicitud.banco_nombre }} ·
-          Asesor {{ solicitud.asesor }} · Ingresada {{ solicitud.created_at }}
+          {{ solicitud.banco_nombre ?? 'Sin banco' }} · Pertenece a {{ solicitud.asesor }}<template
+            v-if="solicitud.registrado_por && solicitud.registrado_por_id !== solicitud.asesor_id"
+          > · Registrada por {{ solicitud.registrado_por }}</template>
+          · Ingresada {{ solicitud.created_at }}
           <template v-if="solicitud.enviado_at"> · Enviada {{ solicitud.enviado_at }}</template>
         </div>
         <div class="row q-gutter-sm q-mt-sm">
@@ -23,11 +30,19 @@
         </div>
       </div>
 
-      <!-- Acciones del administrador -->
-      <div v-if="solicitud.permisos.gestionar" class="col-12 col-md-auto column q-gutter-sm">
-        <q-btn unelevated no-caps color="primary" icon="bi-arrow-left-right" label="Cambiar estado" @click="abrirEstado" />
-        <q-btn outline no-caps color="primary" icon="bi-file-earmark-plus" label="Pedir documento" @click="dialogoDocumento = true" />
+      <!-- Acciones del administrador (sin enviar, solo "No procede") -->
+      <div v-if="solicitud.permisos.gestionar || solicitud.permisos.no_procede" class="col-12 col-md-auto column q-gutter-sm">
+        <q-btn
+          unelevated
+          no-caps
+          color="primary"
+          icon="bi-arrow-left-right"
+          :label="solicitud.permisos.gestionar ? 'Cambiar estado' : 'Marcar como No procede'"
+          @click="abrirEstado"
+        />
+        <q-btn v-if="solicitud.permisos.gestionar" outline no-caps color="primary" icon="bi-file-earmark-plus" label="Pedir documento" @click="dialogoDocumento = true" />
         <q-toggle
+          v-if="solicitud.permisos.gestionar"
           :model-value="solicitud.asesor_puede_comentar"
           label="El asesor puede comentar"
           :disable="procesando"
@@ -206,7 +221,7 @@ import { QForm } from 'quasar'
 import { useNotificaciones } from 'shared/notificaciones'
 import ResultadoValidacion from 'pages/revisionCreditos/view/components/ResultadoValidacion.vue'
 import DatosCliente from 'pages/revisionCreditos/view/components/DatosCliente.vue'
-import { obtenerMensajeError } from 'pages/revisionCreditos/domain/formato'
+import { formatearMoneda, obtenerMensajeError } from 'pages/revisionCreditos/domain/formato'
 import { EstadoSolicitud, SolicitudCredito } from '../../domain/SolicitudCredito'
 import { ESTADOS, ESTADOS_ADMINISTRADOR, ESTADOS_CON_COMENTARIO, estiloEstado } from '../../domain/estados'
 import { solicitudesApi } from '../../infraestructure/solicitudesApi'
@@ -255,8 +270,11 @@ const nuevoEstado = reactive<{
   cuota_aprobada: number | null
 }>({ estado: null, comentario: '', monto_aprobado: null, plazo_aprobado_anios: null, cuota_aprobada: null })
 
+// Sin enviar (borrador abandonado), solo "No procede": libera la cédula en ese banco
 const opcionesEstado = computed(() =>
-  ESTADOS_ADMINISTRADOR.filter((e) => e !== props.solicitud.estado).map((e) => ({
+  (props.solicitud.permisos.gestionar ? ESTADOS_ADMINISTRADOR : (['NO_PROCEDE'] as EstadoSolicitud[]))
+    .filter((e) => e !== props.solicitud.estado)
+    .map((e) => ({
     value: e,
     label: e === 'LISTO_PARA_ENVIAR' ? 'Listo para enviar (devolver al asesor)' : ESTADOS[e].texto,
   }))
