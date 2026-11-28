@@ -9,8 +9,12 @@
           :disabled="!editable"
           @click="seleccionado = banco.value"
         >
-          <span class="opcion-banco__logo">
-            <img :src="LOGOS[banco.value]" :alt="banco.label" />
+          <span
+            class="opcion-banco__logo"
+            :class="`opcion-banco__logo--${banco.value.toLowerCase()}`"
+            :style="{ background: LOGOS[banco.value].fondo }"
+          >
+            <img :src="LOGOS[banco.value].imagen" :alt="banco.label" />
           </span>
           <!-- Check relleno: los bi-* se dibujan con Lucide (solo contorno) -->
           <svg
@@ -86,12 +90,14 @@ import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { useNotificaciones } from 'shared/notificaciones'
 import { Banco, BANCOS, SolicitudCredito } from '../../domain/SolicitudCredito'
 import { REQUISITOS_BANCOS } from '../../domain/requisitosBancos'
-import logoGuayaquil from 'src/assets/bancos/guayaquil.png'
-import logoPichincha from 'src/assets/bancos/pichincha.svg'
+import logoGuayaquil from 'src/assets/bancos/bguayaquil.png'
+import logoPichincha from 'src/assets/bancos/bpichincha.png'
 
-const LOGOS: Record<Banco, string> = {
-  GUAYAQUIL: logoGuayaquil,
-  PICHINCHA: logoPichincha,
+// Logo sobre el color de marca de cada banco (el de Guayaquil es el mismo
+// magenta del fondo de su imagen, para que el recorte no se note)
+const LOGOS: Record<Banco, { imagen: string; fondo: string }> = {
+  GUAYAQUIL: { imagen: logoGuayaquil, fondo: '#d2006e' },
+  PICHINCHA: { imagen: logoPichincha, fondo: '#ffdd00' },
 }
 
 const props = defineProps<{ solicitud: SolicitudCredito; editable: boolean }>()
@@ -226,21 +232,37 @@ defineExpose({ obtenerDatos })
     opacity: 0.8;
   }
 
-  // Fondo blanco también en el tema oscuro: los logos son para fondo claro
+  // Banda con el color de marca del banco (igual en tema claro y oscuro)
   &__logo {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 84px;
-    padding: 10px 16px;
+    height: 110px;
+    padding: 14px 20px;
     border-radius: 10px;
-    background: #fff;
+    overflow: hidden;
 
     img {
       max-height: 100%;
       max-width: 100%;
       object-fit: contain;
+    }
+
+    // Logo vertical con mucho margen magenta: se agranda y la banda recorta
+    // ese margen (el logo ocupa ~la mitad central de la imagen)
+    &--guayaquil {
+      padding: 0;
+
+      img {
+        max-height: none;
+        height: 185%;
+      }
+    }
+
+    // Logo horizontal transparente sobre el amarillo
+    &--pichincha img {
+      max-height: 78%;
     }
   }
 
