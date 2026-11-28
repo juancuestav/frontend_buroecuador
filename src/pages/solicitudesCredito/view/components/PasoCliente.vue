@@ -149,18 +149,16 @@
               unelevated
               no-caps
               class="plazo"
+              :class="{ 'plazo--error': errorPlazo }"
             />
-            <div v-if="errorPlazo" class="text-negative text-caption q-mt-xs">Elija el plazo</div>
+            <div v-if="errorPlazo" class="mensaje-error">Elija el plazo</div>
           </div>
           <div class="col-12 col-md-4">
             <label class="q-mb-sm block">Comisión</label>
             <campo-numero
               v-model="datos.comision"
               suffix="%"
-              :rules="[
-                (v) => (v !== null && v !== undefined) || 'Ingrese la comisión',
-                (v) => (v >= 0 && v <= 100) || 'Debe estar entre 0 y 100',
-              ]"
+              :rules="[reglaComision]"
               :disable="!editable"
               outlined
               dense
@@ -169,7 +167,7 @@
           <div class="col-12 col-md-4">
             <label class="q-mb-sm block">Día de pago</label>
             <selector-dia-pago v-model="datos.dia_pago" :disable="!editable" :error="errorDia" />
-            <div v-if="errorDia" class="text-negative text-caption q-mt-xs">Elija el día de pago</div>
+            <div v-if="errorDia" class="mensaje-error">Elija el día de pago</div>
             <div v-else class="text-caption text-grey-7 q-mt-xs">
               {{ datos.dia_pago ? `El cliente pagará el ${datos.dia_pago} de cada mes` : 'Días disponibles del 3 al 28' }}
             </div>
@@ -300,6 +298,12 @@ const opcionesPlazo = computed(() =>
 const intentoContinuar = ref(false)
 const errorPlazo = computed(() => intentoContinuar.value && !plazoAnios.value)
 const errorDia = computed(() => intentoContinuar.value && !datos.dia_pago)
+// CampoNumero pasa a las reglas el texto del campo ('' si está vacío), no el número
+const reglaComision = (v: string | number | null) => {
+  if (v === null || v === undefined || String(v).trim() === '') return 'Ingrese la comisión'
+  const valor = Number(String(v).replace(',', '.'))
+  return (valor >= 0 && valor <= 100) || 'Debe estar entre 0 y 100'
+}
 
 const autenticacion = useAuthenticationStore()
 const puedeAsignar = autenticacion.can('asignar.asesor_solicitudes_credito')
@@ -471,6 +475,20 @@ defineExpose({ revisar })
 
 .plazo {
   border: 1px solid rgba(0, 0, 0, 0.24);
+
+  // Mismo resaltado que un campo de Quasar con error
+  &--error {
+    border-color: var(--q-negative);
+  }
+}
+
+// Mismo mensaje que el de las reglas de Quasar (q-field__bottom) para los
+// campos que no son q-field (plazo y día de pago)
+.mensaje-error {
+  padding: 8px 12px 0;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--q-negative);
 }
 
 .aviso {
