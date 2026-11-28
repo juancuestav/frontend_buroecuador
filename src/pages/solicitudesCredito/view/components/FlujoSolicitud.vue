@@ -7,7 +7,10 @@
         <div class="text-caption text-grey-8">
           Cédula {{ solicitud.identificacion }} · Monto solicitado
           {{ formatearMoneda(solicitud.monto_solicitado) }}<template v-if="solicitud.dia_pago">
-            · Día de pago: {{ solicitud.dia_pago }} de cada mes</template>
+            · Día de pago: {{ solicitud.dia_pago }} de cada mes</template><template
+            v-if="solicitud.comision !== null && solicitud.comision !== undefined"
+          >
+            · Comisión {{ Number(solicitud.comision) }}%</template>
         </div>
       </div>
       <span class="chip-estado" :style="estiloEstado(solicitud.estado)">
@@ -18,11 +21,19 @@
       </span>
     </div>
     <div
-      v-if="solicitud?.estado === 'LISTO_PARA_ENVIAR' && solicitud.observacion"
+      v-if="solicitud?.estado === 'BORRADOR' && solicitud.observacion"
       class="devuelta row items-center no-wrap q-mb-md"
     >
       <q-icon name="bi-arrow-return-left" size="18px" class="q-mr-sm" />
       <div>Observación del administrador: {{ solicitud.observacion }}</div>
+    </div>
+    <!-- Otro asesor con permiso para editar las solicitudes sin enviar de otros -->
+    <div v-if="solicitud?.es_propia === false" class="ajena row items-center no-wrap q-mb-md">
+      <q-icon name="bi-pencil-square" size="18px" class="q-mr-sm" />
+      <div>
+        Está editando la solicitud de {{ solicitud.asesor ?? 'otro asesor' }}. Sus cambios quedan
+        registrados en el seguimiento.
+      </div>
     </div>
 
     <q-stepper
@@ -165,7 +176,7 @@ async function guardarCliente(revisionId: number, cliente: DatosCliente) {
       ? await solicitudesApi.guardarPaso(props.solicitud.id, 1, { revision_credito_id: revisionId, ...cliente })
       : await solicitudesApi.crear(revisionId, cliente)
     emit('actualizada', respuesta.modelo)
-    if (!props.solicitud) notificarCorrecto('Solicitud creada como borrador.')
+    if (!props.solicitud) notificarCorrecto('Solicitud creada como pendiente.')
     paso.value = 2
   } catch (error) {
     notificarError(obtenerMensajeError(error, 'No se pudo guardar el paso.'))
@@ -255,6 +266,14 @@ function enviar() {
   color: #9a5b00;
   background: rgba(230, 81, 0, 0.07);
   border: 1px solid rgba(230, 81, 0, 0.28);
+}
+
+.ajena {
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #37474f;
+  background: rgba(120, 144, 156, 0.1);
+  border: 1px solid rgba(120, 144, 156, 0.35);
 }
 
 .flujo {

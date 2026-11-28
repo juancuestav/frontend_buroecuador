@@ -106,7 +106,7 @@ export class ContenedorSimpleMixin<
         this.hooks.bindHook('onModificado', callback),
       onReestablecer: (callback: () => void) =>
         this.hooks.bindHook('onReestablecer', callback),
-      onListado: (callback: () => void) =>
+      onListado: (callback: (respuesta?: any) => void) =>
         this.hooks.bindHook('onListado', callback),
       onListadosCargados: (callback: () => void) =>
         this.hooks.bindHook('onListadosCargados', callback),
@@ -171,8 +171,10 @@ export class ContenedorSimpleMixin<
 
   private async listar(params?: ParamsType, append = false) {
     this.statusEssentialLoading.activar()
+    let respuesta: any
     try {
       const { result, meta, response } = await this.controller.listar(params)
+      respuesta = response?.data
       // console.log(response.data)
 
       if (params?.hasOwnProperty('export'))
@@ -197,7 +199,7 @@ export class ContenedorSimpleMixin<
       this.statusEssentialLoading.desactivar()
     }
 
-    this.hooks.onListado()
+    this.hooks.onListado(respuesta)
   }
 
   private async filtrar(uri: string) {

@@ -1,5 +1,5 @@
 // Dependencias
-import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { endpoints } from 'config/api'
 import { useAuthenticationStore } from 'stores/authentication'
@@ -10,6 +10,7 @@ import FlujoSolicitud from './components/FlujoSolicitud.vue'
 import DetalleSolicitud from './components/DetalleSolicitud.vue'
 import DashboardSolicitudes from './components/DashboardSolicitudes.vue'
 import DialogoParametros from './components/DialogoParametros.vue'
+import PestanasConteo, { OpcionPestana } from 'components/filtros/PestanasConteo.vue'
 
 // Logica y controladores
 import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
@@ -30,6 +31,7 @@ export default defineComponent({
     DetalleSolicitud,
     DashboardSolicitudes,
     DialogoParametros,
+    PestanasConteo,
   },
   setup() {
     const mixin = new ContenedorSimpleMixin(
@@ -83,7 +85,12 @@ export default defineComponent({
       claveFlujo.value++
     })
 
-    onListado(() => (historialDesactualizado = false))
+    // El listado trae la cantidad de cada pestaña (con los demás filtros aplicados)
+    const conteos = ref<Record<string, number>>({})
+    onListado((respuesta) => {
+      historialDesactualizado = false
+      if (respuesta?.conteos) conteos.value = respuesta.conteos
+    })
 
     // El dashboard se carga al abrir su pestaña por primera vez; después solo
     // se recarga si hubo cambios. Igual el historial (listado diferido).
@@ -138,6 +145,26 @@ export default defineComponent({
       }
     })
 
+    /** Pestañas sobre la tabla: grupos de estados (backend SolicitudCredito::GRUPOS) */
+    const grupo = ref('todos')
+    const pestanas = computed<OpcionPestana[]>(() =>
+      [
+        { valor: 'todos', etiqueta: 'Todos', color: '#4f52b3', icono: 'bi-list-ul' },
+        { valor: 'en_tramite', etiqueta: 'En trámite', color: ESTADOS.ENVIADO.color, icono: 'bi-hourglass-split' },
+        { valor: 'pendiente', etiqueta: 'Pendiente', color: ESTADOS.BORRADOR.color, icono: ESTADOS.BORRADOR.icono },
+        { valor: 'aprobados', etiqueta: 'Aprobados', color: ESTADOS.APROBADO.color, icono: ESTADOS.APROBADO.icono },
+        { valor: 'negados', etiqueta: 'Negados', color: ESTADOS.NEGADO.color, icono: ESTADOS.NEGADO.icono },
+        { valor: 'no_procede', etiqueta: 'No procede', color: ESTADOS.NO_PROCEDE.color, icono: ESTADOS.NO_PROCEDE.icono },
+      ].map((p) => ({ ...p, total: conteos.value[p.valor] ?? null }))
+    )
+
+    function cambiarGrupo(valor: string) {
+      grupo.value = valor
+      filtrar(async () => {
+        await listar({ ...filtros.fields, paginate: 1 })
+      })
+    }
+
     const filtroEstado = ref<EstadoSolicitud | null>(null)
     const filtroBanco = ref<string | null>(null)
     const filtroAsesor = ref<number | null>(null)
@@ -155,6 +182,7 @@ export default defineComponent({
       }
       filtros.fields = {
         ...filtros.fields,
+        grupo: grupo.value === 'todos' ? undefined : grupo.value,
         estado: filtroEstado.value ?? undefined,
         banco: filtroBanco.value ?? undefined,
         asesor_id: filtroAsesor.value ?? undefined,
@@ -170,6 +198,7 @@ export default defineComponent({
 
     /** Clic en un estado del resumen: filtra el historial por ese estado y periodo */
     function verEnHistorial(filtro: { estado: EstadoSolicitud; desde: string | null }) {
+      grupo.value = 'todos'
       filtroEstado.value = filtro.estado
       filtroBanco.value = null
       filtroAsesor.value = null
@@ -194,6 +223,9 @@ export default defineComponent({
       nuevaSolicitud,
       actualizada,
       verEnHistorial,
+      grupo,
+      pestanas,
+      cambiarGrupo,
       puedeVerTodas,
       asesores,
       BANCOS,

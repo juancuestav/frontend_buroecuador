@@ -9,7 +9,8 @@ export class ActionHooks<T> extends Hooks<T> {
   onBeforeConsultar: () => void
   onConsultado: (entidad?: any) => void
   onReestablecer: () => void
-  onListado: () => void
+  /** Recibe el cuerpo de la respuesta del listado (p. ej. datos adicionales a la tabla) */
+  onListado: (respuesta?: any) => void
   onListadosCargados: () => void
 
   constructor() {

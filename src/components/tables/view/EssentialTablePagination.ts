@@ -459,7 +459,8 @@ export default defineComponent({
      * buscador con el botón "Mostrar filtros avanzados".
      */
     const filtrosPropiosAbiertos = ref(false)
-    const CLAVES_NO_FILTRO = ['search', 'paginate', 'page']
+    // grupo: pestaña sobre la tabla (ya visible, no es un filtro avanzado)
+    const CLAVES_NO_FILTRO = ['search', 'paginate', 'page', 'grupo']
     const filtrosActivos = computed(
       () =>
         Object.entries(filtros.fields ?? {}).filter(

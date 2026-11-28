@@ -112,7 +112,7 @@
             :subtitle="`${s.created_at} · ${s.usuario ?? ''}${s.es_administrador ? '' : ' (asesor)'}`"
           >
             <template v-if="s.estado_nuevo" #title>
-              <span class="chip-estado" :style="estiloEstado(s.estado_nuevo)">{{ ESTADOS[s.estado_nuevo].texto }}</span>
+              <span class="chip-estado" :style="estiloEstado(s.estado_nuevo)">{{ ESTADOS[s.estado_nuevo]?.texto ?? s.estado_nuevo }}</span>
             </template>
             <div class="mensaje">{{ s.mensaje }}</div>
           </q-timeline-entry>
@@ -144,7 +144,7 @@
               label="Nuevo estado"
               :rules="[(v) => !!v || 'Elija el estado']"
             />
-            <div v-if="nuevoEstado.estado === 'LISTO_PARA_ENVIAR'" class="text-caption text-orange-9">
+            <div v-if="nuevoEstado.estado === 'BORRADOR'" class="text-caption text-orange-9">
               Devuelve la solicitud al asesor para que la corrija y la vuelva a enviar.
             </div>
             <template v-if="nuevoEstado.estado === 'APROBADO'">
@@ -230,7 +230,12 @@ import TarjetaDocumento from './TarjetaDocumento.vue'
 import CampoNumero from './CampoNumero.vue'
 
 
-const ICONOS_SEGUIMIENTO = { comentario: 'bi-chat-left-text', estado: 'bi-flag', documento: 'bi-file-earmark' }
+const ICONOS_SEGUIMIENTO = {
+  comentario: 'bi-chat-left-text',
+  estado: 'bi-flag',
+  documento: 'bi-file-earmark',
+  edicion: 'bi-pencil-square',
+}
 
 const props = defineProps<{ solicitud: SolicitudCredito }>()
 const emit = defineEmits<{ (e: 'actualizada', modelo: SolicitudCredito): void }>()
@@ -276,7 +281,7 @@ const opcionesEstado = computed(() =>
     .filter((e) => e !== props.solicitud.estado)
     .map((e) => ({
     value: e,
-    label: e === 'LISTO_PARA_ENVIAR' ? 'Listo para enviar (devolver al asesor)' : ESTADOS[e].texto,
+    label: e === 'BORRADOR' ? 'Pendiente (devolver al asesor)' : ESTADOS[e].texto,
   }))
 )
 const requiereComentario = computed(

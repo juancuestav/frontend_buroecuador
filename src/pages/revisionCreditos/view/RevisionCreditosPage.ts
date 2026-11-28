@@ -7,6 +7,7 @@ import {
   ref,
   watch,
 } from 'vue'
+import { useQuasar } from 'quasar'
 import { endpoints } from 'config/api'
 import { useAuthenticationStore } from 'stores/authentication'
 
@@ -18,6 +19,7 @@ import RelacionLaboral from './components/RelacionLaboral.vue'
 import DialogoRevisionDetenida from './components/DialogoRevisionDetenida.vue'
 import GenerarReporte from './components/GenerarReporte.vue'
 import DashboardRevisiones from './components/DashboardRevisiones.vue'
+import PestanasConteo, { OpcionPestana } from 'components/filtros/PestanasConteo.vue'
 
 // Logica y controladores
 import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
@@ -29,7 +31,7 @@ import { RevisionCreditoController } from '../infraestructure/RevisionCreditoCon
 import { RevisionCreditoHistorial } from '../domain/RevisionCreditoHistorial'
 import { RevisionCredito } from '../domain/RevisionCredito'
 import { obtenerMensajeError } from '../domain/formato'
-import { EstadoResultado } from '../domain/ResumenRevisiones'
+import { COLORES_RESULTADO, EstadoResultado } from '../domain/ResumenRevisiones'
 
 export default defineComponent({
   components: {
@@ -40,6 +42,7 @@ export default defineComponent({
     DialogoRevisionDetenida,
     GenerarReporte,
     DashboardRevisiones,
+    PestanasConteo,
     // ApexCharts (pesado) solo se descarga cuando la revisión llega a Equifax
     DatosCrediticios: defineAsyncComponent(
       () => import('./components/DatosCrediticios.vue')
@@ -222,7 +225,33 @@ export default defineComponent({
     /*************
      * Historial
      *************/
-    onListado(() => (historialDesactualizado = false))
+    // El listado trae la cantidad de cada pestaña (con los demás filtros aplicados)
+    const conteos = ref<Record<string, number>>({})
+    onListado((respuesta) => {
+      historialDesactualizado = false
+      if (respuesta?.conteos) conteos.value = respuesta.conteos
+    })
+
+    /** Pestañas sobre la tabla: una por resultado, con su color del dashboard */
+    const $q = useQuasar()
+    const grupo = ref('todos')
+    const pestanas = computed<OpcionPestana[]>(() => {
+      const colores = COLORES_RESULTADO[$q.dark.isActive ? 'oscuro' : 'claro']
+      return [
+        { valor: 'todos', etiqueta: 'Todos', color: colores.equifax, icono: 'bi-list-ul' },
+        { valor: 'califica', etiqueta: 'Califica', color: colores.califica, icono: 'bi-check-circle' },
+        { valor: 'no_califica', etiqueta: 'No califica', color: colores.no_califica, icono: 'bi-x-circle' },
+        { valor: 'detenida', etiqueta: 'Detenida', color: colores.detenida, icono: 'bi-pause-circle' },
+        { valor: 'pendiente_equifax', etiqueta: 'Pendiente Equifax', color: colores.pendiente_equifax, icono: 'bi-cloud-slash' },
+      ].map((p) => ({ ...p, total: conteos.value[p.valor] ?? null }))
+    })
+
+    function cambiarGrupo(valor: string) {
+      grupo.value = valor
+      filtrar(async () => {
+        await listar({ ...filtros.fields, paginate: 1 })
+      })
+    }
 
     // El resumen se carga al montarse (primera apertura de su pestaña)
     const dashboard = ref<InstanceType<typeof DashboardRevisiones> | null>(null)
@@ -267,6 +296,7 @@ export default defineComponent({
       }
       filtros.fields = {
         ...filtros.fields,
+        grupo: grupo.value === 'todos' ? undefined : grupo.value,
         resultado: filtroResultado.value ?? undefined,
         usuario_id: filtroAsesor.value ?? undefined,
         pertenece_a_id: filtroPerteneceA.value ?? undefined,
@@ -290,6 +320,7 @@ export default defineComponent({
       resultado: EstadoResultado | null
       desde: string | null
     }) {
+      grupo.value = 'todos'
       filtroAsesor.value = null
       filtroPerteneceA.value = null
       filtroResultado.value = filtro.resultado
@@ -330,6 +361,9 @@ export default defineComponent({
       filtroDesde,
       filtroHasta,
       opcionesResultado,
+      grupo,
+      pestanas,
+      cambiarGrupo,
       filtrar,
       filtrarFecha,
       dashboard,

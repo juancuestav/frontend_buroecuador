@@ -20,6 +20,11 @@
       />
     </template>
 
+    <!-- Historial: pestañas por resultado sobre la tabla -->
+    <template #antes-listado>
+      <pestanas-conteo class="q-mb-md" :model-value="grupo" :opciones="pestanas" @update:model-value="cambiarGrupo" />
+    </template>
+
     <!-- Historial: filtros propios del listado (etiqueta sobre el campo,
     columnas de igual ancho para que el espacio entre ellos sea uniforme) -->
     <template #filtros-listado="{ recargar }">

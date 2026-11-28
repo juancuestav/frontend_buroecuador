@@ -22,7 +22,7 @@
       <dialogo-parametros v-model="dialogoParametros" />
     </template>
 
-    <!-- Historial: botón de nueva solicitud sobre la tabla -->
+    <!-- Historial: pestañas por grupo de estado y botón de nueva solicitud sobre la tabla -->
     <template #antes-listado>
       <div class="row justify-end q-mb-md">
         <q-btn
@@ -34,6 +34,7 @@
           @click="nuevaSolicitud"
         />
       </div>
+      <pestanas-conteo class="q-mb-md" :model-value="grupo" :opciones="pestanas" @update:model-value="cambiarGrupo" />
     </template>
 
     <template #filtros-listado="{ recargar }">
@@ -160,11 +161,9 @@
 
 $colores-estado: (
   BORRADOR: #78909c,
-  LISTO_PARA_ENVIAR: #8e24aa,
   ENVIADO: #1e88e5,
   INGRESADO: #00897b,
   EN_REVISION: #ef6c00,
-  EN_APELACION: #f4511e,
   APROBADO: #2e7d32,
   NEGADO: #d32f2f,
   NO_PROCEDE: #6d4c41,

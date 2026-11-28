@@ -153,6 +153,20 @@
             <div v-if="errorPlazo" class="text-negative text-caption q-mt-xs">Elija el plazo</div>
           </div>
           <div class="col-12 col-md-4">
+            <label class="q-mb-sm block">Comisión</label>
+            <campo-numero
+              v-model="datos.comision"
+              suffix="%"
+              :rules="[
+                (v) => (v !== null && v !== undefined) || 'Ingrese la comisión',
+                (v) => (v >= 0 && v <= 100) || 'Debe estar entre 0 y 100',
+              ]"
+              :disable="!editable"
+              outlined
+              dense
+            />
+          </div>
+          <div class="col-12 col-md-4">
             <label class="q-mb-sm block">Día de pago</label>
             <selector-dia-pago v-model="datos.dia_pago" :disable="!editable" :error="errorDia" />
             <div v-if="errorDia" class="text-negative text-caption q-mt-xs">Elija el día de pago</div>
@@ -270,9 +284,10 @@ const formatearFechaHora = (fecha: string | null) => formatearFechaBarra(fecha)
 /* Monto, plazo, día de pago y "Pertenece a" */
 const editable = computed(() => props.solicitud?.permisos.editar ?? true)
 const formulario = ref<QForm | null>(null)
-const datos = reactive<{ monto_solicitado: number | null; dia_pago: number | null }>({
+const datos = reactive<{ monto_solicitado: number | null; dia_pago: number | null; comision: number | null }>({
   monto_solicitado: props.solicitud?.monto_solicitado ?? null,
   dia_pago: props.solicitud?.dia_pago ?? null,
+  comision: props.solicitud?.comision ?? null,
 })
 const plazoMaximo = ref(props.solicitud?.parametros.plazo_maximo ?? 60)
 const plazoAnios = ref<number | null>(props.solicitud?.plazo_meses ? Math.round(props.solicitud.plazo_meses / 12) : null)
@@ -390,6 +405,7 @@ async function continuar() {
     monto_solicitado: datos.monto_solicitado,
     plazo_meses: plazoAnios.value * 12,
     dia_pago: datos.dia_pago,
+    comision: datos.comision,
   }
   // Solo quien tiene el permiso envía "Pertenece a"
   if (puedeAsignar) {

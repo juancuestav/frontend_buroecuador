@@ -2,11 +2,9 @@ import { RevisionCredito } from 'pages/revisionCreditos/domain/RevisionCredito'
 
 export type EstadoSolicitud =
   | 'BORRADOR'
-  | 'LISTO_PARA_ENVIAR'
   | 'ENVIADO'
   | 'INGRESADO'
   | 'EN_REVISION'
-  | 'EN_APELACION'
   | 'APROBADO'
   | 'NEGADO'
   | 'NO_PROCEDE'
@@ -54,7 +52,8 @@ export interface DocumentoSolicitud {
 
 export interface Seguimiento {
   id: number
-  tipo: 'comentario' | 'estado' | 'documento'
+  /** edicion: otro asesor (con permiso) modificó un paso sin enviar */
+  tipo: 'comentario' | 'estado' | 'documento' | 'edicion'
   mensaje: string | null
   estado_anterior: EstadoSolicitud | null
   estado_nuevo: EstadoSolicitud | null
@@ -95,6 +94,8 @@ export interface SolicitudCredito {
   pertenece_a_nombre: string | null
   registrado_por: string | null
   registrado_por_id: number | null
+  /** Quien la ve es responsable (no otro asesor con permiso para editarla) */
+  es_propia: boolean
   estado: EstadoSolicitud
   estado_texto: string
   paso: number
@@ -125,6 +126,8 @@ export interface SolicitudCredito {
   plazo_meses: number | null
   /** Día del mes en que se pagan las cuotas (3 a 28) */
   dia_pago: number | null
+  /** Comisión en porcentaje (paso Cliente) */
+  comision: number | null
   actividad_descripcion: string | null
   monto_sugerido: number | null
   monto_solicitado: number | null
@@ -173,6 +176,7 @@ export interface DatosCliente {
   monto_solicitado: number | null
   plazo_meses: number | null
   dia_pago: number | null
+  comision: number | null
   asesor_id?: number | null
   pertenece_a_nombre?: string | null
 }

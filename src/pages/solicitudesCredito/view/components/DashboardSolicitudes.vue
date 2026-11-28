@@ -4,7 +4,7 @@
       <span class="icono-titulo"><q-icon name="bi-graph-up-arrow" size="18px" /></span>
       <div class="col">
         <h2 class="titulo">Resumen de solicitudes</h2>
-        <p class="subtitulo">{{ puedeVerTodas ? 'Todas las solicitudes enviadas' : 'Sus solicitudes' }} (sin borradores)</p>
+        <p class="subtitulo">{{ puedeVerTodas ? 'Todas las solicitudes enviadas' : 'Sus solicitudes' }} (sin pendientes)</p>
       </div>
       <q-btn
         v-if="puedeGestionar"
