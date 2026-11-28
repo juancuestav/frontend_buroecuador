@@ -330,3 +330,14 @@ input[type='time']::-webkit-calendar-picker-indicator {
   border-right: 3px solid $error;
   border-left: 3px solid $error;
 }
+
+// Área de filas de las tablas: enfocable para desplazarla con las flechas
+// (useScrollConTeclado). Sin contorno al enfocarla con clic; con Tab se marca.
+.q-table__middle:focus {
+  outline: none;
+}
+
+.q-table__middle:focus-visible {
+  outline: 2px solid $primary;
+  outline-offset: -2px;
+}

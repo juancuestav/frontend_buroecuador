@@ -1,6 +1,14 @@
 // Dependencias
 import { EstadoPrevisualizarTablaPDF } from '../application/EstadoPrevisualizarTablaPDF'
-import { computed, defineComponent, ref, watchEffect, nextTick, Ref } from 'vue'
+import {
+  computed,
+  defineComponent,
+  ref,
+  watch,
+  watchEffect,
+  nextTick,
+  Ref,
+} from 'vue'
 import { EntidadAuditable } from 'shared/entidad/domain/entidadAuditable'
 import { Instanciable } from 'shared/entidad/domain/instanciable'
 import { CustomActionTable } from '../domain/CustomActionTable'
@@ -17,8 +25,10 @@ import CustomButtons from './CustomButtonsTable.vue'
 import { ParamsType } from 'config/types'
 import EstadosComponent from './EstadosComponent.vue'
 import { VisibleModal } from '../application/VisibleModal'
+import { useAltoTablaVisible } from '../application/useAltoTablaVisible'
+import { useScrollConTeclado } from '../application/useScrollConTeclado'
 import VisorArchivos from './VisorArchivos.vue'
-import { exportFile } from 'quasar'
+import { exportFile, useQuasar } from 'quasar'
 
 export default defineComponent({
   components: {
@@ -300,6 +310,18 @@ export default defineComponent({
     const visibleColumns = ref(getVisibleColumns(props.configuracionColumnas))
     const refTable = ref()
 
+    const $q = useQuasar()
+    // Alto que deja la barra de scroll horizontal dentro de la ventana
+    const { alto: altoVisible, ajustarAlto } = useAltoTablaVisible(refTable)
+    watch(listado, ajustarAlto)
+    // Desplazar las filas con las flechas del teclado
+    useScrollConTeclado(refTable)
+    const estiloAlto = computed(() =>
+      altoVisible.value && props.altoFijo && !inFullscreen.value && !$q.screen.xs
+        ? { height: altoVisible.value + 'px' }
+        : undefined
+    )
+
     // Observers
     const seleccionar = () => {
       emit('selected', selected.value)
@@ -494,6 +516,7 @@ export default defineComponent({
 
     return {
       refTable,
+      estiloAlto,
       refEditarModal,
       refTableFilters,
       resetearFiltros,

@@ -19,6 +19,7 @@ import VisorArchivos from './VisorArchivos.vue'
 // Logica y controladores
 import { VisibleModal } from '../application/VisibleModal'
 import { useAltoTablaVisible } from '../application/useAltoTablaVisible'
+import { useScrollConTeclado } from '../application/useScrollConTeclado'
 import { ContenedorSimpleMixin } from 'shared/contenedor/modules/simple/application/ContenedorSimpleMixin'
 
 export default defineComponent({
@@ -291,6 +292,8 @@ export default defineComponent({
     // Alto que deja la barra de scroll horizontal dentro de la ventana
     const { alto: altoVisible, ajustarAlto } = useAltoTablaVisible(refTable)
     watch(listado, ajustarAlto)
+    // Desplazar las filas con las flechas del teclado
+    useScrollConTeclado(refTable)
     const estiloAlto = computed(() =>
       altoVisible.value && props.altoFijo && !inFullscreen.value && !$q.screen.xs
         ? { height: altoVisible.value + 'px' }

@@ -26,7 +26,7 @@
     square
     :selection="tipoSeleccion"
     v-model:selected="selected"
-    :style="estilos"
+    :style="[estilos, estiloAlto]"
     class="bg-body-table my-sticky-column-table my-sticky-header-column-table no-border"
     :class="{
       'alto-fijo-desktop': !inFullscreen && altoFijo && !$q.screen.xs,
